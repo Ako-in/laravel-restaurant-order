@@ -29,7 +29,7 @@
        {{-- <td>{{ $menu->status ? 'Active' : 'Inactive' }}</td> --}}
        <td>{{ $menu->status === 'active' ? 'Active' : 'Inactive' }}</td>
        <td>{{ $menu->is_new ? '⚪︎' : '-' }}</td>
-       <td>{{ $menu->is_recommended ? '⚪︎' : '-' }}</td>
+       <td>{{ $menu->is_recommended ? '⚪︎' : '' }}</td>
        <td>
             <form action="{{ route('admin.menus.destroy',$menu->id) }}" method="POST">
                 <a href="{{ route('admin.menus.show',$menu->id) }}">Show</a>

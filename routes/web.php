@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Customer\AuthController;
+// use App\Http\Controllers\Customer\MenuController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,10 +19,28 @@ use App\Http\Controllers\Admin\MenuController;
 Route::get('/', function () {
     return view('welcome');
 });
-
+//管理者側
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('menus', MenuController::class);
 });
 
+
+
+//ユーザー側
+
+Route::middleware('auth:customer')->group(function () {
+    Route::get('/customer/menus', function () {
+        return view('customer.menus.index');
+    })->name('customer.menus.index');
+});
+Route::prefix('customer')->name('customer.')->group(function () {
+    //ユーザー側のログイン画面
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+});
+// Route::prefix('customer')->name('customer.')->group(function () {
+//     Route::resource('menus', MenuController::class);
+// });
 
 // Route::resource('admin/menus', MenuController::class);
