@@ -41,13 +41,17 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
+        // dd('store');
+        // dd($request->all());
+        // dd($request->file('image_file')->getClientOriginalName());
 
-        $request->validate([
+
+        $validatedData = $request->validate([
             'category_id' => 'required',
             'name' => 'required',
             'price' => 'required',
             // 'description' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'status' => 'required',
             'stock' => 'required|integer|min:0',
         ], [
@@ -55,7 +59,7 @@ class MenuController extends Controller
             'name.required' => 'Name is required.',
             'price.required' => 'Price is required.',
             'price.numeric' => 'Price must be a number.',
-            'image.required' => 'Image is required.',
+            // 'image.required' => 'Image is required.',
             'image.image' => 'The file must be an image.',
             'image.mimes' => 'Image must be in jpeg, png, jpg, gif, or svg format.',
             'image.max' => 'Image size must not exceed 2MB.',
@@ -64,29 +68,62 @@ class MenuController extends Controller
             'stock.min' => 'Stock must be 0 or more.',
         ]);
 
+        // dd('store2');
+
         // 画像アップロード
         $imagePath = null;
-        if ($request->hasFile('image')) {
-            $image = $request->file('image_file');
-            $imagePath = $image->store('images', 'public'); // publicディスクに保存
+        if ($request->hasFile('image_file')) {
+            $imagePath = $request->file('image_file')->store('images', 'public');
+            // $menu->image_file = $imagePath;
+        
+        // if ($request->hasFile('image')) {
+        //     $image = $request->file('image');
+        //     $imagePath = $image->store('images', 'public'); // publicディスクに保存
         } else {
             return redirect()->back()->withErrors(['image' => 'Image file is required.']);
         }
+        // dd($imagePath);
+
+        // **$menu を作成**
         $menu = new Menu();
-        $menu->name = $request->input('name');
-        $menu->price = $request->input('price');
-        $menu->category_id = $request->input('category_id');
-        $menu->description = $request->input('description');
-        // $menu->image = $request->file('image_file')->store('images');
-        // $menu->status = $request->input('status');
-        $menu->status = $request->input('status') === '1' ? 'active' : 'inactive';
-        $menu->stock = $request->input('stock');
-        $menu->is_new = $request->input('is_new');
-        $menu->is_recommended = $request->input('is_recommended');
-        $menu->save();
+        $menu->name = $validatedData['name'];
+        $menu->category_id = $validatedData['category_id'];
+        $menu->price = $validatedData['price'];
+        $menu->stock = $validatedData['stock'];
+        $menu->status = $validatedData['status'];
+        $menu->image_file = $imagePath; // **ここでエラーが出ていた**
+
+        // dd($imagePath);
+        
+        $menu->save(); // **データベースに保存**
+
+        // Menu::create([
+        //     'image' => $imagePath,
+        //     'category_id' => $request->category_id,
+        //     'name' => $request->name,
+        //     'price' => $request->price,
+        //     'description' => $request->description,
+        //     'image' => $imagePath,
+        //     'status' => $request->status,
+        //     'stock' => $request->stock,
+        //     'is_new' => $request->is_new,
+        //     'is_recommended' => $request->is_recommended,
+        // ]);
+        // $menu = new Menu();
+        // $menu->name = $request->input('name');
+        // $menu->price = $request->input('price');
+        // $menu->category_id = $request->input('category_id');
+        // $menu->description = $request->input('description');
+        // $menu->image = $request->file('image')->store('images','public');
+        // // $menu->status = $request->input('status');
+        // $menu->status = $request->input('status') === '1' ? 'active' : 'inactive';
+        // $menu->stock = $request->input('stock');
+        // $menu->is_new = $request->input('is_new');
+        // $menu->is_recommended = $request->input('is_recommended');
+        // $menu->save();
         // dd($menu);
 
-        return to_route('admin.menus.index');
+        return redirect()->route('admin.menus.index')->with('success','メニューを追加しました。');
     }
 
     /**

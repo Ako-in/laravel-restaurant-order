@@ -20,11 +20,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 //管理者側
+// Route::prefix('admin')->name('admin.')->group(function () {
+//     Route::resource('menus', MenuController::class);
+// });
+// 管理者用
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('menus', MenuController::class);
+    Route::resource('menus', \App\Http\Controllers\Admin\MenuController::class);
 });
-
-
 
 //ユーザー側
 
@@ -32,6 +34,11 @@ Route::middleware('auth:customer')->group(function () {
     Route::get('/customer/menus', function () {
         return view('customer.menus.index');
     })->name('customer.menus.index');
+    // Route::resource('menus', MenuController::class);
+});
+
+Route::prefix('customer')->name('customer.')->middleware('auth:customer')->group(function () {
+    Route::resource('menus', \App\Http\Controllers\Customer\MenuController::class);
 });
 Route::prefix('customer')->name('customer.')->group(function () {
     //ユーザー側のログイン画面
@@ -43,4 +50,3 @@ Route::prefix('customer')->name('customer.')->group(function () {
 //     Route::resource('menus', MenuController::class);
 // });
 
-// Route::resource('admin/menus', MenuController::class);

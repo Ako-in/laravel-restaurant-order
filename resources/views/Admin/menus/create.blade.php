@@ -135,7 +135,7 @@
                   <div class="flex flex-col mt-4">
                       <label for="image" class="text-gray-800">Image</label>
                       <input type="file" name="image_file" id="image_file" class="border border-gray-200 px-4 py-2 mt-2">
-                      @error('image')
+                      @error('image_file')
                           <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                       @enderror
                   </div>
