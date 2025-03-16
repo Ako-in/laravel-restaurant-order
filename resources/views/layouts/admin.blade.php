@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>{{ config('app.name', 'Laravel') }}</title>
+  {{-- <title>{{ config('app.name', 'Laravel') }}</title> --}}
+  <title>レストラン注文アプリ-管理画面</title>
 
   {{-- まだ使用していない --}}
   <link href="{{ asset('css/style.css') }}" rel="stylesheet">
@@ -41,7 +42,7 @@
 
 <body>
   <div class="wrapper">
-    @include('layouts.header')
+    @include('layouts.adminheader')
     {{-- <header>
         <nav class="navbar navbar-light bg-light">
             <div class="container">

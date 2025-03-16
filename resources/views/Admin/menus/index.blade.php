@@ -1,3 +1,7 @@
+@extends('layouts.admin')
+
+@section('content')
+
 <a href="{{ route('admin.menus.create') }}"> Create New MENU</a>
 
 <table>
