@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Menu;
 use App\Models\Category;
+use App\Models\Customer;
 
 class MenuController extends Controller
 {
@@ -17,7 +19,8 @@ class MenuController extends Controller
     public function index()
     {
         $menus = Menu::all();
-        return view('customer.menus.index',compact('menus'));
+        $customer = Auth::user();
+        return view('customer.menus.index',compact('menus','customer'));
     }
 
     /**

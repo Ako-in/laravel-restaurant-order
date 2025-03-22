@@ -5,7 +5,7 @@
 
           <ul class="navbar-nav">
               <li class="nav-item">
-                  <a href="" class="text-decoration-none ">カート</a>
+                  <a href="{{route('customer.carts.index')}}" class="text-decoration-none ">カート</a>
                   <a href="" class="text-decoration-none ">注文履歴</a>
                   <a href="" class="text-decoration-none">決済画面</a>
                   <a href="{{ route('customer.logout') }}" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a>
