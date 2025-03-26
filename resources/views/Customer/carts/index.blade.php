@@ -90,7 +90,7 @@
 
 </div> 
 <div class="d-flex justify-content-end mt-3"> 
-  <form action="{{route('customer.carts.success')}}"method="POST">
+  <form action="{{route('customer.orders.complete')}}"method="POST">
     
   </form>
   {{-- <a href="{{route('carts.edit',$cart->id)}}" class="btn btn-primary">Edit</a>
@@ -99,14 +99,20 @@
   <a href="{{route('customer.menus.index')}}" class="btn border-dark text-dark mr-3">他のメニューを探す</a>
   @if ($total > 0)
 
-    <form action="{{ route('customer.carts.success') }}" method="GET">
+    <form action="{{ route('customer.orders.store') }}" method="POST">
         @csrf
       <button type="submit" class="btn submit-button w-100">注文送信</button>
       {{-- <a href="{{route('customer.carts.success')}}"class="btn btn-primary">注文送信</a> --}}
     </form>  
       @else
-        <a href="{{route('customer.carts.success')}}"class="btn disabled">注文送信</a>
+        <a href="{{route('customer.orders.store')}}"class="btn disabled">注文送信</a>
       @endif
     
 
 </div>
+
+<script>
+  document.querySelector('.submit-button').addEventListener('click', function(event) {
+      console.log('注文ボタンがクリックされました'); // これが表示されるか確認
+  });
+</script>
