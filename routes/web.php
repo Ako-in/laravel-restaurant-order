@@ -48,9 +48,13 @@ Route::prefix('customer')->name('customer.')->middleware('auth:customer')->group
     // Route::delete('carts/{cart}', [CartController::class, 'destroy'])->name('carts.destroy');
     // Route::post('carts/{cart}', [CartController::class, 'update'])->name('carts.update');
     // Route::get('carts/{cart}/edit', [CartController::class, 'edit'])->name('carts.edit');
-    Route::get('carts/success', [CartController::class, 'success'])->name('carts.success');
+    // Route::get('carts/success', [CartController::class, 'success'])->name('carts.success');
 
-
+    Route::post('/orders/store', [CartController::class, 'storeOrder'])->name('orders.store');
+    Route::get('/orders/complete', function () {
+        return view('customer.orders.complete');
+    })->name('orders.complete');
+    Route::get('/orders/history', [CartController::class, 'history'])->name('orders.history');
 });
 Route::prefix('customer')->name('customer.')->group(function () {
     //ユーザー側のログイン画面
