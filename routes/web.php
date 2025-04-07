@@ -54,7 +54,7 @@ Route::prefix('customer')->name('customer.')->middleware('auth:customer')->group
     Route::get('/orders/complete', function () {
         return view('customer.orders.complete');
     })->name('orders.complete');
-    Route::get('/orders/history', [CartController::class, 'history'])->name('orders.history');
+    Route::get('/carts/history', [CartController::class, 'history'])->name('carts.history');
 });
 Route::prefix('customer')->name('customer.')->group(function () {
     //ユーザー側のログイン画面

@@ -8,6 +8,7 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Models\ShoppingCart;
 use App\Models\Menu;
 use App\Models\Customer;
+use App\Models\Order;
 // use Darryldecode\Cart\Facades\CartFacade as Cart;
 
 use Illuminate\Support\Facades\Auth;
@@ -337,6 +338,7 @@ class CartController extends Controller
             DB::commit();
 
             // 注文完了後、カートを削除
+            session(['table_number' => $carts->first()->options->table ?? '未指定']);
             Cart::instance('customer_' . Auth::id())->destroy();
             Log::info('注文データを保存し、カートをクリア');
 
@@ -348,8 +350,40 @@ class CartController extends Controller
                 'error_message' => $e->getMessage(),
                 'error_trace' => $e->getTraceAsString()
             ]);
+
+            Cart::instance('customer_' . Auth::id())->destroy();
+            session(['table_number' => $carts->first()->options->table ?? '未指定']);
             return redirect()->route('customer.carts.index')->withErrors('注文処理に失敗しました。');
         }
+    }
+
+    public function history()
+    {
+        // $orders = Order::where('table_number', session()->get('table_number'))->get();
+        // dd($orders);//確認できない
+        // session(['table_number' => 'A1']); // テーブル番号をセッションに保存　//確認できる
+        $tableNumber = session()->get('table_number'); // 取得方法を変更
+        // dd(session()->all());
+
+        // $tableNumber = session('table_number'); // セッションからテーブル番号を取得
+
+        // dd($tableNumber);
+
+        // if (!$tableNumber) {
+        //     dd('テーブル番号が設定されていません。');//確認できない
+        //     return redirect()->route('customer.carts.index')->withErrors('テーブル番号が設定されていません。');
+        // }
+
+        $orders = Order::where('table_number', $tableNumber)->get();
+        // dd($orders);//からのまま
+        // if($orders->isEmpty()){
+        //     return redirect()->route('customer.carts.index')->withErrors('注文履歴がありません。');
+        // }
+        
+        // $orders = Order::where('table_number', Auth::id())->get();
+        
+
+        return view('customer.carts.history',compact('orders'));
     }
 }
 
