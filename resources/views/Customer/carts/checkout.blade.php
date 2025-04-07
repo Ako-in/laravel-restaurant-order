@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <p>注文履歴</p>
+    <p>決済画面</p>
     @if($orders->count() > 0)
          <table>
             <tr>
@@ -32,8 +32,13 @@
         <p>注文履歴がありません。</p>
     @endif
 
-    <a href="{{ route('customer.menus.index') }}" class="btn btn-primary">メニュー一覧へ</a>
-    <a href="{{route('customer.carts.checkout')}}" class="btn">決済画面へ</a>
+    <form action="{{ route('customer.carts.checkoutStore') }}" method="POST">
+      @csrf
+      <button type="submit" class="btn">決済画面へ</button>
+    </form>
+  
+    {{-- <a href="{{ route('customer.menus.index') }}" class="btn btn-primary">メニュー一覧へ</a> --}}
+    {{-- <a href="{{route('customer.carts.checkoutStore')}}" class="btn">お支払い</a> --}}
     {{-- <a href="" class="btn">決済画面へ</a> --}}
 </div>
 @endsection

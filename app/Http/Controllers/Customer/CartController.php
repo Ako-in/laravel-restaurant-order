@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+use Stripe\Stripe;
+use Stripe\Checkout\Session;
+
 class CartController extends Controller
 {
     /**
@@ -375,15 +378,62 @@ class CartController extends Controller
         // }
 
         $orders = Order::where('table_number', $tableNumber)->get();
-        // dd($orders);//からのまま
+
+        $orders = Order::where('table_number', $tableNumber)
+                   ->where('is_paid', false)
+                   ->get();
         // if($orders->isEmpty()){
         //     return redirect()->route('customer.carts.index')->withErrors('注文履歴がありません。');
         // }
-        
-        // $orders = Order::where('table_number', Auth::id())->get();
-        
 
         return view('customer.carts.history',compact('orders'));
+    }
+
+    public function checkout(){
+        $orders = Order::where('table_number', session()->get('table_number'))->get();
+        return view('customer.carts.checkout',compact('orders'));
+    }
+
+    public function checkoutStore(){
+        //stripe
+
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        // セッションから table_number で注文を取得
+        $orders = Order::where('table_number', session()->get('table_number'))->get();
+
+        $line_items = [];
+        foreach ($orders as $order) {
+            $line_items[] = [
+                'price_data' => [
+                    'currency' => 'jpy',
+                    'product_data' => [
+                        'name' => $order->menu_name,
+                    ],
+                    'unit_amount' => $order->price,
+                ],
+                'quantity' => $order->qty,
+                // 'table_number' => $order->table_number,
+            ];
+        }
+
+        $checkout_session = Session::create([
+            'line_items' => $line_items,
+            'mode' => 'payment',
+            'success_url' => route('customer.carts.checkoutSuccess'),
+            'cancel_url' => route('customer.carts.checkout'),
+        ]);
+
+        return redirect($checkout_session->url);
+    }
+    public function checkoutSuccess(){
+        //決済完了
+        // セッションからテーブル番号を取得
+        $tableNumber = session()->get('table_number');
+
+        // 該当注文を「支払い済み」にする
+        Order::where('table_number', $tableNumber)->update(['is_paid' => true]);
+        return view('customer.carts.checkoutSuccess');
     }
 }
 

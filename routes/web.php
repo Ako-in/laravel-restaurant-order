@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Customer\AuthController;
 use App\Http\Controllers\Customer\CartController;
+use App\Http\Controllers\Customer\CheckoutController;
 // use App\Http\Controllers\Customer\MenuController;
 
 /*
@@ -55,6 +56,12 @@ Route::prefix('customer')->name('customer.')->middleware('auth:customer')->group
         return view('customer.orders.complete');
     })->name('orders.complete');
     Route::get('/carts/history', [CartController::class, 'history'])->name('carts.history');
+    Route::get('carts/checkout', [CartController::class, 'checkout'])->name('carts.checkout');
+    Route::post('carts/checkoutStore', [CartController::class, 'checkoutStore'])->name('carts.checkoutStore');
+    Route::get('carts/checkoutSuccess', [CartController::class, 'checkoutSuccess'])->name('carts.checkoutSuccess');
+    // Route::get('checkouts',[CheckoutController::class, 'index'])->name('checkouts.index');
+    // Route::post('checkouts',[CheckoutController::class, 'store'])->name('checkouts.store');
+    // Route::get('checkouts/success',[CheckoutController::class, 'success'])->name('checkouts.success');
 });
 Route::prefix('customer')->name('customer.')->group(function () {
     //ユーザー側のログイン画面
