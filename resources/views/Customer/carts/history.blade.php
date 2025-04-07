@@ -4,7 +4,7 @@
 <div class="container">
     <p>注文履歴</p>
     @if($orders->count() > 0)
-        <table>
+         <table>
             <tr>
                 <th>注文日時</th>
                 <th>メニュー名</th>
