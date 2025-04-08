@@ -8,10 +8,10 @@
                   <a href="" class="text-decoration-none ">新規注文</a>
                   <a href="" class="text-decoration-none">在庫管理</a>
                   <a href="" class="text-decoration-none">メニュー</a>
-                  {{-- <a href="{{ route('admin.logout') }}" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a>
+                  <a href="{{ route('admin.logout') }}" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a>
                   <form id="logout-form" action="{{ route('admin.logout') }}" method="POST">
                       @csrf
-                  </form> --}}
+                  </form>
               </li>
           </ul>
       </div>

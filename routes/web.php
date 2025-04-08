@@ -6,6 +6,7 @@ use App\Http\Controllers\Customer\AuthController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
 // use App\Http\Controllers\Customer\MenuController;
+use App\Http\Controllers\Admin;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,12 +26,31 @@ Route::get('/', function () {
 // Route::prefix('admin')->name('admin.')->group(function () {
 //     Route::resource('menus', MenuController::class);
 // });
-// 管理者用
+// ====================管理者用=====================
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('menus', \App\Http\Controllers\Admin\MenuController::class);
 });
 
-//ユーザー側
+Route::middleware('guest:admin')->group(function () {
+    // Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('admin/login', [admin\Auth\AuthenticatedSessionController::class, 'create'])
+                ->name('admin.login');
+
+    Route::post('admin/login', [admin\Auth\AuthenticatedSessionController::class, 'store']);
+    
+   
+});
+
+Route::middleware('auth:admin')->group(function () {
+    Route::post('admin/logout', [admin\Auth\AuthenticatedSessionController::class, 'destroy'])
+                ->name('admin.logout');
+});
+
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {
+    Route::get('home', [Admin\HomeController::class, 'index'])->name('home');
+});
+
+//===============ユーザー側================
 
 Route::middleware('auth:customer')->group(function () {
     Route::get('/customer/menus', function () {
