@@ -111,8 +111,8 @@
 
 </div>
 
-<script>
+{{-- <script>
   document.querySelector('.submit-button').addEventListener('click', function(event) {
       console.log('注文ボタンがクリックされました'); // これが表示されるか確認
   });
-</script>
+</script> --}}

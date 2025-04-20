@@ -329,6 +329,7 @@ class CartController extends Controller
                 DB::table('orders')->insert([
                     // 'user_id' => Auth::id(),
                     'table_number' => $cart->options->table ?? '未指定',
+                    'menu_id'=>$cart->id,
                     'menu_name' => $cart->name,
                     'qty' => $cart->qty,
                     'price' => $cart->price,

@@ -29,6 +29,13 @@ Route::get('/', function () {
 // ====================管理者用=====================
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('menus', \App\Http\Controllers\Admin\MenuController::class);
+    
+    Route::get('orders/print/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
+    Route::get('orders/{id}/confirm',[\App\Http\Controllers\Admin\OrderController::class,'showConfirm'])->name('orders.showConfirm');
+    Route::post('/orders/{id}/confirm', [\App\Http\Controllers\Admin\OrderController::class, 'storeConfirmedOrder'])->name('orders.storeConfirmed');
+    // Route::post('orders/updateStatus/{id}',[\App\Http\Controllers\Admin\OrderController::class,'updateStatus'])->name('orders.updateStatus');
+    Route::put('/orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
 });
 
 Route::middleware('guest:admin')->group(function () {
@@ -92,4 +99,10 @@ Route::prefix('customer')->name('customer.')->group(function () {
 // Route::prefix('customer')->name('customer.')->group(function () {
 //     Route::resource('menus', MenuController::class);
 // });
+
+
+//テスト
+Route::get('/test-confirm/{id}', function($id) {
+    return 'ID: ' . $id;
+});
 
