@@ -59,6 +59,9 @@
             @csrf
             <button type="submit" class="btn btn-primary">注文伝票を出力</button>
         </form>
+
+        {{-- 戻るボタン --}}
+        <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">戻る</a>
       
       
     </tr>

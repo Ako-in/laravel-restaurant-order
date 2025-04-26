@@ -34,7 +34,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('orders/{id}/confirm',[\App\Http\Controllers\Admin\OrderController::class,'showConfirm'])->name('orders.showConfirm');
     Route::post('/orders/{id}/confirm', [\App\Http\Controllers\Admin\OrderController::class, 'storeConfirmedOrder'])->name('orders.storeConfirmed');
     // Route::post('orders/updateStatus/{id}',[\App\Http\Controllers\Admin\OrderController::class,'updateStatus'])->name('orders.updateStatus');
-    Route::put('/orders/{id}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    Route::put('/orders/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class);
 });
 

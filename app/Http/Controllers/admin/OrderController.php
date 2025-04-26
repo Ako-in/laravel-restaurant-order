@@ -29,101 +29,6 @@ class OrderController extends Controller
 
     }
 
-    public function store(Request $request)
-    {
-        // dd('test');
-        // $order = Order::create([
-        //     'table_number'=> $request->table_number,
-        // ]);
-
-        // foreach ($request->menus as $menu_id => $qty) {
-        //     if ($qty > 0) {
-        //         $menu = Menu::find($menu_id);//priceで取得できるように定義
-        //         DB::table('order_items')->insert([
-        //             'order_id' => $order->id,
-        //             'menu_id' => $menu_id,
-        //             'qty' => $qty,
-        //             'price'=> $menu->price,
-        //             'created_at' => now(),
-        //             'updated_at' => now(),
-        //         ]);
-                
-        //     }
-        // }
-        // dd($request->menus);
-
-        // return redirect()->route('admin.orders.index')->with('success', '注文を登録しました。');
-    }
-
-    // public function confirm($id){
-    //     // order_itemsテーブルにコピー,詳細を表示
-    //     $originalOrder = Order::with('order_items')->find($id);
-    //     // dd($originalOrder);
-
-    //     if (!$originalOrder || $originalOrder->order_items->isEmpty()) {
-    //         // dd('kara');
-    //         return redirect()->back()->with('warning', '空の注文は登録できません');
-    //     }
-
-    //     DB::beginTransaction();
-
-    //     try {
-    //         // 元の注文を複製（IDなどは除外される）
-    //         $confirmedOrder = $originalOrder->replicate();
-    //         $confirmedOrder->created_at = now(); // 必要に応じて
-    //         $confirmedOrder->save();
-
-    //         // 紐づく注文アイテムも複製
-    //         foreach ($originalOrder->order_items as $item) {
-    //             $newItem = $item->replicate();
-    //             $newItem->order_id = $confirmedOrder->id; // 新しい注文IDに関連付け
-    //             $newItem->save();
-    //         }
-
-    //         DB::commit();
-
-    //         return redirect()->route('admin.orders.print', ['id' => $confirmedOrder->id])
-    //             ->with('success', '注文が複製され、管理画面に登録されました');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         return redirect()->back()->with('error', '注文の複製中にエラーが発生しました: ' . $e->getMessage());
-    //     }
-
-    //     // 一時的に確認用
-    //     // dd($originalOrder, $originalOrder?->order_items);
-
-    //     // // すでに同じ注文が登録されていないかチェック
-    //     // $alreadyConfirmed = Order::where('id', $originalOrder->id)
-    //     // ->whereDate('created_at', now()->toDateString())
-    //     // ->exists();
-    //     // // dd($alreadyConfirmed);
-
-    //     // if ($alreadyConfirmed) {
-    //     //     return redirect()->back()->with('warning', 'この注文はすでに登録済みです');
-    //     // }
-
-    //     // $confirmedOrder = Order::create([
-    //     //     'table_number'=>$originalOrder->table_number,
-    //     //     'created_at'=>$originalOrder->created_at,
-    //     // ]);
-
-    //     // foreach($originalOrder->order_items as $item){
-    //     //     DB::table('order_items')->insert([
-    //     //         'order_id'=>$confirmedOrder->id,
-    //     //         'menu_id'=>$item->menu_id,
-    //     //         'qty'=>$item->qty,
-    //     //         'price'=>$item->price,
-    //     //         'menu_name' => $item->menu_name ??'', 
-    //     //         'created_at'=>$item->created_at,
-    //     //         'updated_at'=>$item->updated_at,
-    //     //     ]);
-            
-    //     // }
-    //     // // dd($confirmedOrder);
-
-    //     // return redirect()->route('admin.orders.print',['id'=>$confirmedOrder->id])->with('success','管理画面に登録');
-    // }
-
     public function showConfirm($id){
         $order = Order::with('order_items')->find($id);
 
@@ -193,7 +98,8 @@ class OrderController extends Controller
         }
     
         // それ以外は元のページに戻る
-        return redirect()->back()->with('success', '注文ステータスを更新しました。');
+        return redirect()->route('admin.orders.index')->with('success','注文ステータスを更新しました。');
+        // return redirect()->back()->with('success', '注文ステータスを更新しました。');
     }
 
     public function print($id)
