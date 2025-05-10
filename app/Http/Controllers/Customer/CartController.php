@@ -9,6 +9,7 @@ use App\Models\ShoppingCart;
 use App\Models\Menu;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\OrderItem;
 // use Darryldecode\Cart\Facades\CartFacade as Cart;
 
 use Illuminate\Support\Facades\Auth;
@@ -309,57 +310,123 @@ class CartController extends Controller
     //     ]);
     // }
 
-
     public function storeOrder(Request $request)
-    {
-        Log::info('注文確定処理開始１！！');
+{
+    Log::info('注文確定処理開始１！！');
 
-        // カートの中身を取得
-        $carts = Cart::instance('customer_' . Auth::id())->content();
+    // カートの中身を取得
+    $carts = Cart::instance('customer_' . Auth::id())->content();
 
-        if ($carts->isEmpty()) {
-            return redirect()->route('customer.carts.index')->withErrors('カートが空です。');
-        }
-
-        DB::beginTransaction();
-        try {
-            foreach ($carts as $cart) {
-                Log::info('カート内容をDBに保存', ['cart' => $cart]);
-
-                DB::table('orders')->insert([
-                    // 'user_id' => Auth::id(),
-                    'table_number' => $cart->options->table ?? '未指定',
-                    'menu_id'=>$cart->id,
-                    'menu_name' => $cart->name,
-                    'qty' => $cart->qty,
-                    'price' => $cart->price,
-                    'subtotal' => $cart->qty * $cart->price,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-            Log::info('注文が正常に作成されました');
-            DB::commit();
-
-            // 注文完了後、カートを削除
-            session(['table_number' => $carts->first()->options->table ?? '未指定']);
-            Cart::instance('customer_' . Auth::id())->destroy();
-            Log::info('注文データを保存し、カートをクリア');
-
-            return redirect()->route('customer.orders.complete')->with('success', '注文が完了しました');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            // Log::error('注文処理中にエラーが発生', ['error' => $e->getMessage()]);
-            Log::error('注文処理中にエラーが発生', [
-                'error_message' => $e->getMessage(),
-                'error_trace' => $e->getTraceAsString()
-            ]);
-
-            Cart::instance('customer_' . Auth::id())->destroy();
-            session(['table_number' => $carts->first()->options->table ?? '未指定']);
-            return redirect()->route('customer.carts.index')->withErrors('注文処理に失敗しました。');
-        }
+    if ($carts->isEmpty()) {
+        return redirect()->route('customer.carts.index')->withErrors('カートが空です。');
     }
+
+    DB::beginTransaction();
+    try {
+        // 注文ヘッダーを作成
+        $order = Order::create([
+            'table_number' => $carts->first()->options->table ?? '未指定',
+            'status' => 'pending', // デフォルトのステータス
+            'user_id' => Auth::id(), // 必要であればユーザーIDを保存
+        ]);
+        Log::info('注文ヘッダーを作成', ['order_id' => $order->id]);
+
+        foreach ($carts as $cart) {
+            Log::info('カート内容をorder_itemsに保存', ['cart' => $cart]);
+
+            // バリデーションエラー
+            if (!$cart->id || !$cart->name || !$cart->qty || $cart->price <= 0) {
+                throw new \Exception('無効な注文データが含まれています');
+            }
+
+            // order_items に商品詳細を保存
+            OrderItem::create([
+                'order_id' => $order->id,
+                'menu_id' => $cart->id,
+                'menu_name' => $cart->name,
+                'qty' => $cart->qty,
+                'price' => $cart->price,
+                'subtotal' => $cart->qty * $cart->price,
+            ]);
+        }
+        Log::info('注文詳細をorder_itemsに保存完了');
+        DB::commit();
+
+        // 注文完了後、カートを削除
+        session(['table_number' => $carts->first()->options->table ?? '未指定']);
+        Cart::instance('customer_' . Auth::id())->destroy();
+        Log::info('注文データを保存し、カートをクリア');
+
+        return redirect()->route('customer.orders.complete')->with('success', '注文が完了しました');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('注文処理中にエラーが発生', [
+            'error_message' => $e->getMessage(),
+            'error_trace' => $e->getTraceAsString()
+        ]);
+
+        Cart::instance('customer_' . Auth::id())->destroy();
+        session(['table_number' => $carts->first()->options->table ?? '未指定']);
+        return redirect()->route('customer.carts.index')->withErrors('注文処理に失敗しました。');
+    }
+}
+
+
+    // public function storeOrder(Request $request)
+    // {
+    //     Log::info('注文確定処理開始１！！');
+
+    //     // カートの中身を取得
+    //     $carts = Cart::instance('customer_' . Auth::id())->content();
+
+    //     if ($carts->isEmpty()) {
+    //         return redirect()->route('customer.carts.index')->withErrors('カートが空です。');
+    //     }
+
+    //     DB::beginTransaction();
+    //     try {
+    //         foreach ($carts as $cart) {
+    //             Log::info('カート内容をDBに保存', ['cart' => $cart]);
+
+    //             //バリデーションエラー
+    //             if (!$cart->id || !$cart->name || !$cart->qty || $cart->price <= 0) {
+    //                 throw new \Exception('無効な注文データが含まれています');
+    //             }
+
+    //             DB::table('orders')->insert([
+    //                 // 'user_id' => Auth::id(),
+    //                 'table_number' => $cart->options->table ?? '未指定',
+    //                 'menu_id'=>$cart->id,
+    //                 'menu_name' => $cart->name,
+    //                 'qty' => $cart->qty,
+    //                 'price' => $cart->price,
+    //                 'subtotal' => $cart->qty * $cart->price,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //             ]);
+    //         }
+    //         Log::info('注文が正常に作成されました');
+    //         DB::commit();
+
+    //         // 注文完了後、カートを削除
+    //         session(['table_number' => $carts->first()->options->table ?? '未指定']);
+    //         Cart::instance('customer_' . Auth::id())->destroy();
+    //         Log::info('注文データを保存し、カートをクリア');
+
+    //         return redirect()->route('customer.orders.complete')->with('success', '注文が完了しました');
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         // Log::error('注文処理中にエラーが発生', ['error' => $e->getMessage()]);
+    //         Log::error('注文処理中にエラーが発生', [
+    //             'error_message' => $e->getMessage(),
+    //             'error_trace' => $e->getTraceAsString()
+    //         ]);
+
+    //         Cart::instance('customer_' . Auth::id())->destroy();
+    //         session(['table_number' => $carts->first()->options->table ?? '未指定']);
+    //         return redirect()->route('customer.carts.index')->withErrors('注文処理に失敗しました。');
+    //     }
+    // }
 
     public function history()
     {

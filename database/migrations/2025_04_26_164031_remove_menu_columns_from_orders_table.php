@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn(['menu_id', 'menu_name', 'price', 'qty', 'subtotal']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('orders', function (Blueprint $table) {
+            $table->unsignedBigInteger('menu_id')->nullable();
+            $table->string('menu_name')->nullable();
+            $table->decimal('price', 8, 2)->nullable();
+            $table->integer('qty')->nullable();
+            $table->decimal('subtotal', 8, 2)->nullable();
+        });
+    }
+};

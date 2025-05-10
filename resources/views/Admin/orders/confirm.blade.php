@@ -20,10 +20,13 @@
     <tr>
         <td>{{ $order->created_at }}</td>
         <td>{{$order->id}}</td>
-        <td>{{$order->menu_id ?? '不明'}}</td>
-        <td>{{ $order->menu_name ?? '不明' }}</td>
-        <td>{{ $order->qty }}</td>
-        <td>{{ number_format($order->subtotal) }}円</td>
+        <td>{{$item->menu_id ?? '不明'}}</td>
+        <td>{{ $item->menu_name ?? '不明' }}</td>
+        <td>{{ $item->qty }}</td>
+        {{-- <td>{{ number_format($order->subtotal) }}円</td> --}}
+        <td>{{ number_format($order->order_items->sum(function($item) {
+            return $item->price * $item->qty;
+        })) }}円</td>
         <td>{{$order->table_number}}</td>
         {{-- <td><a href="{{ route('admin.orders.show', $order->id) }}">詳細</a></td> --}}
         {{-- <td>
