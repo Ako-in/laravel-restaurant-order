@@ -327,7 +327,16 @@ class CartController extends Controller
         $order = Order::create([
             'table_number' => $carts->first()->options->table ?? '未指定',
             'status' => 'pending', // デフォルトのステータス
-            'user_id' => Auth::id(), // 必要であればユーザーIDを保存
+            'is_paid' => false, // デフォルトの支払いステータス
+            'menu_id' => $carts->first()->id, // 最初の商品のIDを保存
+            'menu_name' => $carts->first()->name, // 最初の商品の名前を保存
+            'price' => $carts->first()->price, // 最初の商品の価格を保存
+            'qty' => $carts->first()->qty, // 最初の商品の数量を保存
+            'subtotal' => $carts->first()->qty * $carts->first()->price, // 最初の商品の小計を保存
+
+
+            // 'user_id' => Auth::id(), // 必要であればユーザーIDを保存
+            // 'customer_id' => Auth::id(), // ユーザーIDを保存
         ]);
         Log::info('注文ヘッダーを作成', ['order_id' => $order->id]);
 
@@ -445,20 +454,28 @@ class CartController extends Controller
         //     return redirect()->route('customer.carts.index')->withErrors('テーブル番号が設定されていません。');
         // }
 
-        $orders = Order::where('table_number', $tableNumber)->get();
+        // $orders = Order::where('table_number', $tableNumber)->get();
 
         $orders = Order::where('table_number', $tableNumber)
+                //    ->where('user_id', Auth::id())
+                   ->with('order_items') // order_items を eager load
                    ->where('is_paid', false)
+                   ->orderBy('created_at', 'desc')
                    ->get();
         // if($orders->isEmpty()){
         //     return redirect()->route('customer.carts.index')->withErrors('注文履歴がありません。');
         // }
+        // dd($orders->toArray());
 
-        return view('customer.carts.history',compact('orders'));
+        return view('customer.carts.history',compact('orders','tableNumber'));
     }
 
     public function checkout(){
-        $orders = Order::where('table_number', session()->get('table_number'))->get();
+        $orders = Order::where('table_number', session()->get('table_number'))
+        // ->where('user_id', Auth::id()) // ログインユーザーの注文のみ
+        ->with('order_items') // order_items を eager load
+        ->get();
+        // $orders = Order::where('table_number', session()->get('table_number'))->get();
         return view('customer.carts.checkout',compact('orders'));
     }
 
@@ -468,21 +485,44 @@ class CartController extends Controller
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         // セッションから table_number で注文を取得
-        $orders = Order::where('table_number', session()->get('table_number'))->get();
+        // $orders = Order::where('table_number', session()->get('table_number'))->get();
+        $tableNumber = session()->get('table_number');
+
+        // ログインユーザーの未払いの注文を取得
+        $orders = Order::where('table_number', $tableNumber)
+        // ->where('user_id', Auth::id())
+        ->where('is_paid', false)
+        ->with('order_items') // order_items を eager load
+        ->get();
 
         $line_items = [];
         foreach ($orders as $order) {
-            $line_items[] = [
-                'price_data' => [
-                    'currency' => 'jpy',
-                    'product_data' => [
-                        'name' => $order->menu_name,
+            //qtyが存在し、整数であることを確認
+            if(isset($order->qty) && is_numeric($order->qty) &&(int) $order->qty > 0){
+    
+                $line_items[] = [
+                    'price_data' => [
+                        'currency' => 'jpy',
+                        'product_data' => [
+                            'name' => $order->menu_name,
+                        ],
+                        'unit_amount' => (int)$order->price,//整数に変換
                     ],
-                    'unit_amount' => $order->price,
-                ],
-                'quantity' => $order->qty,
-                // 'table_number' => $order->table_number,
-            ];
+                    'quantity' => (int)$order->qty,
+                    // 'table_number' => $order->table_number,
+                ];
+            }else{
+                // qtyが無効な場合の処理
+                dd('無効なqtyが検出されました');
+                Log::error('無効なqtyが検出されました', ['order_id' => $order->id, 'qty' => $order->qty]);
+                
+            }
+            
+        }
+
+        // line_items が空の場合の処理
+        if (empty($line_items)) {
+            return redirect()->route('customer.carts.index')->withErrors('決済する商品がありません。カートをご確認ください。');
         }
 
         $checkout_session = Session::create([

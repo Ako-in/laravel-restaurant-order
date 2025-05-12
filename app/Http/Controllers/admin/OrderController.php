@@ -33,7 +33,7 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        dd('test@storeOrderController');
+        // dd('test@storeOrderController');
         $order = Order::create([
             'table_number'=> $request->table_number,
             'status' => 'pending',
