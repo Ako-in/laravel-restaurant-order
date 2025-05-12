@@ -17,10 +17,33 @@
               <div class="card-body">
                 <h5 class="card-title">商品名：{{$menu->name}}</h5>
                 <p class="card-text">Price:{{$menu->price}}JPY</p>
-                @if ($menu->stock < 5)
-                {{-- 在庫が５以下の時、残りわずかを表示 --}}
+                @if ($menu->stock > 5)
+                  {{-- 在庫が５以上の時、在庫ありを表示 --}}
+                  <p>在庫あり</p>
+              
+                @elseif ($menu->stock > 0)
+                  {{-- 在庫が3以下の時、残りわずかを表示 --}}
                   <p class="text-success">残りわずか</p>
+                @elseif($menu->stock === 0)
+                  {{-- 在庫が0の時、在庫なしを表示 --}}
+                  <p class="text-danger">在庫なし</p>
+
                 @endif
+
+                {{-- カート内超過による在庫なし表示 --}}
+                @if(isset($cart[$menu->id]) && $menu->stock < $cart[$menu->id]->qty)
+                  <p class="text-danger">在庫なし（カート内超過）</p>
+                @endif
+                {{-- @if($menu->stock < ($cart[$menu->id]->qty ?? 0)){
+                  <button type="submit" class="btn submit-button btn-primary"disabled>                    
+                    カートに追加
+                  </button>
+                }
+                @endif --}}
+
+
+                {{-- 在庫が０の時、在庫なしを表示
+                  <p class="text-danger">在庫なし</p> --}}
                 <p class="">
                   @if($menu->is_new)
                     <div><span class="badge bg-secondary">新商品</span></div>
@@ -33,8 +56,8 @@
                 <form method="POST" action="{{route('customer.carts.store')}}"class="m-3 align-items-end">
                   @csrf
                   <div class="">
-                    @if ($menu->stock > 0 && $menu->stock >= $menu->quantity)
-                    {{-- 在庫が１以上、在庫数以上の注文ができないように指定する --}}
+                    @if ($menu->stock > 0)
+                      {{-- 在庫が１以上、在庫数以上の注文ができないように指定する --}}
                       <div class="mb-3">
                         {{-- <label for="quantity" class="form-label">QTY(pcs):</label> --}}
                           <input type="hidden" name="id" value="{{$menu->id}}">
@@ -42,10 +65,7 @@
                           <input type="hidden" name="price"value="{{$menu->price}}">
                           {{-- <input type="hidden" name="image" value="{{ $menu->image ?? '' }}"> --}}
                           <input type="number" name="qty" value="1" min="1">
-                          {{-- <input type="hidden" name="table" value="{{$customer->table_number}}"> <!-- table を追加 --> --}}
                           <input type="hidden" name="table" value="{{ $customer?->table_number ?? '' }}"> <!-- nullチェック -->
-
-                          
                       </div>
                         {{-- リクエストは一旦保留のためコメントアウト --}}
                         {{-- <p class="">Any request</p>
@@ -53,15 +73,21 @@
                         {{-- <button type="submit" class="btn btn-primary">カートに追加する</button> --}}
                     @else
                         <p class="text-danger">Out of stock</p>
+                        {{-- <button type="submit" class="btn submit-button btn-primary"disabled>
+                          カートに追加
+                        </button> --}}
                     @endif
                   </div>
 
                   <div class="row">
                     <div class="col-7">
-                      <button type="submit" class="btn submit-button w-100" onclick="console.log('送信ボタンがクリックされました')">
+                      <button type="submit" class="btn submit-button btn-primary"
+                        @if($menu->stock <= 0|| (isset($cart[$menu->id]) && $menu->stock <= $cart[$menu->id]->qty))
+                          disabled
+                        @endif
+                      >
                         カートに追加
                       </button>
-            
                     </div>
                   </div>
                 </form>
@@ -73,5 +99,3 @@
     </div>
         
 @endsection
-
-

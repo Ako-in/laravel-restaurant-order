@@ -210,11 +210,27 @@ class OrderController extends Controller
         $validated = $request->validate([
             'status' => ['required', 'in:pending,ongoing,completed,canceled'],
         ]);
+
+        //在庫更新
+        $shouldUpdateStock = false;
+        //ステータスがOngoingになった時に在庫数量を更新する
+        if ($order->status !== 'ongoing') {
+            $shouldUpdateStock = true;
+        }
     
         $order->status = $validated['status'];
         $order->save();
     
-        // return redirect()->back()->with('success', '注文ステータスを更新しました。');
+        if($shouldUpdateStock){
+            // 在庫数量を更新する処理
+            foreach ($order->order_items as $item) {
+                $menu = Menu::find($item->menu_id);
+                if ($menu) {
+                    $menu->stock -= $item->qty; // 在庫を減らす
+                    $menu->save();
+                }
+            }
+        }
         if ($order->status === 'ongoing') {
             // ステータスが ongoing の場合は伝票出力ページへ
             return redirect()->route('admin.orders.print', ['id' => $order->id])
