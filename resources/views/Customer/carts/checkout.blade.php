@@ -2,7 +2,8 @@
 
 @section('content')
 <div class="container">
-    <p>決済画面</p>
+    <strong>テーブル番号：{{$tableNumber}}の決済画面へ進みます。（この後のキャンセルはできません）</strong>
+    <hr>
     @if($orders->count() > 0)
          <table>
             <tr>
@@ -12,7 +13,7 @@
                 {{-- <th>メニューID</th> --}}
                 <th>メニュー名</th>
                 <th>数量</th>
-                <th>合計金額</th>
+                <th>小計</th>
                 {{-- <th>詳細</th> --}}
             </tr>
             @php
@@ -25,22 +26,41 @@
                     <td>{{$order->id}}</td>
                     <td>{{$order->table_number}}</td>
                     <td>{{ $item->menu_name }}</td>
-                    <td>{{ $item->qty }}</td>
-                    <td>{{ number_format($item->subtotal) }}円</td>
-                    {{-- <td><a href="{{ route('customer.orders.show', $order->id) }}">詳細</a></td> --}}
+                    <td>
+                        @if($order->status === 'completed'|| $order->status === 'ingoing')
+                            {{ $item->qty }}
+                        @elseif($order->status === 'canceled')
+                            0
+                        @endif
+                        {{-- {{ $item->qty }}</td> --}}
+                    <td>
+                        @if($order->status === 'completed'|| $order->status === 'ingoing')
+                            {{ number_format($item->subtotal) }}円
+                        @elseif($order->status === 'canceled')
+                            0円
+                        @else
+                            {{ number_format($item->subtotal) }}円
+                        @endif
+                    </td>
                 </tr>
                 @php
-                    $totalAmount += $item->subtotal; // 各アイテムの小計を合計に加算
+                    // ステータスがキャンセル以外のアイテムの小計を合計に加算
+                    if (strtolower($order->status) !== 'canceled') {
+                        $totalAmount += $item->subtotal;
+                    }
+                //ステータスがキャンセルの時は除外する
+                    // $total = $orders->reject(function ($order) {
+                    //     return strtolower($order->status) === 'canceled';
+                    // })->sum(function ($order) {
+                    //     return $order->order_items->sum('subtotal');
+                    // // });
+                    // $totalAmount += $item->subTotal; // 各アイテムの小計を合計に加算
                 @endphp
                 @endforeach
             @endforeach
-            {{-- <p>注文合計：{{$order->total}}円</p> --}}
         </table>
-        {{-- @php
-            $total = $orders->sum('subtotal');
-        @endphp --}}
+
         <hr>
-        {{-- <p>合計金額：{{ number_format($total) }}円</p> --}}
         <tfoot>
             <tr>
                 <td colspan="3" style="text-align: right;"><strong>合計金額</strong></td>
@@ -53,11 +73,7 @@
 
     <form action="{{ route('customer.carts.checkoutStore') }}" method="POST">
       @csrf
-      <button type="submit" class="btn">決済画面へ</button>
+      <button type="submit" class="btn btn-primary" >最終確定</button>
     </form>
-  
-    {{-- <a href="{{ route('customer.menus.index') }}" class="btn btn-primary">メニュー一覧へ</a> --}}
-    {{-- <a href="{{route('customer.carts.checkoutStore')}}" class="btn">お支払い</a> --}}
-    {{-- <a href="" class="btn">決済画面へ</a> --}}
 </div>
 @endsection

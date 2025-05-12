@@ -380,63 +380,6 @@ class CartController extends Controller
     }
 }
 
-
-    // public function storeOrder(Request $request)
-    // {
-    //     Log::info('注文確定処理開始１！！');
-
-    //     // カートの中身を取得
-    //     $carts = Cart::instance('customer_' . Auth::id())->content();
-
-    //     if ($carts->isEmpty()) {
-    //         return redirect()->route('customer.carts.index')->withErrors('カートが空です。');
-    //     }
-
-    //     DB::beginTransaction();
-    //     try {
-    //         foreach ($carts as $cart) {
-    //             Log::info('カート内容をDBに保存', ['cart' => $cart]);
-
-    //             //バリデーションエラー
-    //             if (!$cart->id || !$cart->name || !$cart->qty || $cart->price <= 0) {
-    //                 throw new \Exception('無効な注文データが含まれています');
-    //             }
-
-    //             DB::table('orders')->insert([
-    //                 // 'user_id' => Auth::id(),
-    //                 'table_number' => $cart->options->table ?? '未指定',
-    //                 'menu_id'=>$cart->id,
-    //                 'menu_name' => $cart->name,
-    //                 'qty' => $cart->qty,
-    //                 'price' => $cart->price,
-    //                 'subtotal' => $cart->qty * $cart->price,
-    //                 'created_at' => now(),
-    //                 'updated_at' => now(),
-    //             ]);
-    //         }
-    //         Log::info('注文が正常に作成されました');
-    //         DB::commit();
-
-    //         // 注文完了後、カートを削除
-    //         session(['table_number' => $carts->first()->options->table ?? '未指定']);
-    //         Cart::instance('customer_' . Auth::id())->destroy();
-    //         Log::info('注文データを保存し、カートをクリア');
-
-    //         return redirect()->route('customer.orders.complete')->with('success', '注文が完了しました');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         // Log::error('注文処理中にエラーが発生', ['error' => $e->getMessage()]);
-    //         Log::error('注文処理中にエラーが発生', [
-    //             'error_message' => $e->getMessage(),
-    //             'error_trace' => $e->getTraceAsString()
-    //         ]);
-
-    //         Cart::instance('customer_' . Auth::id())->destroy();
-    //         session(['table_number' => $carts->first()->options->table ?? '未指定']);
-    //         return redirect()->route('customer.carts.index')->withErrors('注文処理に失敗しました。');
-    //     }
-    // }
-
     public function history()
     {
         // $orders = Order::where('table_number', session()->get('table_number'))->get();
@@ -447,8 +390,6 @@ class CartController extends Controller
 
         // $tableNumber = session('table_number'); // セッションからテーブル番号を取得
 
-        // dd($tableNumber);
-
         // if (!$tableNumber) {
         //     dd('テーブル番号が設定されていません。');//確認できない
         //     return redirect()->route('customer.carts.index')->withErrors('テーブル番号が設定されていません。');
@@ -457,7 +398,6 @@ class CartController extends Controller
         // $orders = Order::where('table_number', $tableNumber)->get();
 
         $orders = Order::where('table_number', $tableNumber)
-                //    ->where('user_id', Auth::id())
                    ->with('order_items') // order_items を eager load
                    ->where('is_paid', false)
                    ->orderBy('created_at', 'desc')
@@ -471,12 +411,15 @@ class CartController extends Controller
     }
 
     public function checkout(){
-        $orders = Order::where('table_number', session()->get('table_number'))
-        // ->where('user_id', Auth::id()) // ログインユーザーの注文のみ
+        $tableNumber = session()->get('table_number');
+        $orders = Order::where('table_number', $tableNumber)
         ->with('order_items') // order_items を eager load
+        ->where('is_paid', false)//未払いの注文のみ
+        ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
+        ->orderBy('created_at', 'desc')
         ->get();
-        // $orders = Order::where('table_number', session()->get('table_number'))->get();
-        return view('customer.carts.checkout',compact('orders'));
+
+        return view('customer.carts.checkout',compact('orders','tableNumber'));
     }
 
     public function checkoutStore(){
@@ -492,6 +435,7 @@ class CartController extends Controller
         $orders = Order::where('table_number', $tableNumber)
         // ->where('user_id', Auth::id())
         ->where('is_paid', false)
+        ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
         ->with('order_items') // order_items を eager load
         ->get();
 
@@ -534,6 +478,7 @@ class CartController extends Controller
 
         return redirect($checkout_session->url);
     }
+
     public function checkoutSuccess(){
         //決済完了
         // セッションからテーブル番号を取得

@@ -22,7 +22,16 @@
                         <td>{{$order->id}}</td>
                         <td>{{ $order->created_at }}</td>
                         <td>{{ $item->menu_name }}</td>
-                        <td>{{ $item->qty }}</td>
+                        <td>
+                            {{-- 注文ステータスがComplete、Ongoing、Pendingの時は数量を記載する --}}
+                            @if($order->status === 'completed'|| $order->status === 'ongoing'|| $order->status === 'pending')
+                                {{ $item->qty }}
+                            {{-- 注文ステータスがCanceledの時は数量を0にする --}}
+                            @elseif($order->status === 'canceled')
+                                0
+                            @endif
+                            {{-- {{ $item->qty }}</td> --}}
+                        </td>
                         <td>
                             @if($order->status === 'completed'|| $order->status === 'ingoing')
                                 {{ number_format($item->subtotal) }}円
@@ -31,14 +40,6 @@
                             @else
                                 {{ number_format($item->subtotal) }}円
                             @endif
-
-                            {{-- @if(strtolower($order->status) === 'completed'|| strtolower($order->status) === 'ingoing')
-                                {{ number_format($item->subtotal) }}円
-                            @elseif(strtolower($order->status) === 'canceled')
-                                0円
-                            @else
-                                {{ number_format($item->subtotal) }}円
-                            @endif --}}
                         </td>
                         <td>{{ $order->status }}</td>
                     </tr>
@@ -49,12 +50,16 @@
         </table>
         
         @php
+            // 注文ステータスがPendingの時は決済ボタンを無効にする
             $hasPendingOrder = $orders->contains('status', 'pending');
-            $total = $orders->sum(function ($order) {
+
+            //ステータスがキャンセルの時は除外する
+            $total = $orders->reject(function ($order) {
+                return strtolower($order->status) === 'canceled';
+            })->sum(function ($order) {
                 return $order->order_items->sum('subtotal');
             });
-            
-            // $total = $item->sum('subtotal');
+
         @endphp
         <hr>
 
@@ -77,6 +82,22 @@
         >決済画面へ</a>
     </td>
 
+
+        {{-- <form href="{{route('customer.carts.checkoutStore')}}" method="POST"class="btn btn-primary">
+            @if($orders->count() === 0 || $hasPendingOrder)
+                disabled
+                style="pointer-events: none; opacity: 0.6;"
+            @endif
+            @csrf
+
+            <button type="submit" class="btn">決済画面へ</button>
+        </form> --}}
+
+
+    {{-- <form action="{{ route('customer.carts.checkoutStore') }}" method="POST">
+        @csrf
+        <button type="submit" class="btn">決済画面へ</button>
+      </form> --}}
 
     
     {{-- <a href="{{route('customer.carts.checkout')}}" class="btn">決済画面へ</a> --}}
