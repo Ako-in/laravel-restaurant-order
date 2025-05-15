@@ -15,6 +15,7 @@
         
         {{-- <th>詳細</th> --}}
         <th>ステータス</th>
+        {{-- <th>在庫数（注文確定前）</th> --}}
         <th>出力</th>
     </tr>
     @foreach($orders as $order)
@@ -78,6 +79,16 @@
                  <span style="color: gray;">不明なデータ</span>
             @endif
         </td>
+        {{-- <td>
+            {{$menu->stock}}
+        </td> --}}
+        {{-- <td>
+            @if ($order->order_items->isNotEmpty())
+                {{ $order->order_items->first()->menu->stock }}
+            @else
+                -
+            @endif
+        </td> --}}
         <td>
             @if($order->order_items->isNotEmpty() &&
                 $order->order_items->first()->menu_id &&

@@ -12,6 +12,7 @@ use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
@@ -23,7 +24,7 @@ class OrderController extends Controller
     public function index()
     {
         // 一覧表示
-        $orders = Order::with('order_items')->get();
+        $orders = Order::with('order_items.menu')->get();
         // $orders = Order::all();
         // dd($orders);
         // dd($orders->pluck('menu_id'));
@@ -208,38 +209,94 @@ class OrderController extends Controller
         // 注文ステータスを変更pending->ongoing->completed
         //pending->canceled
         $validated = $request->validate([
-            'status' => ['required', 'in:pending,ongoing,completed,canceled'],
+            //ruleオブジェクトを使って、現在のステータスに基づいて許可されたステータスを取得
+            'status' => ['required', Rule::in($this->allowedStatuses($order->status))],
         ]);
-
+        $originalStatus = $order->status;
+        $newStatus = $validated['status'];
+        $hasInsufficientStock = false; //在庫不足フラグFalse
         //在庫更新
-        $shouldUpdateStock = false;
-        //ステータスがOngoingになった時に在庫数量を更新する
-        if ($order->status !== 'ongoing') {
-            $shouldUpdateStock = true;
-        }
-    
-        $order->status = $validated['status'];
-        $order->save();
-    
-        if($shouldUpdateStock){
-            // 在庫数量を更新する処理
-            foreach ($order->order_items as $item) {
+        if($originalStatus === 'pending' && $newStatus === 'ongoing'){
+            $orderItems = $order->order_items;
+            
+            // 在庫数量を更新する処理Pending->Ongoing
+            foreach ($orderItems as $item) {
                 $menu = Menu::find($item->menu_id);
-                if ($menu) {
-                    $menu->stock -= $item->qty; // 在庫を減らす
-                    $menu->save();
+                if ($menu && $menu->stock < $item->qty) {
+                    // $menu->stock -= $item->qty; // 在庫を減らす
+                    // $menu->save();
+                    $hasInsufficientStock = true;
+                    break;
                 }
             }
-        }
-        if ($order->status === 'ongoing') {
-            // ステータスが ongoing の場合は伝票出力ページへ
+
+            // 在庫不足フラグが立っている場合、処理を中断
+            if($hasInsufficientStock){
+            return redirect()->back()->withErrors('在庫が不足しています。注文を続行できません。');
+            }
+            $order->status = $newStatus;
+            $order->save();        
+            
+            foreach ($order->order_items as $item) {
+            $menu = Menu::find($item->menu_id);
+            if ($menu) {
+                //在庫が注文数より多い時は減算
+                if($menu->stock >= $item->qty){
+                    $menu->stock -= $item->qty; // 在庫を減らす
+                }else{
+                    //在庫が注文数より少ない時はカスタマーに確認
+                    // $hasInsufficientStock = true;
+                    return redirect()->back()->withErrors('在庫が不足しています。注文を続行できません。カスタマーに確認してください');
+                }
+                $menu->stock -= $item->qty; // 在庫を減らす
+                $menu->save();
+                Log::info('在庫数を更新', ['menu_id' => $menu->id, 'ordered_qty' => $item->qty, 'new_stock' => $menu->stock]);
+                } else {
+                    Log::warning('メニューが見つかりません', ['menu_id' => $item->menu_id]);
+                }
+            }
+
+            Log::info('注文 ' . $order->id . ' の在庫数を更新しました。');
             return redirect()->route('admin.orders.print', ['id' => $order->id])
-            ->with('success', '注文ステータスを更新しました。伝票を出力します。');
+                ->with('success', '注文ステータスを更新し、伝票を出力します。');
+            } else {
+                $order->status = $newStatus;
+                $order->save();
+                return redirect()->back()->with('success', '注文ステータスを更新しました。');
+            }
+
+
         }
+        
+
+        // $shouldUpdateStock = false;
+        // //ステータスがOngoingになった時に在庫数量を更新する
+        // if ($order->status !== 'ongoing') {
+        //     $shouldUpdateStock = true;
+        // }
     
-        // それ以外は元のページに戻る
-        return redirect()->back()->with('success', '注文ステータスを更新しました。');
-    }
+        // $order->status = $validated['status'];
+        // $order->save();
+    
+        // if($shouldUpdateStock){
+        //     // 在庫数量を更新する処理
+        //     foreach ($order->order_items as $item) {
+        //         $menu = Menu::find($item->menu_id);
+        //         if ($menu) {
+        //             $menu->stock -= $item->qty; // 在庫を減らす
+        //             $menu->save();
+        //         }
+        //     }
+        // }
+        // if ($order->status === 'ongoing') {
+        //     // ステータスが ongoing の場合は伝票出力ページへ
+        //     return redirect()->route('admin.orders.print', ['id' => $order->id])
+        //     ->with('success', '注文ステータスを更新しました。伝票を出力します。');
+        // }
+    
+        // // それ以外は元のページに戻る
+        // return redirect()->back()->with('success', '注文ステータスを更新しました。');
+    
 
     public function print($id)
     {
@@ -259,5 +316,21 @@ class OrderController extends Controller
         // dd($order_items);//取得できない、空のまま
         $menus = Menu::all();
         return view('admin.orders.print', compact('order','table_number', 'order_items', 'menus'));
+    }
+
+
+    protected function allowedStatuses($currentStatus){
+        switch($currentStatus){
+            case 'pending':
+                return ['ongoing', 'canceled'];
+            case 'ongoing':
+                return ['completed'];
+            case 'completed':
+                return [];
+            case 'canceled':
+                return [];
+            default:
+                return ['pending', 'ongoing', 'completed', 'canceled'];
+        }
     }
 }

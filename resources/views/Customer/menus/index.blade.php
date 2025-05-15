@@ -64,7 +64,7 @@
                           <input type="hidden" name="name"value="{{$menu->name}}">
                           <input type="hidden" name="price"value="{{$menu->price}}">
                           {{-- <input type="hidden" name="image" value="{{ $menu->image ?? '' }}"> --}}
-                          <input type="number" name="qty" value="1" min="1">
+                          <input type="number" name="qty" value="1" min="1"max="{{ $menu->stock }}">
                           <input type="hidden" name="table" value="{{ $customer?->table_number ?? '' }}"> <!-- nullチェック -->
                       </div>
                         {{-- リクエストは一旦保留のためコメントアウト --}}

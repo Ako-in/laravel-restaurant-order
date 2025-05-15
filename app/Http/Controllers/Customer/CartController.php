@@ -15,6 +15,7 @@ use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
@@ -73,6 +74,33 @@ class CartController extends Controller
      */
     public function store(Request $request)
     {
+        //バリデーション追加
+        $menuId = $request->input('id');
+        $menu = Menu::findOrFail($menuId);
+
+        $validator = Validator::make($request->all(), [
+            // 'id' => 'required|integer| exists:menus,id',
+            // 'name' => 'required|string',
+            'qty' => 'required|integer|min:1|max:' . $menu->stock, // 在庫数を最大値としてバリデーション
+            // 'qty' => 'required|integer|min:1|max:'.$menu->stock',
+            // 'price' => 'required|numeric',
+            // 'image' => 'nullable|image|max:2048', // 画像のバリデーション
+            // 'table_number'=>'required|integer',
+        ],[
+            'qty.max' => '選択できる数量は在庫数（' . $menu->stock . '個）までです。',
+            // 'qty.min' => '数量は1個以上を入力してください。',
+            // 'required' => ':attributeは必須項目です。',
+            // 'integer' => ':attributeは整数で入力してください。',
+            // 'numeric' => ':attributeは数値で入力してください。',
+            // 'min' => ':attributeは:min以上で入力してください。',
+            // 'exists' => '指定された:attributeは存在しません。',
+
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         // dd('test');
         Log::info('カートに追加');
 
