@@ -40,10 +40,11 @@
                 <span>不明</span>
             @endif
         </td> --}}
-
-        <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST">
+        <form action="{{ route('admin.orders.updateStatus', ['order' => $order->id]) }}" method="POST">
+        {{-- <form action="{{ route('admin.orders.updateStatus', ['order' => $order->id]) }}" method="POST"> --}}
           @csrf
-          @method('PUT') {{-- もしくは PATCH --}}
+          @method('PUT') 
+          {{-- もしくは PATCH --}}
           
           <div class="mb-3">
               <label for="status" class="form-label">ステータスを変更</label>
@@ -64,7 +65,7 @@
         </form>
 
         {{-- 戻るボタン --}}
-        <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">戻る</a>
+        <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">一覧へ戻る</a>
       
       
     </tr>

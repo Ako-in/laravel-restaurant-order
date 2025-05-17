@@ -44,5 +44,8 @@
             </tfoot> --}}
         </table>
         <strong>合計{{$order_items->count()}}点</strong>
+
+        {{-- 戻るボタン --}}
+        <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">一覧へ戻る</a>
     </div>
 @endsection

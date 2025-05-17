@@ -15,7 +15,7 @@
         
         {{-- <th>詳細</th> --}}
         <th>ステータス</th>
-        {{-- <th>在庫数（注文確定前）</th> --}}
+        <th>在庫数（注文確定前）</th>
         <th>出力</th>
     </tr>
     @foreach($orders as $order)
@@ -82,13 +82,13 @@
         {{-- <td>
             {{$menu->stock}}
         </td> --}}
-        {{-- <td>
+        <td>
             @if ($order->order_items->isNotEmpty())
                 {{ $order->order_items->first()->menu->stock }}
             @else
                 -
             @endif
-        </td> --}}
+        </td>
         <td>
             @if($order->order_items->isNotEmpty() &&
                 $order->order_items->first()->menu_id &&
