@@ -3,6 +3,11 @@
 @section('content')
 
 <h3>注文詳細</h3>
+@if (session('flash_message'))
+    <div class="alert alert-success mt-3">
+      {{ session('flash_message') }}
+    </div>
+@endif
 <table>
     <tr>
         <th>注文日時</th>

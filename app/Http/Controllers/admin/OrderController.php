@@ -309,7 +309,8 @@ class OrderController extends Controller
             // $order->status = $newStatus;
             // $order->save();
             DB::commit(); // トランザクションをコミット
-            return redirect()->back()->with('success', '注文ステータスを更新しました。');
+            return redirect()->back()->with('flash_message', '注文ステータスを更新しました。');
+            // return redirect()->route('admin.orders.updateStatus',$order->id)->with('flash_message', '注文ステータスを更新しました。');
                 // return redirect()->route('admin.orders.index')->with('success', '注文ステータスを更新しました。'); 
             //     return redirect()->route('admin.orders.showConfirm', ['id' => $order->id])->with('success', '注文をキャンセルしました。');
             //     // return redirect()->route('admin.orders.updateStatus', ['id' => $order->id])

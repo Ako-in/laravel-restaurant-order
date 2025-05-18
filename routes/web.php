@@ -76,9 +76,9 @@ Route::prefix('customer')->name('customer.')->middleware('auth:customer')->group
     Route::get('carts', [CartController::class, 'index'])->name('carts.index');
     // Route::get('carts/{cart}', [CartController::class, 'show'])->name('carts.show');
     Route::post('carts/store', [CartController::class, 'store'])->name('carts.store');
-    // Route::delete('carts/{cart}', [CartController::class, 'destroy'])->name('carts.destroy');
-    // Route::post('carts/{cart}', [CartController::class, 'update'])->name('carts.update');
-    // Route::get('carts/{cart}/edit', [CartController::class, 'edit'])->name('carts.edit');
+    Route::delete('carts/{rowId}', [CartController::class, 'destroy'])->name('carts.destroy');
+    Route::put('carts/{rowId}', [CartController::class, 'update'])->name('carts.update');
+    Route::get('carts/{cart}/edit', [CartController::class, 'edit'])->name('carts.edit');
     // Route::get('carts/success', [CartController::class, 'success'])->name('carts.success');
 
     Route::post('/orders/store', [CartController::class, 'storeOrder'])->name('orders.store');

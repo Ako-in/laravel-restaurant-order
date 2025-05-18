@@ -53,7 +53,9 @@ class CartController extends Controller
         $total = $subTotal + $tax; // 合計
         // dd($carts);
 
-        return view('customer.carts.index', compact('carts', 'total','subTotal'));
+        $menu = Menu::all();
+
+        return view('customer.carts.index', compact('carts', 'total','subTotal','menu'));
     }
 
     /**
@@ -210,14 +212,15 @@ class CartController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    // public function update(Request $request, $id)
-    // {
-    //     // カートの中身をデバッグ
-    //     //  dd(Cart::instance(Auth::id())->content());
-    //     //カートの中身を更新
-    //     Cart::instance('customer_'.Auth::id())->update($id, $request->qty);
-    //     return redirect()->route('customer.carts.index')->with('success', 'カートを更新しました');
-    // }
+    public function update(Request $request, $rowId)
+    {
+        // カートの中身をデバッグ
+        //  dd(Cart::instance(Auth::id())->content());
+        //カートの中身を更新
+        Cart::instance('customer_'.Auth::id())->update($rowId, $request->qty);
+        // return redirect()->route('customer.carts.index')->with('flash_message', '数量を更新しました');
+        return to_route('customer.carts.index')->with('flash_message', '数量を更新しました');
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -225,19 +228,19 @@ class CartController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    // public function destroy(Request $request)
-    // {
-    //     //カートを空にする
-    //     $customer_carts = DB::table('shoppingcart')->where('identifier', Auth::id())->get();
-    //     $count = $customer_carts->count();
+    public function destroy(Request $request, $rowId)
+    {
+        //カートを空にする
+        // $customer_carts = DB::table('shoppingcart')->where('identifier', Auth::id())->get();
+        // $count = $customer_carts->count();
 
-    //     // Cart::instance(Auth::id())->store(Auth::id());
-    //     Cart::instance('customer_' . Auth::id())->store(Auth::id());
+        // Cart::instance(Auth::id())->store(Auth::id());
+        Cart::instance('customer_' . Auth::id())->remove($rowId);
 
-    //     DB::table('shoppingcart')->where('instance',Auth::id())->delete();
-    //     Cart::instance(Auth::id())->destroy();
-    //     return redirect()->route('customer.menus.index')->with('success', 'カートから削除しました');
-    // }
+        // DB::table('shoppingcart')->where('instance',Auth::id())->delete();
+        // Cart::instance(Auth::id())->destroy();
+        return redirect()->route('customer.carts.index')->with('flash_message', 'カートから削除しました');
+    }
 
     // public function success(){
     //     //購入完了画面を表示
