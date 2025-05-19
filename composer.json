@@ -9,6 +9,7 @@
         "bumbummen99/shoppingcart": "^4.2",
         "doctrine/dbal": "^4.2",
         "guzzlehttp/guzzle": "^7.2",
+        "kyslik/column-sortable": "^7.0",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",

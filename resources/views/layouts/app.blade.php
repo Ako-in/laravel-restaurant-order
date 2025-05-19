@@ -6,6 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>{{ config('app.name', 'Laravel') }}</title>
 
+  {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM8d7x2z5e5a5e5a5e5a5e5a5e5a5e5a5e5a5" crossorigin="anonymous"> --}}
+    
   {{-- まだ使用していない --}}
   <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 
@@ -35,6 +37,7 @@
             padding-bottom: 50px;
         }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 
 </head>
@@ -71,6 +74,8 @@
     </footer> --}}
     @include('layouts.footer')
   </div>
+  
+  
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

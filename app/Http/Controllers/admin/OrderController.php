@@ -21,14 +21,48 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         // 一覧表示
-        $orders = Order::with('order_items.menu')->get();
-        // $orders = Order::all();
-        // dd($orders);
-        // dd($orders->pluck('menu_id'));
-        return view('admin.orders.index', compact('orders'));
+        // $orders = Order::with('order_items.menu')->get();
+        //日付検索
+        $orderDate = Order::select('created_at')->distinct()->get();
+        $date = $request->input('order_date');
+        // メニュー検索
+        $menu_search = $request->input('menu_search');
+        $menu_search_type = $request->input('menu_search_type','name');
+
+        // dd(route('admin.orders.index', ['order_date' => $date]));
+        // dd($date->order_date);
+        // dd($date);
+        // $query = Order::with('order_items.menu')->get();
+        $query = Order::with('order_items.menu');
+        if(!empty($date)){
+            $query->whereDate('created_at', $date);
+        }
+
+        if(!empty($menu_search)){
+            $query->whereHas('order_items.menu', function($q) use ($menu_search, $menu_search_type){
+                if($menu_search_type === 'name'){
+                    $q->where('name','like','%'.$menu_search.'%');
+                }else{
+                    $q->where('id',$menu_search);
+                }
+            });
+        }
+
+        // $sort_query = $request->query('sort'); // 例: リクエストパラメータ 'sort' でソートカラムを取得
+
+        // $orders = Order::sortable($sort_query)->orderBy('created_at', 'desc')->paginate(15);
+        $orders = $query->orderBy('created_at', 'desc')->paginate(15);
+        // $orders = $query->paginate(15);
+
+        $orderedMenu = OrderItem::with('menu')->get();
+        $menu_search = $request->input('menu_search');
+        
+
+
+        return view('admin.orders.index', compact('orders','orderDate','date','menu_search','menu_search_type','orderedMenu'));
 
     }
 

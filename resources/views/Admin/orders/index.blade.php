@@ -3,6 +3,67 @@
 @section('content')
 <h3>注文一覧</h3>
 
+{{-- <p>注文検索</p> --}}
+{{-- <div class="d-flex justify-content-between align-items-end flex-wrap">
+    <form method="GET" action="{{ route('admin.orders.index') }}" class="admin-search-box mb-3">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="日付から検索" name="date" value="{{ $orderDate }}">
+            <button type="submit" class="btn text-black shadow-sm">検索</button>
+        </div>
+    </form>
+</div> --}}
+
+{{-- <div class="d-flex justify-content-between align-items-end flex-wrap">
+    <form method="GET" action="{{ route('admin.orders.index') }}" class="admin-search-box mb-3">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="日付を選択" name="date" value="{{ $orderDate }}" id="order_date">
+            <button type="submit" class="btn text-black shadow-sm">検索</button>
+        </div>
+    </form>
+</div> --}}
+
+<div class="form-group row mb-3">
+    <form method="GET"action="{{route('admin.orders.index')}}"class="admin-search-box mb-3">
+        <label for="order_date" class="col-md-5 col-form-label text-md-left fw-bold">◆日付から検索する</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="order_date" name="order_date" value="{{$date}}">
+            <button type="submit" class="btn">検索</button>
+        </div>
+    </form>
+    
+</div>
+
+{{-- <div class="form-group row mb-3">
+    <form method="GET"action="{{route('admin.orders.index')}}"class="admin-search-box mb-3">
+        <label for="order_menu" class="col-md-5 col-form-label text-md-left fw-bold">◆注文から検索する</label>
+        <div class="col-md-7">
+            <input type="text" class="form-control" id="order_menu" name="order_menu" value="{{$orderMenu}}">
+            <button type="submit" class="btn">検索</button>
+        </div>
+    </form>
+</div> --}}
+
+<div class="form-group row mb-3">
+    <form action="{{ route('admin.orders.index') }}" method="GET" class="admin-search-box mb-3">
+        <label for="menu_search" class="col-md-5 col-form-label text-md-left fw-bold">◆メニューから検索する</label>
+        <div class="col-md-7">
+            <div class="input-group">
+                <input type="text" class="form-control" id="menu_search" name="menu_search" placeholder="メニュー名またはIDを入力" value="{{ $menu_search }}">
+                <select class="form-select" id="menu_search_type" name="menu_search_type">
+                    <option value=""disabled selected>IDまたは名前を選択</option>
+                    <option value="name" {{ $menu_search_type === 'name' ? 'selected' : '' }}>名前</option>
+                    <option value="id" {{ $menu_search_type === 'id' ? 'selected' : '' }}>ID</option>
+                </select>
+                <button type="submit" class="btn">検索</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+
+
 <table>
     <tr>
         <th>注文日時</th>
@@ -15,7 +76,7 @@
         
         {{-- <th>詳細</th> --}}
         <th>ステータス</th>
-        <th>在庫数（注文確定前）</th>
+        <th>在庫数(Pendingから変更後在庫も更新)</th>
         <th>出力</th>
     </tr>
     @foreach($orders as $order)
@@ -150,4 +211,22 @@
     </tr>
     @endforeach
 </table>
+
+<div class="d-flex justify-content-center">
+    {{ $orders->links() }}
+</div>
+
+<script>
+    // Flatpickrの初期化スクリプト 
+
+    //予約日付選択
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr("#order_date", {
+            dateFormat: "Y-m-d",
+            maxDate: "today",//今日まで
+            minDate: new Date().fp_incr(-365) // 365日前から
+        });
+    });
+</script>
+
 @endsection

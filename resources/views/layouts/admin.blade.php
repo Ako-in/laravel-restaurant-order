@@ -7,6 +7,9 @@
   {{-- <title>{{ config('app.name', 'Laravel') }}</title> --}}
   <title>レストラン注文アプリ-管理画面</title>
 
+  {{-- Flatpickr CSS --}}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
   {{-- まだ使用していない --}}
   <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 
@@ -72,6 +75,7 @@
     </footer> --}}
     @include('layouts.footer')
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -30,14 +30,14 @@ Route::get('/', function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('menus', \App\Http\Controllers\Admin\MenuController::class);
     
-    // Route::get('orders/index', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/print/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
     Route::get('orders/{id}/confirm',[\App\Http\Controllers\Admin\OrderController::class,'showConfirm'])->name('orders.showConfirm');
     Route::post('/orders/{id}/confirm', [\App\Http\Controllers\Admin\OrderController::class, 'storeConfirmedOrder'])->name('orders.storeConfirmed');
     // Route::post('orders/updateStatus/{id}',[\App\Http\Controllers\Admin\OrderController::class,'updateStatus'])->name('orders.updateStatus');
     Route::put('/orders/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only([
-        'index', 'show', 'edit', 'update', 'destroy' 
+        'show', 'edit', 'update', 'destroy' 
     ]);;
 });
 
