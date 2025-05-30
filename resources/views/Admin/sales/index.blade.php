@@ -7,6 +7,8 @@
 <div class="container">
   <a href="{{route('admin.sales.salesItem')}}">売上アイテム</a>
   <a href="{{route('admin.sales.salesAmount')}}">売上金額</a>
+  <p>本日の売り上げ：{{$todaySalesFormatted}}円</p>
+  <p>今月の売上累計：{{$monthlySalesFormatted}}円</p>
   
 </div>
 

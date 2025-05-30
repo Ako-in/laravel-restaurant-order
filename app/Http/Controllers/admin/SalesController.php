@@ -65,7 +65,19 @@ class SalesController extends Controller
 
         krsort($salesData); // 日付で降順ソート
 
-        return view('admin.sales.index', compact('salesData'));
+        $todaySales = Order::where('status','completed')
+            ->whereDate('created_at', Carbon::today())
+            ->sum('subtotal');
+        $monthlySales = Order::where('status','completed')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->sum('subtotal');
+
+        // 金額を正数で表示するため、小数点以下を切り捨ててフォーマット
+        // number_format(数値, 小数点以下の桁数)
+        $todaySalesFormatted = number_format($todaySales, 0);
+        $monthlySalesFormatted = number_format($monthlySales, 0);
+
+        return view('admin.sales.index', compact('salesData', 'todaySalesFormatted', 'monthlySalesFormatted'));
     }
 
     function salesAmount(Request $request){
