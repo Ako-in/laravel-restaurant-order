@@ -39,6 +39,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only([
         'show', 'edit', 'update', 'destroy' 
     ]);;
+    // Route::resource('sales', \App\Http\Controllers\Admin\SalesController::class);
+    Route::get('sales', [\App\Http\Controllers\Admin\SalesController::class, 'index'])->name('sales.index');
+    //売上合計を表示
+    Route::get('sales/salesAmount', [\App\Http\Controllers\Admin\SalesController::class, 'salesAmount'])->name('sales.salesAmount');
+    //売上の並び替え
+    // Route::get('sales/amountSort', [\App\Http\Controllers\Admin\SalesController::class, 'amountSort'])->name('sales.amountSort');
+    //アイテム別の売上を表示
+    Route::get('sales/salesItem', [\App\Http\Controllers\Admin\SalesController::class, 'salesItem'])->name('sales.salesItem');
+    //アイテムの並び替え
+    // Route::get('sales/itemSort', [\App\Http\Controllers\Admin\SalesController::class, 'itemSort'])->name('sales.itemSort');
+    
 });
 
 Route::middleware('guest:admin')->group(function () {

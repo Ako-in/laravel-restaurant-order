@@ -213,7 +213,8 @@
 </table>
 
 <div class="d-flex justify-content-center">
-    {{ $orders->links() }}
+    {{-- {{ $orders->links() }} --}}
+    {{ $orders->appends(request()->query())->links() }}
 </div>
 
 <script>
