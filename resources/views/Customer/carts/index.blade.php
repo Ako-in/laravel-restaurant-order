@@ -17,7 +17,8 @@
             <th>商品名</th>
             <th>数量</th>
             <th>価格</th>
-            <th>小計</th>
+            <th>小計（税抜）</th>
+            <th>小計（税込）</th>
         </tr>
         {{-- @foreach($carts as $cart)
         <tr>
@@ -51,6 +52,7 @@
               </td>
               <td>{{ number_format($cart->price) }}円</td>
               <td>{{ number_format($cart->qty * $cart->price) }}円</td>
+              <td>{{ number_format(round($cart->qty * $cart->price * (1 + config('cart.tax') / 100))) }}円</td>
               {{-- <td>
                   <form action="{{ route('customer.carts.destroy', $cart->rowId) }}" method="POST">
                       @csrf
@@ -107,10 +109,10 @@
   </form>
   {{-- <a href="{{route('carts.edit',$cart->id)}}" class="btn btn-primary">Edit</a>
   <a href="{{route('carts.destroy',$cart->id)}}" class="btn btn-danger">Delete</a> --}}
-  {{-- <p class="">合計:{{$total}}JPY(税込)</p> --}}
+  <p class="">合計:{{$totalIncludeTax}}円(税込)</p>
   <div class="d-flex justify-content-end mt-3">
     <a href="{{route('customer.menus.index')}}" class="btn btn-success">他のメニューを探す</a>
-    @if ($total > 0)
+    @if ($totalIncludeTax > 0)
 
       <form action="{{ route('customer.orders.store') }}" method="POST">
           @csrf

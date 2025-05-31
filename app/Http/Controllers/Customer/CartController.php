@@ -50,12 +50,12 @@ class CartController extends Controller
         $taxRate = (float) config('cart.tax'); // 税率を float に変換
         $tax = ($subTotal * $taxRate) / 100; // 税額
         // $tax = ($subTotal * config('cart.tax')) / 100; // 税額
-        $total = $subTotal + $tax; // 合計
+        $totalIncludeTax = $subTotal + $tax; // 合計
         // dd($carts);
 
         $menu = Menu::all();
 
-        return view('customer.carts.index', compact('carts', 'total','subTotal','menu'));
+        return view('customer.carts.index', compact('carts', 'totalIncludeTax','subTotal','menu'));
     }
 
     /**
@@ -411,35 +411,45 @@ class CartController extends Controller
     }
 }
 
-    public function history()
-    {
-        // $orders = Order::where('table_number', session()->get('table_number'))->get();
-        // dd($orders);//確認できない
-        // session(['table_number' => 'A1']); // テーブル番号をセッションに保存　//確認できる
-        $tableNumber = session()->get('table_number'); // 取得方法を変更
-        // dd(session()->all());
+    // public function history()
+    // {
+    //     $tableNumber = session()->get('table_number'); // セッションからテーブル番号を取得
 
-        // $tableNumber = session('table_number'); // セッションからテーブル番号を取得
+    //     // if (!$tableNumber) {
+    //     //     dd('テーブル番号が設定されていません。');//確認できない
+    //     //     return redirect()->route('customer.carts.index')->withErrors('テーブル番号が設定されていません。');
+    //     // }
 
-        // if (!$tableNumber) {
-        //     dd('テーブル番号が設定されていません。');//確認できない
-        //     return redirect()->route('customer.carts.index')->withErrors('テーブル番号が設定されていません。');
-        // }
+    //     $orders = Order::where('table_number', $tableNumber)
+    //                ->with('order_items') // order_items を eager load
+    //                ->where('is_paid', false)
+    //                ->orderBy('created_at', 'desc')
+    //                ->get();
+    //     // if($orders->isEmpty()){
+    //     //     return redirect()->route('customer.carts.index')->withErrors('注文履歴がありません。');
+    //     // }
+    //     // dd($orders->toArray());
+    //     // 合計金額（税込）の計算
+    //     $totalIncludeTax = 0;//合計金額の初期化
+    //     $taxRate = (float) config('cart.tax') / 100; // Laravelの設定から税率を取得(10%)
 
-        // $orders = Order::where('table_number', $tableNumber)->get();
+    //     foreach ($orders as $order) {
+    //         foreach ($order->order_items as $item) {
+    //             // 個々のアイテムの単価（税抜）に税率を適用し、四捨五入して税込単価を計算
+    //             // Stripeに送る unit_amount と同じ計算ロジックを適用
+    //             $unitAmountTaxInclusive = (int) round($item->price * (1 + $taxRate));
+    //             // dd($unitAmountTaxInclude);
+    //             // その税込単価に数量を掛け、合計に加算
+    //             $totalIncludeTax += ($unitAmountTaxInclusive * $item->qty);
+    //             // dd($totalIncludeTax);//1行しか取れてない
 
-        $orders = Order::where('table_number', $tableNumber)
-                   ->with('order_items') // order_items を eager load
-                   ->where('is_paid', false)
-                   ->orderBy('created_at', 'desc')
-                   ->get();
-        // if($orders->isEmpty()){
-        //     return redirect()->route('customer.carts.index')->withErrors('注文履歴がありません。');
-        // }
-        // dd($orders->toArray());
+    //         }
+    //         // $totalIncludeTax += ($unitAmountTaxInclude * $item->qty);
 
-        return view('customer.carts.history',compact('orders','tableNumber'));
-    }
+    //     }
+
+    //     return view('customer.carts.history',compact('orders','tableNumber','totalIncludeTax'));
+    // }
 
     public function checkout(){
         $tableNumber = session()->get('table_number');
@@ -450,7 +460,38 @@ class CartController extends Controller
         ->orderBy('created_at', 'desc')
         ->get();
 
-        return view('customer.carts.checkout',compact('orders','tableNumber'));
+        // 合計金額（税込）の計算
+        $totalIncludeTax = 0;
+
+        $taxRate = (float) config('cart.tax') / 100; // Laravelの設定から税率を取得(10%)
+
+        foreach ($orders as $order) {
+            foreach ($order->order_items as $item) {
+
+                // 個々のアイテムの単価（税抜）に税率を適用し、四捨五入して税込単価を計算
+                // Stripeに送る unit_amount と同じ計算ロジックを適用
+                $unitAmountTaxInclusive = (int) round($item->price * (1 + $taxRate));
+                
+                // その税込単価に数量を掛け、合計に加算
+                $totalIncludeTax += ($unitAmountTaxInclusive * $item->qty);
+                // 各注文の小計を加算
+                // $subTotalMount += $item->qty * $item->price;
+            }
+            // $subTotalMount += $order->subtotal; // 小計を加算
+        }
+
+        $hasPendingOrder = Order::where('table_number', $tableNumber)
+            ->where('is_paid', false)
+            ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
+            ->exists();
+
+        // $totalIncludeTax  = (int) round($subTotalMount * (1 + $taxRate)); // 税込合計金額を計算
+        // $totalIncludeTax = (int) $totalIncludeTax; // 整数に変換
+
+        // number_format() は表示のためだけに使用します。
+        // $totalIncludeTax = ($totalIncludeTax, 0);
+
+        return view('customer.carts.checkout',compact('orders','tableNumber','totalIncludeTax','hasPendingOrder'));
     }
 
     public function checkoutStore(){
@@ -470,30 +511,63 @@ class CartController extends Controller
         ->with('order_items') // order_items を eager load
         ->get();
 
+        $taxRate = (float) config('cart.tax') / 100; // Laravelの設定から税率を取得(10%)
+        // $unitAmount = (int) round($item->price * (1 + $taxRate)); // 税抜き単価に税率を乗じて、税込単価を計算
+
         $line_items = [];
+
+
         foreach ($orders as $order) {
-            //qtyが存在し、整数であることを確認
-            if(isset($order->qty) && is_numeric($order->qty) &&(int) $order->qty > 0){
-    
-                $line_items[] = [
-                    'price_data' => [
-                        'currency' => 'jpy',
-                        'product_data' => [
-                            'name' => $order->menu_name,
+            // 各注文のorder_itemsから商品情報を取得し、Stripeのline_itemsに追加
+            // ここで $order->order_items をループすることで、各アイテム ($item) が定義
+            foreach ($order->order_items as $item) {
+                //qtyが存在し、整数であることを確認
+                if (isset($item->qty) && is_numeric($item->qty) && (int) $item->qty > 0) {
+                    // 税抜き単価に税率を適用して税込単価を計算
+                    // この計算は $item が定義されたこのループの中で行う必要があります
+                    $unitAmount = (int) round($item->price * (1 + $taxRate));
+
+                    $line_items[] = [
+                        'price_data' => [
+                            'currency' => 'jpy',
+                            'product_data' => [
+                                'name' => $item->menu_name, // order_item のメニュー名を使用
+                            ],
+                            'unit_amount' => $unitAmount, // 税込単価
                         ],
-                        'unit_amount' => (int)$order->price,//整数に変換
-                    ],
-                    'quantity' => (int)$order->qty,
-                    // 'table_number' => $order->table_number,
-                ];
-            }else{
-                // qtyが無効な場合の処理
-                dd('無効なqtyが検出されました');
-                Log::error('無効なqtyが検出されました', ['order_id' => $order->id, 'qty' => $order->qty]);
-                
+                        'quantity' => (int) $item->qty, // order_item の数量を使用
+                    ];
+                } else {
+                    Log::error('無効なqtyが検出されました', ['order_item_id' => $item->id, 'qty' => $item->qty]);
+                    // 無効なqtyが検出された場合、エラーを返すか、スキップするか、適切に処理
+                    return redirect()->route('customer.carts.index')->withErrors('決済する商品に無効な数量が含まれています。');
+                }
             }
-            
         }
+        // foreach ($orders as $order) {
+        //     //qtyが存在し、整数であることを確認
+        //     if(isset($order->qty) && is_numeric($order->qty) &&(int) $order->qty > 0){
+    
+        //         $line_items[] = [
+        //             'price_data' => [
+        //                 'currency' => 'jpy',
+        //                 'product_data' => [
+        //                     'name' => $order->menu_name,
+        //                 ],
+        //                 // 'unit_amount' => (int)$order->price,//整数に変換
+        //                 'unit_amount' => $unitAmount, // この税込単価をStripeに送る
+        //             ],
+        //             'quantity' => (int)$order->qty,
+        //             // 'table_number' => $order->table_number,
+        //         ];
+        //     }else{
+        //         // qtyが無効な場合の処理
+        //         dd('無効なqtyが検出されました');
+        //         Log::error('無効なqtyが検出されました', ['order_id' => $order->id, 'qty' => $order->qty]);
+                
+        //     }
+            
+        // }
 
         // line_items が空の場合の処理
         if (empty($line_items)) {

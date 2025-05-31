@@ -96,7 +96,7 @@ Route::prefix('customer')->name('customer.')->middleware('auth:customer')->group
     Route::get('/orders/complete', function () {
         return view('customer.orders.complete');
     })->name('orders.complete');
-    Route::get('/carts/history', [CartController::class, 'history'])->name('carts.history');
+    // Route::get('/carts/history', [CartController::class, 'history'])->name('carts.history');//checkoutとhistoryは同じ機能なので、checkoutを使う
     Route::get('carts/checkout', [CartController::class, 'checkout'])->name('carts.checkout');
     Route::post('carts/checkoutStore', [CartController::class, 'checkoutStore'])->name('carts.checkoutStore');
     Route::get('carts/checkoutSuccess', [CartController::class, 'checkoutSuccess'])->name('carts.checkoutSuccess');
