@@ -5,18 +5,55 @@
     <div class="container mt-4">
       <div class="row w-100">
         @foreach($menus as $menu)
+          {{-- メニューのステータスが 'inactive' の場合は、このループの残りの処理をスキップ --}}
+          @if($menu->status === 'inactive')
+            @continue
+          @endif
+
+          @if($menu->stock <= 0)
+            {{-- 在庫が０の時、在庫なしを表示 --}}
+            <div class="col-3">
+              <div class="card" style="width: 18rem;">
+                <div class="mb-2">
+                  @if ($menu->image_file !== '')
+                      <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-100 {{ $menu->stock <= 0 ? 'grayscale' : '' }}">
+                  @else
+                      <img src="{{ asset('/images/no_image.jpg') }}" class="w-100 {{ $menu->stock <= 0 ? 'grayscale' : '' }}">
+                  @endif
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">商品名：{{$menu->name}}</h5>
+                  <p class="card-text">Price:{{$menu->price}}円（税抜）</p>
+                  <p class="text-danger">在庫なし</p>
+                  <p class="">
+                    @if($menu->is_new)
+                      <div><span class="badge bg-secondary">新商品</span></div>
+                    @endif
+                    @if($menu->is_recommended)
+                      <div><span class="badge bg-danger">おすすめ</span></div>
+                    @endif
+                  </p>
+                </div>
+              </div>
+            </div>
+            @continue
+          @endif
+
+          {{-- メニューのステータスが'Active'の時 --}}
           <div class="col-3">
             <div class="card" style="width: 18rem;">
               <div class="mb-2">
+
                 @if ($menu->image_file !== '')
                     <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-100">
                 @else
                     <img src="{{ asset('/images/no_image.jpg') }}" class="w-100">
                 @endif
               </div>
+              
               <div class="card-body">
                 <h5 class="card-title">商品名：{{$menu->name}}</h5>
-                <p class="card-text">Price:{{$menu->price}}JPY</p>
+                <p class="card-text">Price:{{$menu->price}}円（税抜）</p>
                 @if ($menu->stock > 5)
                   {{-- 在庫が５以上の時、在庫ありを表示 --}}
                   <p>在庫あり</p>
@@ -27,6 +64,7 @@
                 @elseif($menu->stock === 0)
                   {{-- 在庫が0の時、在庫なしを表示 --}}
                   <p class="text-danger">在庫なし</p>
+
 
                 @endif
 
@@ -57,7 +95,7 @@
                   @csrf
                   <div class="">
                     @if ($menu->stock > 0)
-                      {{-- 在庫が１以上、在庫数以上の注文ができないように指定する --}}
+                      {{-- 在庫が１以上、在庫数以上の注文ができるように指定する --}}
                       <div class="mb-3">
                         {{-- <label for="quantity" class="form-label">QTY(pcs):</label> --}}
                           <input type="hidden" name="id" value="{{$menu->id}}">
@@ -73,9 +111,10 @@
                         {{-- <button type="submit" class="btn btn-primary">カートに追加する</button> --}}
                     @else
                         <p class="text-danger">Out of stock</p>
-                        {{-- <button type="submit" class="btn submit-button btn-primary"disabled>
-                          カートに追加
-                        </button> --}}
+                    @endif
+
+                    @if($menu->status === 'inactive')
+                      
                     @endif
                   </div>
 
@@ -97,5 +136,12 @@
         @endforeach
       </div>
     </div>
+    <style>
+      /* 画像をグレーにするCSS */
+      .grayscale {
+          filter: grayscale(100%);
+          opacity: 0.7; /* 少し透明度も加えることで、在庫がないことをより明確に */
+      }
+      </style>
         
 @endsection

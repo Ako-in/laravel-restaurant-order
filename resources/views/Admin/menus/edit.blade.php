@@ -44,7 +44,7 @@
       @error('category_id')
           <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
       @enderror
-  </div>
+    </div>
     {{-- <div>
       <strong>CategoryName:</strong>
       {{$menu->category_id}}
@@ -55,11 +55,11 @@
     <div class="flex flex-col mt-4">
       <label for="status" class="text-gray-800">Status</label>
       <select name="status" id="status" class="border border-gray-200 px-4 py-2 mt-2"value="{{old('status')}}">
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
+        <option value="active" {{ old('status', $menu->status) == 'active' ? 'selected' : '' }}>Active</option>
+        <option value="inactive" {{ old('status', $menu->status) == 'inactive' ? 'selected' : '' }}>Inactive</option>
       </select>
       @error('status')
-          <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
       @enderror
     </div>
 
@@ -96,9 +96,9 @@
     
     <div class="mb-2">
       @if ($menu->image_file !== '')
-          <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-100">
+          <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-48 h-48 object-cover rounded-lg mx-auto">
       @else
-          <img src="{{ asset('/images/no_image.jpg') }}" class="w-100">
+          <img src="{{ asset('/images/no_image.jpg') }}" class="w-48 h-48 object-cover rounded-lg mx-auto">
       @endif
     </div>
     

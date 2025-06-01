@@ -160,22 +160,22 @@ class MenuController extends Controller
     public function update(Request $request, Menu $menu)
     {
 
-        // $request->validate([
-        //     'name' => 'required|string|max:255',
-        //     'price' => 'required|numeric|min:0',
-        //     'category_id' => 'nullable|exists:categories,id',
-        //     'description' => 'nullable|string',
-        //     'status' => 'required|boolean',
-        //     'stock' => 'required|integer|min:0', // `required` を追加
-        //     // 'is_new' => 'nullable|boolean',
-        //     // 'is_recommended' => 'nullable|boolean',
-        // ]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'description' => 'nullable|string',
+            'status' => 'required|in:active,inactive', // 'status' のバリデーションを追加/確認
+            'stock' => 'required|integer|min:0', // `required` を追加
+            // 'is_new' => 'nullable|boolean',
+            // 'is_recommended' => 'nullable|boolean',
+        ]);
         $menu->name = $request->input('name');
         $menu->price = $request->input('price');
         $menu->category_id = $request->input('category_id');
         $menu->description = $request->input('description');
-        // $menu->status = $request->input('status');
-        $menu->status = $request->input('status') === '1' ? 'active' : 'inactive';
+        $menu->status = $request->input('status');
+        // $menu->status = $request->input('status') === '1' ? 'active' : 'inactive';
 
         $menu->stock = $request->input('stock',0);
         $menu->is_new = $request->input('is_new');

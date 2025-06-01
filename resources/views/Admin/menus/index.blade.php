@@ -15,10 +15,11 @@
        
        <th>Stock</th>
        <th>Status</th>
+       <th>1ヶ月売上個数</th>
        <th>新商品</th>
        <th>おすすめ</th>
        {{-- <th>Category Name</th> --}}
-       <th >Action</th>
+       {{-- <th >Action</th> --}}
    </tr>
    @foreach ($menus as $menu)
    <tr>
@@ -32,15 +33,18 @@
        <td>{{ $menu->stock }}</td>
        {{-- <td>{{ $menu->status ? 'Active' : 'Inactive' }}</td> --}}
        <td>{{ $menu->status === 'active' ? 'Active' : 'Inactive' }}</td>
+       <td>
+            //ここに表示させる//
+       </td>
        <td>{{ $menu->is_new ? '⚪︎' : '-' }}</td>
        <td>{{ $menu->is_recommended ? '⚪︎' : '' }}</td>
        <td>
             <form action="{{ route('admin.menus.destroy',$menu->id) }}" method="POST">
-                <a href="{{ route('admin.menus.show',$menu->id) }}">Show</a>
-                <a href="{{ route('admin.menus.edit',$menu->id) }}">Edit</a>
-                @csrf
+                <a href="{{ route('admin.menus.show',$menu->id) }}" class="btn btn-primary">確認</a>
+                <a href="{{ route('admin.menus.edit',$menu->id) }}"class="btn btn-danger">編集</a>
+                {{-- @csrf
                 @method('DELETE')
-                <button type="submit">Delete</button>
+                <button type="submit">Delete</button> --}}
             </form>
        </td>
    </tr>

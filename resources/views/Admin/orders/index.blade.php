@@ -72,6 +72,7 @@
         <th>メニューID</th>
         <th>メニュー名</th>
         <th>数量</th>
+        <th>小計税抜</th>
         {{-- <th>合計金額</th> --}}
         
         {{-- <th>詳細</th> --}}
@@ -118,6 +119,18 @@
                     {{-- {{ $item->qty }}<br> --}}
                     {{ $item->qty ?? '-' }}<br>
                 {{-- {{ $order->order_items->first()->qty }} --}}
+                @endforeach
+            @else
+                -
+            @endif
+        </td>
+
+        <td>
+            @if($order->order_items->isNotEmpty())
+                @foreach($order->order_items as $item)
+                    {{-- {{ number_format($item->subtotal) }}円<br> --}}
+                    {{ number_format($item->subtotal) }}円<br>
+                {{-- {{ number_format($order->order_items->first()->subtotal) }}円 --}}
                 @endforeach
             @else
                 -
