@@ -7,6 +7,7 @@ use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CheckoutController;
 // use App\Http\Controllers\Customer\MenuController;
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\Admin\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('sales/salesItem', [\App\Http\Controllers\Admin\SalesController::class, 'salesItem'])->name('sales.salesItem');
     //アイテムの並び替え
     // Route::get('sales/itemSort', [\App\Http\Controllers\Admin\SalesController::class, 'itemSort'])->name('sales.itemSort');
+
+    // カテゴリ管理
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+
     
 });
 

@@ -17,8 +17,9 @@ class MenuController extends Controller
     public function index()
     {
         $menus = Menu::all();
+        $categories = Category::all(); // カテゴリも取得
 
-        return view('admin.menus.index', compact('menus'));
+        return view('admin.menus.index', compact('menus','categories'));
     }
 
     /**
