@@ -30,6 +30,11 @@ class MenuController extends Controller
         $startTime = Carbon::createFromTime(11, 0, 0); // 11:00
         $closingTime = Carbon::createFromTime(20, 0, 0); // ラストオーダー20:00
 
+        // ラストオーダー前30分前にラストオーダー時間のアラートを出す
+        if ($now->between($closingTime->subMinutes(30), $closingTime)) {
+            session()->flash('alert', 'ラストオーダー時間の30分前です。ご注意ください。');
+        }
+
         // 注文可能時間内かどうかをチェック
         $isOrderableTime = $now->between($startTime, $closingTime);
         return view('customer.menus.index',compact('menus','customer','isOrderableTime'));
