@@ -18,7 +18,8 @@ class MenuController extends Controller
      */
     public function index()
     {
-        $menus = Menu::all();
+        // $menus = Menu::all();
+        $menus = Menu::paginate(15);
         $customer = Auth::user();
         return view('customer.menus.index',compact('menus','customer'));
     }

@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Category;
+use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // DBファサードをインポート
 
 class MenuController extends Controller
 {
@@ -18,6 +20,18 @@ class MenuController extends Controller
     {
         $menus = Menu::all();
         $categories = Category::all(); // カテゴリも取得
+
+        // 過去30日の売上個数を表示させたい
+        $menus = Menu::with('category') // カテゴリリレーションもEager Load
+                        ->withCount(['orderItems as sales_count' => function ($query) {
+                            $query->whereHas('order', function ($q) { // orderItemsの親であるOrderのcreated_atをフィルタ
+                                $q->where('created_at', '>=', now()->subDays(30));
+                            })
+                            ->select(DB::raw('sum(qty)')); // 数量の合計をselect
+                        }])
+                        ->get();
+
+
 
         return view('admin.menus.index', compact('menus','categories'));
     }

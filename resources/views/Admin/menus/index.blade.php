@@ -2,8 +2,8 @@
 
 @section('content')
 
-<a href="{{ route('admin.menus.create') }}"> 新規メニュー作成</a>
-<a href="{{ route('admin.categories.index')}}">カテゴリー一覧表示</a>
+<a href="{{ route('admin.menus.create') }}"class="btn btn-success"> ＋新規メニュー</a>
+<a href="{{ route('admin.categories.index')}}"class="btn btn-warning">カテゴリー表示</a>
 
 <table class="table table-striped table-hover">
     <thead>
@@ -17,7 +17,7 @@
             
             <th>Stock</th>
             <th>Status</th>
-            <th>1ヶ月売上個数</th>
+            <th>30日間の売上個数</th>
             <th>新商品</th>
             <th>おすすめ</th>
             {{-- <th>Category Name</th> --}}
@@ -38,9 +38,11 @@
             <td>{{ $menu->stock }}</td>
             {{-- <td>{{ $menu->status ? 'Active' : 'Inactive' }}</td> --}}
             <td>{{ $menu->status === 'active' ? 'Active' : 'Inactive' }}</td>
-            <td>
-                    //ここに表示させる//
-            </td>
+
+
+            {{-- {{$menu->orders->where('created_at', '>=', now()->subMonth())->sum('order_items.qty')}} --}}
+            <td>{{ $menu->sales_count ?? 0 }}</td>
+
             <td>{{ $menu->is_new ? '⚪︎' : '-' }}</td>
             <td>{{ $menu->is_recommended ? '⚪︎' : '' }}</td>
             <td>

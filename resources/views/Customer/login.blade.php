@@ -17,6 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>テーブルログイン</title>
 </head>
+
 <body>
     <h2>テーブルログイン</h2>
     <form action="{{ route('customer.login') }}" method="POST">
