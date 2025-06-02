@@ -20,7 +20,7 @@ class MenuController extends Controller
     public function index()
     {
         // $menus = Menu::all();
-        $menus = Menu::paginate(15);
+        $menus = Menu::paginate(5);
         $customer = Auth::user();
 
         // 注文可能時間を設定するための変数

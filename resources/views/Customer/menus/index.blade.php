@@ -175,7 +175,10 @@
 
         
       </div>
-      {{$menus->links()}}
+      <div class="d-flex justify-content-center">
+        {{$menus->links()}}
+      </div>
+
 
     </div>
     <style>
