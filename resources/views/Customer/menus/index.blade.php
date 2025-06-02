@@ -3,6 +3,20 @@
 @section('content')
 <h4>メニュー一覧</h4>
 <p>営業時間 11:00-21:00(ラストオーダー20:00)</p>
+{{-- 営業時間以外の場合にメッセージを表示、写真をグレースケール、カートに追加ボタンを非表示 --}}
+@if (now()->format('H:i') < '11:00' || now()->format('H:i') > '20:00')
+
+  <div class="alert alert-warning" role="alert">
+    ただいまの時間はご注文いただけません。ご注文は11:00から21:00まで受け付けています。
+  </div>
+
+  {{-- カートに追加ボタンを非表示 --}}
+  <style>
+    .submit-button {
+        display: none; /* カートに追加ボタンを非表示 */
+    }
+  </style>
+@endif
     <div class="container mt-4">
       <div class="row w-100">
         @foreach($menus as $menu)
@@ -10,6 +24,37 @@
           @if($menu->status === 'inactive')
             @continue
           @endif
+
+        {{-- 営業時間外の判定 --}}
+          @if($isOrderableTime === false)
+          {{-- 営業時間外の場合、メニューをグレースケールにする --}}
+          <div class="col-md-3 mb-4">
+            <div class="card h-100" style="width: 18rem;">
+              <div class="mb-2">
+                @if ($menu->image_file !== '')
+                    <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-100 grayscale">
+                @else
+                    <img src="{{ asset('/images/no_image.jpg') }}" class="w-100 grayscale">
+                @endif
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">商品名：{{$menu->name}}</h5>
+                <p class="card-text">Price:{{$menu->price}}円（税抜）</p>
+                <p class="text-danger">営業時間外です。</p>
+                <p class="">
+                  @if($menu->is_new)
+                    <div><span class="badge bg-secondary grayscale">新商品</span></div>
+                  @endif
+                  @if($menu->is_recommended)
+                    <div><span class="badge bg-danger grayscale">おすすめ</span></div>
+                  @endif
+                </p>
+              </div>
+            </div>
+          </div>
+          @continue
+        @endif
+
 
           @if($menu->stock <= 0)
             {{-- 在庫が０の時、在庫なしを表示 --}}

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Menu;
 use App\Models\Category;
 use App\Models\Customer;
+use Carbon\Carbon;
 
 class MenuController extends Controller
 {
@@ -21,7 +22,17 @@ class MenuController extends Controller
         // $menus = Menu::all();
         $menus = Menu::paginate(15);
         $customer = Auth::user();
-        return view('customer.menus.index',compact('menus','customer'));
+
+        // 注文可能時間を設定するための変数
+        $now = Carbon::now();
+
+        // 注文可能時間の設定（11:00から20:00まで）
+        $startTime = Carbon::createFromTime(11, 0, 0); // 11:00
+        $closingTime = Carbon::createFromTime(20, 0, 0); // ラストオーダー20:00
+
+        // 注文可能時間内かどうかをチェック
+        $isOrderableTime = $now->between($startTime, $closingTime);
+        return view('customer.menus.index',compact('menus','customer','isOrderableTime'));
     }
 
     /**
