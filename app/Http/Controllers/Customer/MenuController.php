@@ -17,10 +17,11 @@ class MenuController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         // $menus = Menu::all();
         $menus = Menu::paginate(5);
+        $categories = Category::all(); // カテゴリも取得
         $customer = Auth::user();
 
         // 注文可能時間を設定するための変数
@@ -37,7 +38,75 @@ class MenuController extends Controller
 
         // 注文可能時間内かどうかをチェック
         $isOrderableTime = $now->between($startTime, $closingTime);
-        return view('customer.menus.index',compact('menus','customer','isOrderableTime'));
+
+        $query = Menu::query();
+        $totalCount = 0; // 初期値として0を設定
+        // メニュー検索（名前検索）
+        $search = $request->input('search');
+        if($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+            $totalCount = $query->count(); // 検索結果の総数を取得
+        }
+
+        // メニュー検索（キーワード、カテゴリ、価格帯）
+        // $categoryId = $request->input('category');
+        // if ($categoryId) {
+        //     $query->where('category', $categoryId);
+        //     $totalCount = $query->count(); // カテゴリで絞り込んだ後の総数を取得
+        // }
+
+        $priceRange = $request->input('price_range');
+        if ($priceRange) {
+            // 価格帯のフォーマットは "min-max" であると仮定
+            list($minPrice, $maxPrice) = explode('-', $priceRange);
+            $query->whereBetween('price', [(int)$minPrice, (int)$maxPrice]);
+            $totalCount = $query->count(); // 価格帯で絞り込んだ後の総数を取得
+        }
+
+
+
+
+
+        // if($keyword !== null){
+        //     $menus = Menu::where('name',function($query)use($keyword){
+        //         $query->where('categories.name','like',"%{$keyword}%");
+        //     })
+        //     // ->orWhere('address', 'like', "%{$keyword}%")
+        //     ->orWhere('name', 'like', "%{$keyword}%")
+
+        //     ->orderBy('created_at','desc')
+        //     ->paginate(4);
+
+        //     $total = $menus->total();
+        // }
+
+        // $total = 0; // 初期値として0を設定
+        // if($request !== null && $keyword !== null){
+        //     $menus = Menu::where('name', 'like', "%{$keyword}%")
+        //         ->orWhereHas('category', function($query) use ($keyword) {
+        //             $query->where('name', 'like', "%{$keyword}%");
+        //         })
+        //         ->orderBy('created_at', 'desc')
+        //         ->paginate(4);
+
+        //     $total = $menus->total();
+        // } else {
+        //     $menus = Menu::orderBy('created_at', 'desc')->paginate(4);
+        // }
+
+        // メニュー検索（カテゴリ）
+
+
+        // メニュー検索（価格帯）
+
+        // 常に最新のものが上に来るように並べ替え
+        $query->orderBy('created_at', 'desc');
+
+        // 全ての検索条件が適用されたクエリに対してページネーションを適用
+        $menus = $query->paginate(4); // 例: 1ページあたり3件表示
+
+
+        return view('customer.menus.index',compact('menus','customer','categories','isOrderableTime','search','totalCount','priceRange'));
     }
 
     /**
