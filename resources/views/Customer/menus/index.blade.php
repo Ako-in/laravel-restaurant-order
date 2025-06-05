@@ -21,6 +21,12 @@
 
 {{-- 検索ボックス --}}
 <form method="GET" action="{{ route('customer.menus.index') }}" class="mb-3">
+  <div>
+    <button type="submit" name="recommend" value="1" class="btn btn-info">おすすめから探す</button>
+    <button type="submit" name="new_item" value="1" class="btn btn-info">新商品から探す</button>
+    <button type="submit" name="has_stock" value="1" class="btn btn-info">在庫ありから探す</button>
+    
+  </div>
   <div class="mt-2">
     <label for="search" class="form-label">メニュー名で検索</label>
     <input type="text" class="form-control" placeholder="メニュー名で検索" name="search" value="{{ old('search',request('search')) }}">
@@ -59,14 +65,14 @@
     <div class="container mt-4">
       <div>
         @if($search)
-          <p>検索結果: {{ $search }}は{{$totalCount}}件です</p>
-          {{-- <p>{{$search}}の商品一覧{{$totalCount}}件</p> --}}
+          {{-- <p>検索結果: {{ $search }}は{{$totalCount}}件です</p> --}}
+          <p>{{$search}}の商品一覧{{$totalCount}}件</p>
         {{-- @elseif($categoryId)
           <p>カテゴリ: {{ $categoryName }}は{{$totalCount}}件です</p>
           <p>{{$categoryName}}の商品一覧{{$totalCount}}件</p> --}}
         @elseif($priceRange)
-          <p>価格帯: {{ $priceRange }}円は{{$totalCount}}件です</p>
-          {{-- <p>{{$priceRange}}の商品一覧{{$totalCount}}件</p> --}}
+          {{-- <p>価格帯: {{ $priceRange }}円は{{$totalCount}}件です</p> --}}
+          <p>{{$priceRange}}の商品一覧{{$totalCount}}件</p>
         @endif
       </div>
       <div class="row w-100">

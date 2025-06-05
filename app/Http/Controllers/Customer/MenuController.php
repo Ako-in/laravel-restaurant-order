@@ -49,11 +49,12 @@ class MenuController extends Controller
         }
 
         // メニュー検索（キーワード、カテゴリ、価格帯）
-        // $categoryId = $request->input('category');
-        // if ($categoryId) {
-        //     $query->where('category', $categoryId);
-        //     $totalCount = $query->count(); // カテゴリで絞り込んだ後の総数を取得
-        // }
+        $categoryId = $request->input('category');
+        if ($categoryId) {
+            // menusテーブルのcategory_idカラムがある場合
+            $query->where('category_id', $categoryId);
+            $totalCount = $query->count(); // カテゴリで絞り込んだ後の総数を取得
+        }
 
         $priceRange = $request->input('price_range');
         if ($priceRange) {
@@ -61,6 +62,26 @@ class MenuController extends Controller
             list($minPrice, $maxPrice) = explode('-', $priceRange);
             $query->whereBetween('price', [(int)$minPrice, (int)$maxPrice]);
             $totalCount = $query->count(); // 価格帯で絞り込んだ後の総数を取得
+        }
+
+        // 新しい検索ボタンのパラメータ
+        $recommend = $request->has('recommend');
+        $newItem = $request->has('new_item');
+        $hasStock = $request->has('has_stock');
+        
+        // おすすめ商品検索
+        if ($request->has('recommend')) {
+            $query->where('is_recommended', true);
+        }
+
+        // 新商品検索
+        if ($request->has('new_item')) {
+            $query->where('is_new', true);
+        }
+
+        // 在庫ありのみ
+        if ($hasStock) {
+            $query->where('stock', '>', 0); // 在庫数が0より大きいメニューを絞り込む
         }
 
 
@@ -106,7 +127,7 @@ class MenuController extends Controller
         $menus = $query->paginate(4); // 例: 1ページあたり3件表示
 
 
-        return view('customer.menus.index',compact('menus','customer','categories','isOrderableTime','search','totalCount','priceRange'));
+        return view('customer.menus.index',compact('menus','customer','categories','isOrderableTime','search','totalCount','priceRange','categoryId'));
     }
 
     /**
