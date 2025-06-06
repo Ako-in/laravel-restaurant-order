@@ -8,6 +8,7 @@ use App\Http\Controllers\Customer\CheckoutController;
 // use App\Http\Controllers\Customer\MenuController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\CategoryController;
+// use App\Http\Controllers\Admin\IncomingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,10 +52,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
     //アイテムの並び替え
     // Route::get('sales/itemSort', [\App\Http\Controllers\Admin\SalesController::class, 'itemSort'])->name('sales.itemSort');
 
+    //グラフの表示
+    Route::get('sales/chart',[\App\Http\Controllers\Admin\SalesController::class, 'chart'])->name('sales.chart');
+
+    // 売上検索
+    // Route::get('sales/search',[\App\Http\Controllers\Admin\SalesController::class, 'search'])->name('sales.search');
+
     // カテゴリ管理
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 
-    
+    // 発注管理
+    Route::resource('incomings', \App\Http\Controllers\Admin\IncomingController::class);
 });
 
 Route::middleware('guest:admin')->group(function () {

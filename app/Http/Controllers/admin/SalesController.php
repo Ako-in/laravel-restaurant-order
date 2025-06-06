@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Carbon;
+// use Carbon\Carbon;
+
 
 class SalesController extends Controller
 {
@@ -369,4 +371,114 @@ class SalesController extends Controller
     {
         //
     }
+
+    public function chart(Request $request)
+    {
+        $labels = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+        // 現在の年を取得
+        $currentYear = carbon::now()->year;
+
+        // 各月の売上データ、件数を格納する配列を初期化
+        $monthlySalesData = array_fill(0,12,0);
+        $monthlyOrderCounts = array_fill(0, 12, 0);
+
+        $sales = OrderItem::selectRaw('
+            MONTH(orders.created_at) as month,
+            SUM(order_items.price * order_items.qty) as total_amount
+            ')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id') // orders テーブルと結合
+            ->whereYear('orders.created_at', $currentYear)//今年のデータのみ対象
+            ->where('orders.status','completed')//ステータスが官僚の注文のみ対象
+            ->groupBy('month')
+            ->orderBy('month','asc')
+            ->get();
+
+        // 集計したデータをグラフ用の配列にマッピング
+        foreach ($sales as $sale) {
+            // 月は1から12なので、配列のインデックス（0から11）に変換
+            $monthlySalesData[$sale->month - 1] = $sale->total_amount;
+        }
+        $orderAmounts = $monthlySalesData;
+        
+
+        $orderCountsResult = Order::selectRaw('MONTH(created_at) as month, COUNT(id) as count')
+            ->whereYear('created_at', $currentYear)
+            ->where('status', 'completed')
+            ->groupBy('month')
+            ->orderBy('month', 'asc')
+            ->get();
+        foreach ($orderCountsResult as $item) {
+            $monthlyOrderCounts[$item->month - 1] = $item->count;
+        }
+        $orderCounts = $monthlyOrderCounts;
+
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // --- アイテム別の合計売上集計 ---
+        $itemSalesSummaryQuery = OrderItem::query()
+        ->join('orders', 'order_items.order_id', '=', 'orders.id')
+        ->leftJoin('menus', 'order_items.menu_id', '=', 'menus.id')
+        ->select(
+            'menus.name as menu_name',
+            \DB::raw('SUM(order_items.price * order_items.qty) as total_item_amount'), // アイテムごとの合計金額
+            \DB::raw('SUM(order_items.qty) as total_item_qty') // アイテムごとの合計数量
+        )
+        ->where('orders.status', 'completed');
+
+        $query = OrderItem::query()
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->leftJoin('menus', 'order_items.menu_id', '=', 'menus.id') // メニュー名を取得するため結合
+            ->select(
+                'order_items.id',
+                'orders.id as order_id',
+                'menus.name as menu_name', // メニュー名
+                'order_items.price',
+                'order_items.qty',
+                \DB::raw('order_items.price * order_items.qty as subtotal'), // 小計
+                'orders.created_at as order_date', // 注文日
+                'orders.status' // 注文ステータス
+            )
+            ->where('orders.status', 'completed'); // 完了した注文のみを対象とする
+
+        if ($startDate) {
+            $query->whereDate('orders.created_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('orders.created_at', '<=', $endDate);
+        }
+
+        $query->orderBy('orders.created_at', 'desc')
+              ->orderBy('order_items.id', 'asc');
+
+        $perPage = 10; // 1ページあたりの表示件数
+        $salesItems = $query->paginate($perPage); // ★$salesItems にページネーション結果を格納
+
+        // 期間内合計売上金額の計算（フィルタリングされた全件の合計）
+        $fullQueryTotal = OrderItem::query()
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->selectRaw('SUM(order_items.price * order_items.qty) as total_amount')
+            ->where('orders.status', 'completed');
+
+        if ($startDate) {
+            $fullQueryTotal->whereDate('orders.created_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $fullQueryTotal->whereDate('orders.created_at', '<=', $endDate);
+        }
+
+        $itemSalesSummary = $itemSalesSummaryQuery
+        ->groupBy('menus.id', 'menus.name')
+        ->orderBy('total_item_amount', 'desc')
+        ->get();
+
+        $totalSalesAmountAcrossFilter = $fullQueryTotal->first()->total_amount ?? 0;
+
+
+
+        return view('admin.sales.chart',compact('labels','orderAmounts','orderCounts','startDate','endDate','salesItems','totalSalesAmountAcrossFilter','itemSalesSummary'));
+
+    }
+
 }

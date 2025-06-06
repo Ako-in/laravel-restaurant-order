@@ -16,6 +16,9 @@
             {{-- <th>Image</th> --}}
             
             <th>Stock</th>
+            <th>発注状況</th>
+            <th>入荷予定日</th>
+            <th>入荷数量</th>
             <th>Status</th>
             <th>30日間の売上個数</th>
             <th>新商品</th>
@@ -36,9 +39,14 @@
             {{-- <th>{{$menu->image_file}}</th> --}}
             
             <td>{{ $menu->stock }}</td>
+            <td>
+                //済・未<br>
+                <button type="submit" name="incoming_status" value="1" class="btn btn-info">詳細</button>
+            </td>
+            <td>//入荷日</td>
+            <td>//入荷数量</td>
             {{-- <td>{{ $menu->status ? 'Active' : 'Inactive' }}</td> --}}
             <td>{{ $menu->status === 'active' ? 'Active' : 'Inactive' }}</td>
-
 
             {{-- {{$menu->orders->where('created_at', '>=', now()->subMonth())->sum('order_items.qty')}} --}}
             <td>{{ $menu->sales_count ?? 0 }}</td>

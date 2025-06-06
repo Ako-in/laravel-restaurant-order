@@ -212,4 +212,10 @@ class MenuController extends Controller
         $menu->delete();
         return to_route('admin.menus.index')->with('flash_message','menuを削除しました。');
     }
+
+    public function incoming()
+    {
+        
+    }
+
 }
