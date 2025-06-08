@@ -9,6 +9,7 @@
   <a href="{{route('admin.sales.salesAmount')}}">売上金額</a>
   <p>本日の売り上げ：{{$todaySalesFormatted}}円</p>
   <p>今月の売上累計：{{$monthlySalesFormatted}}円</p>
+  <a href="{{route('admin.sales.chart')}}"class="btn btn-primary">売上分析</a>
   
 </div>
 

@@ -32,14 +32,17 @@ class SalesController extends Controller
         }
 
         // 過去30日間の売上データを取得
-        $dailySales = Order::where('status', '!=', 'canceled')
-            ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
-            ->selectRaw('DATE(created_at) as sale_date, sum(subtotal) as total_sales, count(*) as total_orders, avg(subtotal) as averageSales')
+        $dailySales = OrderItem::query()
+            ->join('orders','order_items.order_id','=','orders.id')
+            ->where('orders.status','=','completed')
+            ->whereBetween('orders.created_at', [Carbon::now()->subDays(30), Carbon::now()])
+            // ->selectRaw('DATE(created_at) as sale_date, sum(subtotal) as total_sales, count(*) as total_orders, avg(subtotal) as averageSales')
+            ->selectRaw('DATE(orders.created_at) as sale_date, SUM(order_items.price * order_items.qty) as total_sales, COUNT(DISTINCT orders.id) as total_orders')
             ->groupBy('sale_date')
             ->orderBy('sale_date','desc')
-            ->get()
-            ->keyBy('sale_date')
-            ->toArray();
+            // ->keyBy('sale_date')
+            // ->toArray();
+            ->get();
 
         // 過去30日間のデータが存在しない日付を補完
         $salesData = [];
@@ -95,11 +98,18 @@ class SalesController extends Controller
         }
 
         // 過去30日間の売上データをデータベースから取得
-        $dailySalesQuery = Order::where('status', '!=', 'canceled')
-            ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
-            ->selectRaw('DATE(created_at) as sale_date, sum(subtotal) as total_sales, count(*) as total_orders, avg(subtotal) as averageSales')
-            ->groupBy('sale_date');
+        // $dailySalesQuery = Order::where('status', '!=', 'canceled')
+        //     ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
+        //     ->selectRaw('DATE(created_at) as sale_date, sum(subtotal) as total_sales, count(*) as total_orders, avg(subtotal) as averageSales')
+        //     ->groupBy('sale_date');
         
+        $dailySalesQuery = OrderItem::query()
+        ->join('orders','order_items.order_id','=','orders.id')
+        ->where('orders.status','!=','canceled')
+        ->whereBetween('orders.created_at',[Carbon::now()->subDays(30)->startOfDay(), Carbon::now()->endOfDay()]) // 日付範囲を正確に指定
+        ->selectRaw('DATE(orders.created_at) as sale_date, SUM(order_items.price * order_items.qty) as total_sales, COUNT(DISTINCT orders.id) as total_orders, AVG(order_items.price * order_items.qty) as averageSales')
+        ->groupBy('sale_date');
+
         // sortable() を適用し、ソートされたコレクションとして取得
         $dailySalesRawCollection = $dailySalesQuery->sortable()->get();
 
@@ -374,12 +384,14 @@ class SalesController extends Controller
 
     public function chart(Request $request)
     {
+        // グラフのラベルを設定
         $labels = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 
         // 現在の年を取得
         $currentYear = carbon::now()->year;
 
         // 各月の売上データ、件数を格納する配列を初期化
+        // array_fill関数：(start_index,num,value)0からカウント、配列は12、指定する値は０
         $monthlySalesData = array_fill(0,12,0);
         $monthlyOrderCounts = array_fill(0, 12, 0);
 
@@ -389,7 +401,7 @@ class SalesController extends Controller
             ')
             ->join('orders', 'order_items.order_id', '=', 'orders.id') // orders テーブルと結合
             ->whereYear('orders.created_at', $currentYear)//今年のデータのみ対象
-            ->where('orders.status','completed')//ステータスが官僚の注文のみ対象
+            ->where('orders.status','completed')//ステータスが完了の注文のみ対象
             ->groupBy('month')
             ->orderBy('month','asc')
             ->get();
@@ -422,10 +434,19 @@ class SalesController extends Controller
         ->leftJoin('menus', 'order_items.menu_id', '=', 'menus.id')
         ->select(
             'menus.name as menu_name',
+            'menus.price as menu_price',
             \DB::raw('SUM(order_items.price * order_items.qty) as total_item_amount'), // アイテムごとの合計金額
-            \DB::raw('SUM(order_items.qty) as total_item_qty') // アイテムごとの合計数量
+            \DB::raw('SUM(order_items.qty) as total_item_qty'), // アイテムごとの合計数量
+            \DB::raw('SUM(order_items.price * order_items.qty) / SUM(order_items.qty) as average_unit_price')
         )
         ->where('orders.status', 'completed');
+
+        if($startDate){
+            $itemSalesSummaryQuery->whereDate('orders.created_at','>=',$startDate);
+        }
+        if($endDate){
+            $itemSalesSummaryQuery->whereDate('orders.created_at','<=',$endDate);
+        }
 
         $query = OrderItem::query()
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -453,7 +474,7 @@ class SalesController extends Controller
               ->orderBy('order_items.id', 'asc');
 
         $perPage = 10; // 1ページあたりの表示件数
-        $salesItems = $query->paginate($perPage); // ★$salesItems にページネーション結果を格納
+        $salesItems = $query->paginate($perPage); // $salesItems にページネーション結果を格納
 
         // 期間内合計売上金額の計算（フィルタリングされた全件の合計）
         $fullQueryTotal = OrderItem::query()
@@ -469,13 +490,11 @@ class SalesController extends Controller
         }
 
         $itemSalesSummary = $itemSalesSummaryQuery
-        ->groupBy('menus.id', 'menus.name')
+        ->groupBy('menus.id', 'menus.name','menus.price')
         ->orderBy('total_item_amount', 'desc')
         ->get();
 
         $totalSalesAmountAcrossFilter = $fullQueryTotal->first()->total_amount ?? 0;
-
-
 
         return view('admin.sales.chart',compact('labels','orderAmounts','orderCounts','startDate','endDate','salesItems','totalSalesAmountAcrossFilter','itemSalesSummary'));
 
