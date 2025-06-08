@@ -19,6 +19,13 @@
   </style>
 @endif
 
+{{-- ラストオーダー前30分間、アラートを表示 --}}
+@if(session('alert'))
+    <div class="alert alert-warning">
+        {{ session('alert') }}
+    </div>
+@endif
+
 {{-- 検索ボックス --}}
 <form method="GET" action="{{ route('customer.menus.index') }}" class="mb-3">
   <div>
