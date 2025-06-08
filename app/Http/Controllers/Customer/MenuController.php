@@ -36,6 +36,8 @@ class MenuController extends Controller
 
         if ($now->between($alertTime, $closingTime)) { 
             session()->put('alert', 'ラストオーダーは20:00です。ご注意ください。');
+        }else{
+            session()->forget('alert');
         }
         // if ($now->between($closingTime->subMinutes(30), $closingTime)) {
         //     session()->flash('alert', 'ラストオーダー時間の30分前です。ご注意ください。');

@@ -20,6 +20,7 @@
 @endif
 
 {{-- ラストオーダー前30分間、アラートを表示 --}}
+
 @if(session('alert'))
     <div class="alert alert-warning">
         {{ session('alert') }}
