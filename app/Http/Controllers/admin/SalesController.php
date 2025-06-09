@@ -496,7 +496,24 @@ class SalesController extends Controller
 
         $totalSalesAmountAcrossFilter = $fullQueryTotal->first()->total_amount ?? 0;
 
-        return view('admin.sales.chart',compact('labels','orderAmounts','orderCounts','startDate','endDate','salesItems','totalSalesAmountAcrossFilter','itemSalesSummary'));
+
+        // カテゴリ別円グラフ
+        $itemCategorySummaryQuery = OrderItem::query()
+        ->join('orders','order_items.order_id','=','orders.id')
+        ->join('menus','order_items.menu_id','=','menus.id')
+        ->join('categories','menus.category_id','=','categories.id')
+        ->select(
+            'categories.name as category_name',
+            \DB::raw('SUM(order_items.price * order_items.qty) as total_category_amount') // カテゴリごとの合計金額
+        )
+        ->where('orders.status','completed');
+
+        $itemCategorySummary = $itemCategorySummaryQuery
+        ->groupBy('categories.id', 'categories.name') // カテゴリIDと名前でグループ化
+        ->orderBy('total_category_amount', 'desc')
+        ->get();
+
+        return view('admin.sales.chart',compact('labels','orderAmounts','orderCounts','startDate','endDate','salesItems','totalSalesAmountAcrossFilter','itemSalesSummary','itemCategorySummary'));
 
     }
 
