@@ -20,7 +20,7 @@ class MenuController extends Controller
     public function index(Request $request)
     {
         // $menus = Menu::all();
-        $menus = Menu::paginate(5);
+        // $menus = Menu::paginate(5);
         $categories = Category::all(); // カテゴリも取得
         $customer = Auth::user();
 
@@ -131,7 +131,7 @@ class MenuController extends Controller
         $query->orderBy('created_at', 'desc');
 
         // 全ての検索条件が適用されたクエリに対してページネーションを適用
-        $menus = $query->paginate(4); // 例: 1ページあたり3件表示
+        $menus = $query->paginate(15); // 例: 1ページあたり3件表示
 
 
         return view('customer.menus.index',compact('menus','customer','categories','isOrderableTime','search','totalCount','priceRange','categoryId'));

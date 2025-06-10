@@ -29,46 +29,76 @@
 
 {{-- 検索ボックス --}}
 <form method="GET" action="{{ route('customer.menus.index') }}" class="mb-3">
-  <div>
-    <button type="submit" name="recommend" value="1" class="btn btn-info">おすすめから探す</button>
-    <button type="submit" name="new_item" value="1" class="btn btn-info">新商品から探す</button>
-    <button type="submit" name="has_stock" value="1" class="btn btn-info">在庫ありから探す</button>
-    
-  </div>
-  <div class="mt-2">
-    <label for="search" class="form-label">メニュー名で検索</label>
-    <input type="text" class="form-control" placeholder="メニュー名で検索" name="search" value="{{ old('search',request('search')) }}">
-    {{-- <button type="submit" class="btn btn-primary">検索</button>
-    <a href="{{ route('customer.menus.index') }}" class="btn btn-secondary">リセット</a> --}}
-  </div>
-  {{-- カテゴリ検索 --}}
-  <div class="mt-2">
-    <label for="category" class="form-label">カテゴリで絞り込み</label>
-    <select name="category" id="category" class="form-select">
-      <option value="" disabled selected>カテゴリを選択</option>
-      @foreach($categories as $category)
-        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-          {{ $category->name }}
-        </option>
-      @endforeach
-    </select>
-    {{-- <button type="submit" class="btn btn-primary">絞り込み</button> --}}
-  </div>
+  {{-- <p class="">かんたん検索</p> --}}
+  <div class="row g-2 ">
+    <div class="">
 
-  {{-- 価格帯検索 --}}
-  <div class="mt-2">
-    <label for="price_range" class="form-label">価格帯で絞り込み</label>
-    <select name="price_range" id="price_range" class="form-select">
-      <option value="" disabled selected>価格帯を選択</option>
-      <option value="0-500" {{ request('price_range') == '0-500' ? 'selected' : '' }}>0円 - 500円</option>
-      <option value="501-1000" {{ request('price_range') == '501-1000' ? 'selected' : '' }}>501円 - 1000円</option>
-      <option value="1001-1500" {{ request('price_range') == '1001-1500' ? 'selected' : '' }}>1001円 - 1500円</option>
-      <option value="1501-2000" {{ request('price_range') == '1501-2000' ? 'selected' : '' }}>1501円 - 2000円</option>
-      <option value="2001-3000" {{ request('price_range') == '2001-3000' ? 'selected' : '' }}>2001円 - 3000円</option>
-    </select>
-    {{-- <button type="submit" class="btn btn-primary">絞り込み</button> --}}
-    <button type="submit" class="btn btn-primary">検索</button>
-    <a href="{{ route('customer.menus.index') }}" class="btn btn-secondary">リセット</a>
+      <div class="rounded"style="background-color:rgb(236, 149, 188);">
+        <p class="text-center mb-0 fw-bold">==ワンクリック検索==</p>
+        <div class="d-flex align-items-center justify-content-center flex-wrap mb-2">
+          <button type="submit" name="recommend" value="1" class="btn btn-info me-2">おすすめから探す</button>
+          <button type="submit" name="new_item" value="1" class="btn btn-info me-2">新商品から探す</button>
+          <button type="submit" name="has_stock" value="1" class="btn btn-info me-2">在庫ありから探す</button>
+          
+        </div>
+      </div>
+      
+
+      <div class="col-12 d-flex align-items-end justify-content-start flex-wrap text-center rounded"style="background-color:ivory;">
+        <p class="text-center mb-0 w-100 fw-bold">★★かんたん検索★★</p>
+        <div class="d-flex flex-wrap align-items-end justify-content-center w-100 pb-2">
+
+          <div class="col-12 col-md-auto me-2 mb-2">
+            <label for="search" class="form-label">メニュー名で検索</label>
+            <input type="text" class="form-control" placeholder="メニュー名で検索" name="search" value="{{ old('search',request('search')) }}">
+            {{-- <button type="submit" class="btn btn-primary">検索</button>
+            <a href="{{ route('customer.menus.index') }}" class="btn btn-secondary">リセット</a> --}}
+          </div>
+          {{-- カテゴリ検索 --}}
+          <div class="col-12 col-md-auto me-2 mb-2">
+            <label for="category" class="form-label">カテゴリで絞り込み</label>
+            <select name="category" id="category" class="form-select">
+              <option value="" disabled selected>カテゴリを選択</option>
+              @foreach($categories as $category)
+                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                  {{ $category->name }}
+                </option>
+              @endforeach
+            </select>
+            {{-- <button type="submit" class="btn btn-primary">絞り込み</button> --}}
+          </div>
+        
+          {{-- 価格帯検索 --}}
+          <div class="col-12 col-md-auto me-2 mb-2">
+            <label for="price_range" class="form-label">価格帯で絞り込み</label>
+            <select name="price_range" id="price_range" class="form-select">
+              <option value="" disabled selected>価格帯を選択</option>
+              <option value="0-500" {{ request('price_range') == '0-500' ? 'selected' : '' }}>0円 - 500円</option>
+              <option value="501-1000" {{ request('price_range') == '501-1000' ? 'selected' : '' }}>501円 - 1000円</option>
+              <option value="1001-1500" {{ request('price_range') == '1001-1500' ? 'selected' : '' }}>1001円 - 1500円</option>
+              <option value="1501-2000" {{ request('price_range') == '1501-2000' ? 'selected' : '' }}>1501円 - 2000円</option>
+              <option value="2001-3000" {{ request('price_range') == '2001-3000' ? 'selected' : '' }}>2001円 - 3000円</option>
+            </select>
+      
+      
+          </div>
+        </div>
+        
+        <div class="d-flex align-items-end justify-content-center mb-2 w-100"style="">
+          {{-- <button type="submit" class="btn btn-primary">絞り込み</button> --}}
+          <button type="submit" class="btn btn-primary me-2">検索</button>
+          <a href="{{ route('customer.menus.index') }}" class="btn btn-secondary">リセット</a>
+        </div>
+
+
+
+      </div>
+    </div>
+    
+
+    
+  
+    
 </form>
     <div class="container mt-4">
       <div>
@@ -99,7 +129,7 @@
                 @if ($menu->image_file !== '')
                     <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-100 grayscale">
                 @else
-                    <img src="{{ asset('/images/no_image.jpg') }}" class="w-100 grayscale">
+                    <img src="{{ asset('/images/noimage.jpg') }}" class="w-100 grayscale">
                 @endif
               </div>
               <div class="card-body">
