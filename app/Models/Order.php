@@ -14,13 +14,14 @@ class Order extends Model
     
     protected $fillable = [
         'table_number',
-        'menu_name',
-        'menu_id',
-        'price',
-        'qty',
-        'subtotal',
+        // 'menu_name',
+        // 'menu_id',
+        // 'price',
+        // 'qty',
+        // 'subtotal',
         'status',
         'created_at',
+        'total_amount', // 新規作成したカラム
     ];
 
     // ソート可能なカラムを定義

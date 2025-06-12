@@ -29,10 +29,10 @@ class MenuController extends Controller
 
         // 注文可能時間の設定（11:00から20:00まで）
         $startTime = Carbon::createFromTime(11, 0, 0); // 11:00
-        $closingTime = Carbon::createFromTime(20, 0, 0); // ラストオーダー20:00
+        $closingTime = Carbon::createFromTime(22, 0, 0); // ラストオーダー22:00
 
         // ラストオーダー前30分前にラストオーダー時間のアラートを出す
-        $alertTime = $closingTime->clone()->subMinutes(30);//19:30を取得
+        $alertTime = $closingTime->clone()->subMinutes(30);//21:30を取得
 
         if ($now->between($alertTime, $closingTime)) { 
             session()->put('alert', 'ラストオーダーは20:00です。ご注意ください。');
@@ -75,6 +75,7 @@ class MenuController extends Controller
         $recommend = $request->has('recommend');
         $newItem = $request->has('new_item');
         $hasStock = $request->has('has_stock');
+        $stockLow = $request->has('stock_low');
         
         // おすすめ商品検索
         if ($request->has('recommend')) {

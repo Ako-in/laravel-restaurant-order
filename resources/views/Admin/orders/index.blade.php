@@ -65,7 +65,7 @@
 
 
 <table>
-    <tr>
+    <tr style="border-bottom: 1px solid black;">
         <th>注文日時</th>
         <th>注文ID</th>
         <th>テーブル番号</th>
@@ -77,11 +77,11 @@
         
         {{-- <th>詳細</th> --}}
         <th>ステータス</th>
-        <th>在庫数(Pendingから変更後在庫も更新)</th>
-        <th>出力</th>
+        {{-- <th>在庫数(Pendingから変更後在庫も更新)</th> --}}
+        <th>詳細</th>
     </tr>
     @foreach($orders as $order)
-    <tr>
+    <tr style="border-bottom: 0.5px solid black;">
         <td>{{ $order->created_at }}</td>
         <td>{{$order->id}}</td>
     
@@ -150,30 +150,30 @@
             @elseif($order->status === 'canceled')
                 <span style="color: red;">キャンセル</span>
             @else
-                 <span style="color: gray;">不明なデータ</span>
+                 {{-- <span style="color: gray;">不明なデータ</span> --}}
             @endif
         </td>
         {{-- <td>
             {{$menu->stock}}
         </td> --}}
-        <td>
+        {{-- <td>
             @if ($order->order_items->isNotEmpty())
                 {{ $order->order_items->first()->menu->stock }}
             @else
                 -
             @endif
-        </td>
+        </td> --}}
         <td>
-            @if($order->order_items->isNotEmpty() &&
+            {{-- @if($order->order_items->isNotEmpty() &&
                 $order->order_items->first()->menu_id &&
                 $order->order_items->first()->menu_name &&
-                $order->order_items->first()->qty)
+                $order->order_items->first()->qty) --}}
                 <a href="{{ route('admin.orders.showConfirm', ['id' => $order->id]) }}" class="btn btn-info">
                     注文確認画面
                 </a>
-            @else
+            {{-- @else
                 <span style="color: gray;">不明なデータ</span>
-            @endif
+            @endif --}}
             {{-- <form action="{{ route('admin.orders.print', $order->id) }}" method="GET">
                 @csrf
                 <button type="submit">出力</button>
@@ -207,8 +207,6 @@
             <a href="{{ route('admin.orders.confirm', $order->id) }}" class="btn btn-primary">
                 注文確認
             </a> --}}
-
-            {{-- <a href="{{ url('/test-confirm/' . $order->id) }}">テストリンク</a> --}}
 
             
             {{-- <a href="{{ route('admin.orders.confirmOrder', ['id' => $order->id]) }}" class="btn btn-primary">

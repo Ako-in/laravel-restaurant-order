@@ -19,6 +19,7 @@ class OrderItem extends Model
         'price', 
         'qty',
         'subtotal',
+        'status',
     ];
 
     public $sortable = [
@@ -49,4 +50,10 @@ class OrderItem extends Model
     public function menu(){
         return $this->belongsTo(Menu::class);
     }
+
+    public function order_items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
 }

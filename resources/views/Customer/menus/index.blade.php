@@ -2,13 +2,13 @@
 
 @section('content')
 <h4>メニュー一覧</h4>
-<p>営業時間 11:00-21:00(ラストオーダー20:00)</p>
+<p>営業時間 11:00-22:00(ラストオーダー21:30)</p>
 
 {{-- 営業時間以外の場合にメッセージを表示、写真をグレースケール、カートに追加ボタンを非表示 --}}
-@if (now()->format('H:i') < '11:00' || now()->format('H:i') > '20:00')
+@if (now()->format('H:i') < '11:00' || now()->format('H:i') > '22:00')
 
   <div class="alert alert-warning" role="alert">
-    ただいまの時間はご注文いただけません。ご注文は11:00から20:00まで受け付けています。
+    ただいまの時間はご注文いただけません。ご注文は11:00から22:00まで受け付けています。
   </div>
 
   {{-- カートに追加ボタンを非表示 --}}
@@ -39,6 +39,7 @@
           <button type="submit" name="recommend" value="1" class="btn btn-info me-2">おすすめから探す</button>
           <button type="submit" name="new_item" value="1" class="btn btn-info me-2">新商品から探す</button>
           <button type="submit" name="has_stock" value="1" class="btn btn-info me-2">在庫ありから探す</button>
+          <button type="submit" name="stock_low" value="1"class="btn btn-info me-2">残りわずか</button>
           
         </div>
       </div>
@@ -133,9 +134,10 @@
                 @endif
               </div>
               <div class="card-body">
-                <h5 class="card-title">商品名：{{$menu->name}}</h5>
+                <h5 class="card-title">商品名：{{$menu->name}}:{{$menu->id}}</h5>
                 <p class="card-text">Price:{{$menu->price}}円（税抜）</p>
                 <p class="text-danger">営業時間外です。</p>
+                <p class="text-muted">在庫数: {{ $menu->stock }}</p> {{-- ★営業時間外でも在庫数を表示 --}}
                 <p class="">
                   @if($menu->is_new)
                     <div><span class="badge bg-secondary grayscale">新商品</span></div>
@@ -163,7 +165,7 @@
                   @endif
                 </div>
                 <div class="card-body">
-                  <h5 class="card-title">商品名：{{$menu->name}}</h5>
+                  <h5 class="card-title">商品名：{{$menu->name}}:{{$menu->id}}</h5>
                   <p class="card-text">Price:{{$menu->price}}円（税抜）</p>
                   <p class="text-danger">在庫なし</p>
                   <p class="">
@@ -196,12 +198,12 @@
                 <h5 class="card-title">商品名：{{$menu->name}}</h5>
                 <p class="card-text">価格:{{$menu->price}}円（税抜）</p>
 
-                @if ($menu->stock > 0)
-                  {{-- 在庫が3以下の時、残りわずかを表示 --}}
-                  <p class="text-success">残りわずか</p>
-                @elseif($menu->stock === 0)
+                @if ($menu->stock === 0)
                   {{-- 在庫が0の時、在庫なしを表示 --}}
                   <p class="text-danger">在庫なし</p>
+                @elseif($menu->stock > 0 && $menu->stock < 5)
+                  {{-- 在庫が1−4の時、残りわずかを表示 --}}
+                  <p class="text-warning">残りわずか</p>
                 @endif
 
                 {{-- カート内超過による在庫なし表示 --}}

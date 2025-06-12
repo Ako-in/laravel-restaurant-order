@@ -37,10 +37,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('orders/{id}/confirm',[\App\Http\Controllers\Admin\OrderController::class,'showConfirm'])->name('orders.showConfirm');
     Route::post('/orders/{id}/confirm', [\App\Http\Controllers\Admin\OrderController::class, 'storeConfirmedOrder'])->name('orders.storeConfirmed');
     // Route::post('orders/updateStatus/{id}',[\App\Http\Controllers\Admin\OrderController::class,'updateStatus'])->name('orders.updateStatus');
-    Route::put('/orders/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+
+    // 注文の全体ステータスを更新に変更
+    Route::put('/orders/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateAllStatus'])->name('orders.updateAllStatus');
     Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only([
-        'show', 'edit', 'update', 'destroy' 
+        'show', 'edit', 'update', 'destroy'
     ]);;
+    Route::put('orders/{item}/updateQty',[\App\Http\Controllers\Admin\OrderController::class,'updateQty'])->name('orders.updateQty');
+
+    // 注文の個別アイテムのステータスを更新
+    Route::put('orders/items/{item}/status',[\App\Http\Controllers\Admin\OrderController::class,'updateOrderItemStatus'])->name('orders.updateOrderItemStatus');
+    
+    // 注文の全体ステータスを更新
+    // Route::put('orders/{order}/status',[\App\Http\Controllers\Admin\OrderController::class,'updateStatusOverallOrder'])->name('orders.updateStatusOverallOrder');
+
+
+    
     // Route::resource('sales', \App\Http\Controllers\Admin\SalesController::class);
     Route::get('sales', [\App\Http\Controllers\Admin\SalesController::class, 'index'])->name('sales.index');
     //売上合計を表示
