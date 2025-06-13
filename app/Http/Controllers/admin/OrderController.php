@@ -395,11 +395,12 @@ class OrderController extends Controller
     {
         $order->load('order_items');
         $totalItems = $order->order_items->count();
+
         if($totalItems === 0){
             $order->status = 'canceled'; // 注文アイテムがない場合はキャンセル
             $order->save();
 
-            return redirect()->back()->with('warning', '注文アイテムがありません。');
+            // return redirect()->back()->with('warning', '注文アイテムがありません。');
         }
 
         $pendingCount = $order->order_items->where('status', 'pending')->count();
@@ -410,13 +411,13 @@ class OrderController extends Controller
         $currentOverallStatus = $order->status;// 現在の注文全体のステータスを取得
 
         if($canceledCount === $totalItems){
-            $newOverallStatus = 'canceled'; // 全てキャンセルされた場合
-        }elseif($completedCount === $totalItems){
-            $newOverallStatus = 'completed'; // 全て完了した場合
-        }elseif($ongoingCount > 0 && $pendingCount === 0 && $canceledCount === 0){
-            $newOverallStatus = 'ongoing'; // 進行中のアイテムがあり、他はない場合
-        }elseif($pendingCount > 0 && $ongoingCount === 0 && $canceledCount === 0){
-            $newOverallStatus = 'pending'; // 保留中のアイテムがあり、他はない場合
+            $newOverallStatus = 'canceled'; // 全てキャンセルされた場合：OK
+        }elseif(($completedCount + $canceledCount) === $totalItems){
+            $newOverallStatus = 'completed'; // 全て完了した場合：OK
+        }elseif($ongoingCount > 0){
+            $newOverallStatus = 'ongoing'; // ongoingが1以上ある時はOngoing
+        }elseif($pendingCount > 0){
+            $newOverallStatus = 'pending'; // pendingが1以上ある時はPending
         }else{
             $newOverallStatus = $currentOverallStatus; // 既存のステータスを維持する
         }
@@ -425,7 +426,16 @@ class OrderController extends Controller
         if ($newOverallStatus !== $currentOverallStatus) {
             $order->status = $newOverallStatus;
             $order->save();
-            return redirect()->back()->with('flash_message', '注文全体のステータスを更新しました。');
+            // return redirect()->back()->with('flash_message', '注文全体のステータスを更新しました。');
+        }
+
+        $calculatedTotalAmount = $order->order_items
+        ->where('status', '!=', 'canceled') // キャンセルされたアイテムを除外
+        ->sum('subtotal');
+
+        if($order->total_amount !== $calculatedTotalAmount){
+            $order->total_amount = $calculatedTotalAmount; // 合計金額を更新
+            $order->save();
         }
 
     }
@@ -448,7 +458,7 @@ class OrderController extends Controller
                 return redirect()->back()->withErrors('メニューが見つかりませんでした。');
             }
 
-            $stockDifference = $oldQty - $newQty;
+            // $stockDifference = $oldQty - $newQty;
             // 数量が増える（在庫が減る）場合のみ在庫チェック
 
             if($newQty > $oldQty){
@@ -464,6 +474,11 @@ class OrderController extends Controller
                 $menu->stock += $returnedStock; // 在庫を戻す
             }
             $menu->save();
+
+            if($newQty === 0){
+                $item->status = 'canceled';
+                Log::info('アイテム ' . $item->id . ' (メニューID: ' . $item->menu_id . ') の数量が0になったため、ステータスを「canceled」に設定しました。');
+            }
 
             $item->qty = $newQty;
             $item->subtotal = $item->price * $newQty; // 小計の再計算

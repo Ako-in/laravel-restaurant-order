@@ -21,7 +21,8 @@
         })) }}円
     </p>
     {{-- 注文全体のステータスは、個々のアイテムのステータスから算出されるものとして表示 --}}
-    <p><strong>注文全体の現在のステータス:</strong> <span class="badge bg-primary">{{ $order->allStatus }}</span></p>
+    <p><strong>注文全体の現在のステータス:</strong> <span class="badge bg-primary">{{ $order->status }}</span></p>
+    {{-- <p><strong>注文全体の現在のステータス:</strong> <span class="badge bg-primary">{{$newOverallStatus}}</span></p> --}}
     <small class="text-muted">（各アイテムのステータス変更により自動更新されます）</small>
 
 
