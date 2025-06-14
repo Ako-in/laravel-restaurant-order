@@ -1,147 +1,178 @@
 @extends('layouts.app')
 
 @section('content')
+
+
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 <div class="container">
     <strong>テーブル番号：{{$tableNumber}}の決済画面へ進みます。（この後のキャンセルはできません）</strong>
     <hr>
     @if($orders->count() > 0)
-         <table>
-            <tr>
-                <th>注文日時</th>
-                <th>注文ID</th>
-                <th>テーブル番号</th>
-                {{-- <th>メニューID</th> --}}
-                <th>メニュー名</th>
-                <th>数量</th>
-                <th>単価</th>
-                <th>小計（税抜）</th>
-                <th>小計（税込）</th>
-                <th>ステータス</th>
-                {{-- <th>詳細</th> --}}
-            </tr>
-            @php
-                $totalAmount = 0; // 合計金額の初期化
-            @endphp
-            @foreach($orders as $order)
-                @foreach ($order->order_items as $item)
+         <table class="table table-bordered table-striped">
+            <thead>
                 <tr>
-                    <td>{{ $order->created_at }}</td>
-                    <td>{{$order->id}}</td>
-                    <td>{{$order->table_number}}</td>
-                    <td>{{ $item->menu_name }}</td>
-                    <td>
-                        @if($order->status === 'completed'|| $order->status === 'ingoing')
-                            {{ $item->qty }}
-                        @elseif($order->status === 'canceled')
-                            0
-                        @endif
-                        {{-- {{-- {{ $item->qty }} --}}
-                    </td>
-                    <td>{{number_format($item->price)}}円</td>
-                    <td>
-                        {{-- 税抜小計 --}}
-                        @if($order->status === 'completed'|| $order->status === 'ingoing')
-                            {{ number_format($item->subtotal) }}円
-                        @elseif($order->status === 'canceled')
-                            0円
-                        @else
-                            {{ number_format($item->subtotal) }}円
-                        @endif
-                    </td>
-                    <td>
-                        {{-- 税込小計 --}}
-                        @if($order->status === 'completed'|| $order->status === 'ingoing')
-                            {{ number_format($item->subtotal * 1.1) }}円
-                        @elseif($order->status === 'canceled')
-                            0円
-                        @else
-                            {{ number_format($item->subtotal * 1.1) }}円
-                        @endif
-                    </td>
-                    <td>
-                        {{ $order->status }}
-                    </td>
+                    <th>注文日時</th>
+                    <th>注文ID</th>
+                    <th>テーブル番号</th>
+                    {{-- <th>メニューID</th> --}}
+                    <th>メニュー名</th>
+                    <th>数量</th>
+                    <th>単価(税抜)</th>
+                    <th>小計(税抜)</th>
+                    <th>小計(税込)</th>
+                    {{-- <th>詳細</th> --}}
+                    <th>ステータス</th>
+                    {{-- <th>在庫数(Pendingから変更後在庫も更新)</th> --}}
                 </tr>
-                @php
-                    // ステータスがキャンセル以外のアイテムの小計を合計に加算
-                    if (strtolower($order->status) !== 'canceled') {
-                        $totalAmount += $item->subtotalTax; // 各アイテムの小計（税込）を合計に加算
-                    }
-                //ステータスがキャンセルの時は除外する
-                    // $total = $orders->reject(function ($order) {
-                    //     return strtolower($order->status) === 'canceled';
-                    // })->sum(function ($order) {
-                    //     return $order->order_items->sum('subtotal');
-                    // // });
-                    // $totalAmount += $item->subTotal; // 各アイテムの小計を合計に加算
-                @endphp
+            </thead>
+            <tbody>
+
+                {{-- @php
+                    $totalAmount = 0; // 合計金額の初期化
+                @endphp --}}
+                @foreach($orders as $order)
+                    @foreach ($order->order_items as $item)
+                    <tr>
+                        <td>{{ $order->created_at }}</td>
+                        <td>{{$order->id}}</td>
+                        <td>{{$order->table_number}}</td>
+                        <td>{{ $item->menu_name }}</td>
+                        <td>
+                            @if($item->status === 'completed'|| $order->status === 'ingoing'|| $order->status ==='pending')
+                                {{ $item->qty }}
+                            @elseif($item->status === 'canceled')
+                                0
+                            @endif
+                            {{-- {{ $item->qty }}</td> --}}
+                        {{-- <td>
+                            @if($item->status === 'completed'|| $item->status === 'ongoing')
+                                {{ number_format($item->subtotal) }}円
+                            @elseif($order->status === 'canceled')
+                                0円
+                            @else
+                                {{ number_format($item->subtotal) }}円
+                            @endif
+                        </td> --}}
+                        <td>
+                            {{-- 単価税抜 --}}
+                            @if($item->status === 'completed'|| $item->status === 'ongoing')
+                                {{ number_format($item->price) }}円
+                            @elseif($item->status === 'canceled')
+                                0円
+                            @else
+                                {{ number_format($item->price) }}円
+                            @endif
+                        </td>
+                        <td>
+                            {{-- 小計税抜 --}}
+                            @if($item->status === 'completed'|| $item->status === 'ongoing')
+                                {{ number_format($item->subtotal) }}円
+                            @elseif($item->status === 'canceled')
+                                0円
+                            @else
+                                {{ number_format($item->subtotal) }}円
+                            @endif
+                        </td>
+                        <td>
+                            {{-- 小計税込 --}}
+                            {{-- Stripe決済時と同じ計算ロジックを適用 --}}
+                            @php
+                                $taxRate = (float) config('cart.tax') / 100;
+                                $unitPriceTaxInclusive = (int) round($item->price * (1 + $taxRate));
+                                $subtotalTaxInclusive = $unitPriceTaxInclusive * $item->qty;
+                            @endphp
+                            @if($item->status === 'completed'|| $item->status === 'ongoing' || $item ->status ==='pending')
+                                {{ number_format($subtotalTaxInclusive) }}円
+                            @elseif($item->status === 'canceled')
+                                0円
+                            @else
+                                {{ number_format($subtotalTaxInclusive) }}円
+                            @endif
+                        </td>
+                        <td>
+                            @if($item->status === 'pending')
+                                <span style="color: orange;">保留中</span>
+                            @elseif($item->status === 'ongoing')
+                                <span style="color: blue;">準備中</span>
+                            @elseif($item->status === 'completed')
+                                <span style="color: green;">完了</span>
+                            @elseif($item->status === 'canceled')
+                                <span style="color: red;">キャンセル</span>
+                            @endif
+                        </td>
+
+                    </tr>
+                    {{-- @php
+                        // ステータスがキャンセル以外のアイテムの小計を合計に加算
+                        if (strtolower($order->status) !== 'canceled') {
+                            $totalAmount += $item->subtotal;
+                        }
+                    //ステータスがキャンセルの時は除外する
+                        // $total = $orders->reject(function ($order) {
+                        //     return strtolower($order->status) === 'canceled';
+                        // })->sum(function ($order) {
+                        //     return $order->order_items->sum('subtotal');
+                        // // });
+                        // $totalAmount += $item->subTotal; // 各アイテムの小計を合計に加算
+                    @endphp --}}
+                    @endforeach
                 @endforeach
-            @endforeach
+            </tbody>
+            
         </table>
-
-        @php
-            // 注文ステータスがPendingの時は決済ボタンを無効にする
-            $hasPendingOrder = $orders->contains('status', 'pending');
-
-            //ステータスがキャンセルの時は除外する
-            $total = $orders->reject(function ($order) {
-                return strtolower($order->status) === 'canceled';
-            })->sum(function ($order) {
-                return $order->order_items->sum('subtotal');
-            });
-
-        @endphp
 
         <hr>
         <tfoot>
             <tr>
-                <td colspan="3" style="text-align: right;"><strong>合計金額（税込）</strong></td>
-                {{-- <td><strong>{{ number_format($totalAmount) }}円</strong></td> --}}
-                {{-- <td><strong>{{ number_format($totalIncludeTax) }}円</strong></td> --}}
-                <td><strong>{{ number_format($totalIncludeTax) }}円</strong></td>
-                <p class="mt-3">
-                    ☑️ステータスが「Pending」になっている注文がある場合、決済画面には進めません。<br>
-                    しばらくお待ちくださいませ。
-                </p>
-                
+                <td colspan="7" style="text-align: right;"><strong>合計金額(税込)</strong></td>
+                <td colspan="2"><strong>{{ number_format($calculatedTotalAmount) }}円</strong></td>
             </tr>
         </tfoot>
     @else
         <p>注文履歴がありません。</p>
     @endif
 
-    <div class="d-flex justify-content-between mt-3">
-        <a href="{{ route('customer.menus.index') }}" class="btn btn-primary">メニュー一覧へ</a>
-        
-        {{-- 決済ボタン --}}
-        <form action="{{ route('customer.carts.checkoutStore') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-success"
-            {{-- ステータスがPendingの時は決済ボタンをDiabledに設定 --}}
-                @if($orders->count() === 0 || $hasPendingOrder)
-                    disabled
-                    style="pointer-events: none; opacity: 0.6;"
-                @endif
-            >最終確定（決済へ）</button>
-        </form>
-    </div>
-
-    
-
-
-    {{-- <a href="{{ route('customer.menus.index') }}" class="btn btn-primary">メニュー一覧へ</a>
-
     <form action="{{ route('customer.carts.checkoutStore') }}" method="POST">
+        @csrf
+        @if($hasPendingOrder)
+          {{-- 注文アイテムが保留中または注文がない場合は決済ボタンを無効化 --}}
+          <p class="alert alert-warning">
+            まだ保留の注文アイテムがあります。全ての注文アイテムが「完了」または「準備中」になってから決済に進んでください。
+          </p>
+          <button type="submit" class="btn btn-primary" disabled>最終確定</button>
+        @elseif($orders->count() === 0)
+          {{-- 注文がない場合は決済ボタンを無効化 --}}
+            <p class="alert alert-warning">
+                注文がありません。メニューを注文してから決済に進んでください。
+            </p>
+            <button type="submit" class="btn btn-primary" disabled>最終確定</button>
+            <a class="btn btn-info"href="{{route('customer.menus.index')}}">メニューに戻る</a>
+
+        @else
+        {{-- 決済に進める場合 --}}
+          <button type="submit" class="btn btn-primary" >最終確定</button>
+
+        @endif
+    </form>
+
+    {{-- <form action="{{ route('customer.carts.checkoutStore') }}" method="POST">
       @csrf
-
-
-      <a href="{{route('customer.carts.checkout')}}" class="btn btn-primary"
-      @if($orders->count() === 0 || $hasPendingOrder)
-          disabled
-          style="pointer-events: none; opacity: 0.6;"
-      @endif
-        >決済画面へ</a>
-      {{-- <button type="submit" class="btn btn-primary" >最終確定</button> --}}
-    {{-- </form> --}}
+      <button type="submit" class="btn btn-primary" >最終確定</button>
+    </form> --}}
+    {{-- <a href="{{route('customer.carts.checkoutStore')}}" class="btn btn-primary"
+            @if($orders->count() === 0 || $hasPendingOrder)
+                disabled
+                style="pointer-events: none; opacity: 0.6;"
+            @endif
+        >決済画面へ</a> --}}
 </div>
 @endsection

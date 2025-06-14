@@ -342,6 +342,11 @@ class OrderController extends Controller
         $originalItemStatus = $item->status;
         $newItemStatus = $validated['status'];
 
+        // $oldItemStatus = $item->status; // 元のステータスを保存
+        if($newItemStatus === 'canceled'&& $originalItemStatus !== 'canceled'){
+            $item->qty = 0; // キャンセルされた場合は数量を0に設定
+        }
+
         Log::info('バリデーション後、新しいステータス: ' . $newItemStatus);
 
         DB::beginTransaction();

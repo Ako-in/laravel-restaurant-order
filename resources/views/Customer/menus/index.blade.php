@@ -2,13 +2,13 @@
 
 @section('content')
 <h4>メニュー一覧</h4>
-<p>営業時間 11:00-22:00(ラストオーダー21:30)</p>
+<p>営業時間 {{$startTime}}-{{$closeTime}}(ラストオーダー{{$lastOrderTime}})</p>
 
 {{-- 営業時間以外の場合にメッセージを表示、写真をグレースケール、カートに追加ボタンを非表示 --}}
-@if (now()->format('H:i') < '11:00' || now()->format('H:i') > '22:00')
+@if (now()->format('H:i') < $startTime || now()->format('H:i') > $lastOrderTime)
 
   <div class="alert alert-warning" role="alert">
-    ただいまの時間はご注文いただけません。ご注文は11:00から22:00まで受け付けています。
+    ただいまのお時間はご注文を受け付けていません。ご注文は{{$startTime}}から{{$lastOrderTime}}まで受け付けています。
   </div>
 
   {{-- カートに追加ボタンを非表示 --}}

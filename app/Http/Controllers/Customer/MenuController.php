@@ -27,15 +27,21 @@ class MenuController extends Controller
         // 注文可能時間を設定するための変数
         $now = Carbon::now();
 
-        // 注文可能時間の設定（11:00から20:00まで）
-        $startTime = Carbon::createFromTime(11, 0, 0); // 11:00
-        $closingTime = Carbon::createFromTime(22, 0, 0); // ラストオーダー22:00
+        // 注文可能時間の設定（コントローラのみで変更可能）
+        $startTimeCarbon = Carbon::createFromTime(9, 0, 0); // 9:00
+        $closeTimeCarbon = Carbon::createFromTime(22, 0, 0); // 22:00
+        $lastOrderTimeCarbon = Carbon::createFromTime(21, 30, 0); // ラストオーダー時間は21:30
+
+        // Bladeで表示させるために時間文字列にする
+        $startTime = $startTimeCarbon->format('H:i');
+        $closeTime = $closeTimeCarbon->format('H:i');
+        $lastOrderTime = $lastOrderTimeCarbon->format('H:i');
 
         // ラストオーダー前30分前にラストオーダー時間のアラートを出す
-        $alertTime = $closingTime->clone()->subMinutes(30);//21:30を取得
+        $alertTime = $closeTimeCarbon->clone()->subMinutes(30);//21:30を取得
 
-        if ($now->between($alertTime, $closingTime)) { 
-            session()->put('alert', 'ラストオーダーは20:00です。ご注意ください。');
+        if ($now->between($alertTime, $lastOrderTime)) { 
+            session()->put('alert', 'ラストオーダーは21:30です。ご注意ください。');
         }else{
             session()->forget('alert');
         }
@@ -44,7 +50,7 @@ class MenuController extends Controller
         // }
 
         // 注文可能時間内かどうかをチェック
-        $isOrderableTime = $now->between($startTime, $closingTime);
+        $isOrderableTime = $now->between($startTime, $closeTime);
 
         $query = Menu::query();
         $totalCount = 0; // 初期値として0を設定
@@ -92,10 +98,6 @@ class MenuController extends Controller
             $query->where('stock', '>', 0); // 在庫数が0より大きいメニューを絞り込む
         }
 
-
-
-
-
         // if($keyword !== null){
         //     $menus = Menu::where('name',function($query)use($keyword){
         //         $query->where('categories.name','like',"%{$keyword}%");
@@ -135,7 +137,23 @@ class MenuController extends Controller
         $menus = $query->paginate(15); // 例: 1ページあたり3件表示
 
 
-        return view('customer.menus.index',compact('menus','customer','categories','isOrderableTime','search','totalCount','priceRange','categoryId'));
+        return view('customer.menus.index',compact(
+            'menus',
+            'customer',
+            'categories',
+            'isOrderableTime',
+            'search',
+            'totalCount',
+            'priceRange',
+            'categoryId',
+            'startTime',
+            'closeTime',
+            'lastOrderTime',
+            'recommend',
+            'newItem',
+            'hasStock',
+            'stockLow',
+        ));
     }
 
     /**

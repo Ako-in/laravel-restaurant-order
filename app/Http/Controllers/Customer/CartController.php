@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Validator;
 
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use Stripe\Exception\ApiErrorException;
 
 class CartController extends Controller
 {
@@ -32,6 +33,7 @@ class CartController extends Controller
         // ユーザーのカートを復元
         // Cart::instance(Auth::id())->restore(Auth::id());
         // Log::info('カート一覧表示');
+        // Log::info("カートのインスタンスを復元", ['instance' => 'customer_' . Auth::id()]);
         //カートの中身を取得
         $carts = Cart::instance('customer_'.Auth::id())->content();
         Log::info('indexカートの中身を取得',['carts' => $carts->toArray()]);
@@ -456,46 +458,64 @@ class CartController extends Controller
         $orders = Order::where('table_number', $tableNumber)
         ->with('order_items') // order_items を eager load
         ->where('is_paid', false)//未払いの注文のみ
-        ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
+        // ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
         ->orderBy('created_at', 'desc')
         ->get();
 
         // 合計金額（税込）の計算
-        $totalIncludeTax = 0;
+        $calculatedTotalAmount = 0;
 
         $taxRate = (float) config('cart.tax') / 100; // Laravelの設定から税率を取得(10%)
 
+        // pendingの注文があるかどうかを確認
+        $hasPendingOrder = false;//個別アイテムにPendingがあるかどうか
+        $hasUnpaidOrder = false;//有効な未払いの注文があるかどうか
+        // $hasActiveUnpaidOrders = false; // 有効な未払いの注文があるかどうか
+
         foreach ($orders as $order) {
+            // $hasUnpaidOrders = true; // 有効な未払いの注文がある
             foreach ($order->order_items as $item) {
+                if($item->status === 'pending'){
+                    $hasPendingItems = true; // 個別アイテムにPendingがある
+                }
+
+                if(strtolower($item->status) !== 'canceled' && $item->qty > 0){
+                    $unitAmountTaxInclusive = (int) round($item->price * (1 + $taxRate)); // 税抜き単価に税率を適用して税込単価を計算
+                    $calculatedTotalAmount += ($unitAmountTaxInclusive * $item->qty); // その税込単価に数量を掛け、合計に加算
+                    $hasUnpaidOrder = true; // 有効な未払いの注文がある
+
+                }
 
                 // 個々のアイテムの単価（税抜）に税率を適用し、四捨五入して税込単価を計算
                 // Stripeに送る unit_amount と同じ計算ロジックを適用
-                $unitAmountTaxInclusive = (int) round($item->price * (1 + $taxRate));
+                // $unitAmountTaxInclusive = (int) round($item->price * (1 + $taxRate));
                 
                 // その税込単価に数量を掛け、合計に加算
-                $totalIncludeTax += ($unitAmountTaxInclusive * $item->qty);
+                // $totalIncludeTax += ($unitAmountTaxInclusive * $item->qty);
                 // 各注文の小計を加算
                 // $subTotalMount += $item->qty * $item->price;
             }
             // $subTotalMount += $order->subtotal; // 小計を加算
         }
 
-        $hasPendingOrder = Order::where('table_number', $tableNumber)
-            ->where('is_paid', false)
-            ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
-            ->exists();
+        // $hasPendingOrder = Order::where('table_number', $tableNumber)
+        //     ->where('is_paid', false)
+        //     ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
+        //     ->exists();
 
         // $totalIncludeTax  = (int) round($subTotalMount * (1 + $taxRate)); // 税込合計金額を計算
         // $totalIncludeTax = (int) $totalIncludeTax; // 整数に変換
 
         // number_format() は表示のためだけに使用します。
         // $totalIncludeTax = ($totalIncludeTax, 0);
+        // $calculatedTotalAmount = (int) round($totalIncludeTax); // 税込合計金額を整数に変換
 
-        return view('customer.carts.checkout',compact('orders','tableNumber','totalIncludeTax','hasPendingOrder'));
+        return view('customer.carts.checkout',compact('orders','tableNumber','hasPendingOrder','hasUnpaidOrder','calculatedTotalAmount'));
     }
 
     public function checkoutStore(){
         //stripe
+        Log::info('Stripe Checkout Store 処理開始');
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
@@ -521,6 +541,18 @@ class CartController extends Controller
             // 各注文のorder_itemsから商品情報を取得し、Stripeのline_itemsに追加
             // ここで $order->order_items をループすることで、各アイテム ($item) が定義
             foreach ($order->order_items as $item) {
+                //数量が0以下、キャンセルされたアイテムはline_itemsに追加せずスキップ
+               if(!isset($item->qty) || !is_numeric($item->qty) || (int) $item->qty <= 0 || strtolower($item->status) === 'canceled'){
+                    Log::warning('checkoutStore: スキップされた注文アイテム（無効な数量またはキャンセル済み）', [
+                        'order_item_id' => $item->id,
+                        'qty' => $item->qty,
+                        'status' => $item->status
+                    ]);
+                    continue; // 無効な数量またはキャンセル済みのアイテムはスキップ
+                }
+
+
+
                 //qtyが存在し、整数であることを確認
                 if (isset($item->qty) && is_numeric($item->qty) && (int) $item->qty > 0) {
                     // 税抜き単価に税率を適用して税込単価を計算
@@ -540,7 +572,7 @@ class CartController extends Controller
                 } else {
                     Log::error('無効なqtyが検出されました', ['order_item_id' => $item->id, 'qty' => $item->qty]);
                     // 無効なqtyが検出された場合、エラーを返すか、スキップするか、適切に処理
-                    return redirect()->route('customer.carts.index')->withErrors('決済する商品に無効な数量が含まれています。');
+                    return redirect()->route('customer.carts.checkout')->withErrors('決済する商品に無効な数量が含まれています。');
                 }
             }
         }

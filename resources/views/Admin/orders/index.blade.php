@@ -79,6 +79,7 @@
         <th>ステータス</th>
         {{-- <th>在庫数(Pendingから変更後在庫も更新)</th> --}}
         <th>詳細</th>
+        <th>支払い</th>
     </tr>
     @foreach($orders as $order)
     <tr style="border-bottom: 0.5px solid black;">
@@ -164,60 +165,18 @@
             @endif
         </td> --}}
         <td>
-            {{-- @if($order->order_items->isNotEmpty() &&
-                $order->order_items->first()->menu_id &&
-                $order->order_items->first()->menu_name &&
-                $order->order_items->first()->qty) --}}
-                <a href="{{ route('admin.orders.showConfirm', ['id' => $order->id]) }}" class="btn btn-info">
-                    注文確認画面
-                </a>
-            {{-- @else
-                <span style="color: gray;">不明なデータ</span>
-            @endif --}}
-            {{-- <form action="{{ route('admin.orders.print', $order->id) }}" method="GET">
-                @csrf
-                <button type="submit">出力</button>
-            </form> --}}
-
-            {{-- <form action="{{ route('admin.orders.confirmOrder', ['id' => $order->id])}}" method="PUT">
-                <button type="submit">注文確認</button>
-            </form> --}}
-
-            {{-- <!-- 表示用 -->
             <a href="{{ route('admin.orders.showConfirm', ['id' => $order->id]) }}" class="btn btn-info">
                 注文確認画面
-            </a> --}}
-
-            {{-- orders.printへ遷移 --}}
-            {{-- <form method="POST" action="{{ route('admin.orders.print', $order->id) }}">
-                @csrf
-                <button type="submit" class="btn btn-primary">注文伝票を出力</button>
-            </form> --}}
-
-
-            <!-- 複製用 -->
-            {{-- <form method="POST" action="{{ route('admin.orders.storeConfirmed', $order->id) }}">
-                @csrf
-                <button type="submit" class="btn btn-primary">注文を確定</button>
-            </form> --}}
-
-            {{-- <a href="{{ route('admin.orders.confirm', ['id' => $order->id]) }}" class="btn btn-primary">
-                注文確認
             </a>
-            <a href="{{ route('admin.orders.confirm', $order->id) }}" class="btn btn-primary">
-                注文確認
-            </a> --}}
-
-            
-            {{-- <a href="{{ route('admin.orders.confirmOrder', ['id' => $order->id]) }}" class="btn btn-primary">
-                注文確認
-            </a> --}}
-            
-            {{-- <form method="GET" action="{{ route('admin.orders.print', $order->id) }}">
-                @csrf
-                <button type="submit" class="btn btn-success">注文を確定して印刷</button>
-            </form> --}}
-            
+        </td>
+        <td>
+            @if($order->is_paid === 1)
+                <span style="color: green;">済</span>
+            @elseif($order->is_paid === 0)
+                <span style="color: red;">未払い</span>
+            @else
+                <span style="color: gray;">不明</span>
+            @endif
         </td>
     </tr>
     @endforeach
