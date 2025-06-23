@@ -24,7 +24,7 @@
         @csrf
         <div>
             <label for="table_number">テーブル番号</label>
-            <input type="number" name="table_number" id="table_number" required>
+            <input type="text" name="table_number" id="table_number" required>
         </div>
         <div>
             <label for="password">パスワード</label>

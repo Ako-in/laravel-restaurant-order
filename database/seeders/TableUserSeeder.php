@@ -32,6 +32,11 @@ class TableUserSeeder extends Seeder
             'password' => Hash::make('table103pass')
         ]);
 
+        Customer::create([
+            'table_number'=>'guest',
+            'password' => Hash::make('guestpass')
+        ]);
+
         
     }
 }

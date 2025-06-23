@@ -16,9 +16,9 @@
             {{-- <th>Image</th> --}}
             
             <th>Stock</th>
-            <th>発注状況</th>
+            {{-- <th>発注状況</th>
             <th>入荷予定日</th>
-            <th>入荷数量</th>
+            <th>入荷数量</th> --}}
             <th>Status</th>
             <th>30日間の売上個数</th>
             <th>新商品</th>
@@ -27,6 +27,25 @@
             {{-- <th >Action</th> --}}
         </tr>
     </thead>
+
+    <div class="col-9">
+        <div class="container">
+            Sort by:
+            @sortablelink('id', 'ID')
+            {{-- @sortablelink('category.id', 'Category id') --}}
+            {{-- @sortablelink('name', 'Name') --}}
+            @sortablelink('price', 'Price')
+            @sortablelink('stock', 'Stock')
+            {{-- @sortablelink('status', 'Status') --}}
+            {{-- @sortablelink('sales_count', '30日間の売上個数') --}}
+            {{-- @sortablelink('is_new', '新商品') --}}
+            {{-- @sortablelink('is_recommended', 'おすすめ') --}}
+            {{-- @sortablelink('created_at', 'Created At') --}}
+            @sortablelink('updated_at', 'Updated At')
+
+        </div>
+    </div>
+
    <tbody>
         @foreach ($menus as $menu)
         <tr>
@@ -39,12 +58,12 @@
             {{-- <th>{{$menu->image_file}}</th> --}}
             
             <td>{{ $menu->stock }}</td>
-            <td>
+            {{-- <td>
                 //済・未<br>
                 <button type="submit" name="incoming_status" value="1" class="btn btn-info">詳細</button>
             </td>
             <td>//入荷日</td>
-            <td>//入荷数量</td>
+            <td>//入荷数量</td> --}}
             {{-- <td>{{ $menu->status ? 'Active' : 'Inactive' }}</td> --}}
             <td>{{ $menu->status === 'active' ? 'Active' : 'Inactive' }}</td>
 
@@ -67,5 +86,10 @@
    </tbody>
 
 </table>
+
+<div class="d-flex justify-content-center">
+    {{-- {{$menus->links()}} --}}
+    {{$menus->appends(request()->query())->links()}}
+  </div>
 
 @endsection

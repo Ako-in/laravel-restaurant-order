@@ -9,6 +9,7 @@ use App\Http\Controllers\Customer\CheckoutController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\CategoryController;
 // use App\Http\Controllers\Admin\IncomingController;
+use App\Http\Controllers\Admin\CsvImportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +76,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // 発注管理
     Route::resource('incomings', \App\Http\Controllers\Admin\IncomingController::class);
+
+    // CSVインポート
+    // Route::get('csv/import', [\App\Http\Controllers\Admin\CsvImportController::class, 'import'])->name('csv.import');
+    Route::post('csv/importStore', [\App\Http\Controllers\Admin\CsvImportController::class, 'importStore'])->name('csv.importStore');
+
+
 });
 
 Route::middleware('guest:admin')->group(function () {

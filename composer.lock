@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "037a02e3edeff9ac78997c7c84fa1713",
+    "content-hash": "04cfab544ffe6d8fd3627e0e7648f4cb",
     "packages": [
         {
             "name": "brick/math",
@@ -800,6 +800,66 @@
                 }
             ],
             "time": "2023-10-12T05:21:21+00:00"
+        },
+        {
+            "name": "goodby/csv",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/goodby/csv.git",
+                "reference": "f61513e1459ed1e732eeb3f4cc6cf80d29486cd7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/goodby/csv/zipball/f61513e1459ed1e732eeb3f4cc6cf80d29486cd7",
+                "reference": "f61513e1459ed1e732eeb3f4cc6cf80d29486cd7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "eher/phpunit": ">=1.6",
+                "mikey179/vfsstream": ">=1.1.0",
+                "mockery/mockery": ">=0.7.2",
+                "suin/php-expose": ">=1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Goodby\\CSV": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "suin",
+                    "email": "suinyeze@gmail.com",
+                    "homepage": "https://www.facebook.com/suinyeze",
+                    "role": "Developer, Renaming Specialist"
+                },
+                {
+                    "name": "reoring",
+                    "email": "mori.reo@gmail.com",
+                    "homepage": "https://www.facebook.com/reoring",
+                    "role": "Developer"
+                }
+            ],
+            "description": "CSV import/export library",
+            "homepage": "https://github.com/goodby/csv",
+            "keywords": [
+                "csv",
+                "export",
+                "import"
+            ],
+            "support": {
+                "issues": "https://github.com/goodby/csv/issues",
+                "source": "https://github.com/goodby/csv/tree/1.0.0"
+            },
+            "time": "2012-12-06T17:04:38+00:00"
         },
         {
             "name": "graham-campbell/result-type",
@@ -8469,12 +8529,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.0.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

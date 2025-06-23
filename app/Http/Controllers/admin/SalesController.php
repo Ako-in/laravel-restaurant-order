@@ -4,16 +4,25 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Admin;
-use App\Models\Order;
+// use App\Models\Admin;
+// use App\Models\Order;
 use App\Models\Menu;
 use App\Models\OrderItem;
-use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
+// use Illuminate\Validation\Rule;
 use Illuminate\Support\Carbon;
-// use Carbon\Carbon;
+
+// use Encore\Admin\Grid;
+// use Encore\Admin\Form;
+// use Encore\Admin\Show; 
+
+// use App\Admin\Extensions\Tools\CsvImport;
+// use Goodby\CSV\Import\Standard\Lexer;
+// use Goodby\CSV\Import\Standard\Interpreter;
+// use Goodby\CSV\Import\Standard\LexerConfig;
+
 
 
 class SalesController extends Controller
@@ -23,6 +32,8 @@ class SalesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    // protected $title = '売上管理';
+
     public function index(Request $request)
     {
         // 過去30日間の日付を配列で生成
@@ -70,10 +81,10 @@ class SalesController extends Controller
 
         krsort($salesData); // 日付で降順ソート
 
-        $todaySales = Order::where('status','completed')
+        $todaySales = OrderItem::where('status','completed')
             ->whereDate('created_at', Carbon::today())
             ->sum('subtotal');
-        $monthlySales = Order::where('status','completed')
+        $monthlySales = OrderItem::where('status','completed')
             ->whereMonth('created_at', Carbon::now()->month)
             ->sum('subtotal');
 
@@ -316,72 +327,6 @@ class SalesController extends Controller
 
     // }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
     public function chart(Request $request)
     {
         // グラフのラベルを設定
@@ -414,7 +359,7 @@ class SalesController extends Controller
         $orderAmounts = $monthlySalesData;
         
 
-        $orderCountsResult = Order::selectRaw('MONTH(created_at) as month, COUNT(id) as count')
+        $orderCountsResult = OrderItem::selectRaw('MONTH(created_at) as month, COUNT(id) as count')
             ->whereYear('created_at', $currentYear)
             ->where('status', 'completed')
             ->groupBy('month')
@@ -516,5 +461,91 @@ class SalesController extends Controller
         return view('admin.sales.chart',compact('labels','orderAmounts','orderCounts','startDate','endDate','salesItems','totalSalesAmountAcrossFilter','itemSalesSummary','itemCategorySummary'));
 
     }
+
+    // public function grid()
+    // {
+    //     $grid = new Grid(new OrderItem());
+    //     $grid->model()->whereHas('order', function ($query) {
+    //         $query->where('status', 'completed'); // 完了した注文のみを対象
+    //     });
+    //     $grid->column('id', 'ID')->sortable();
+    //     $grid->column('order_id', 'Order ID')->sortable();
+    //     $grid->column('menu.name', 'Menu Name')->sortable();
+    //     $grid->column('price', 'Price')->sortable();
+    //     $grid->column('qty', 'Quantity')->sortable();
+    //     $grid->column('subtotal', 'Subtotal')->display(function () {
+    //         return number_format($this->price * $this->qty, 2);
+    //     })->sortable();
+    //     $grid->column('order.created_at', 'Order Date')->sortable();
+    //     $grid->column('order.status', 'Order Status')->sortable();
+    //     $grid->column('created_at', 'Created At')->sortable();
+    //     $grid->column('updated_at', 'Updated At')->sortable();
+        
+    //     // $grid->tools(function ($tools) {
+    //     //     $tools->append(new CsvImport());
+    //     // });
+    //     // CSVインポートツールを追加
+    //     $grid->tools(function (Grid\Tools $tools) {
+    //         // Adminツールは、AdminのURLヘルパーを使ってルーティングするのがベスト
+    //         // ルート名 'admin.csv.importStore' が有効であれば route() も使える
+    //         $tools->append(new CsvImport(url('csv/importStore')));
+    //     });
+    //     return $grid;
+    // }
+
+    // protected function form()
+    // {
+    //     $form = new Form(new OrderItem());
+
+    //     return $form;
+
+    // }
+
+    // public function csvImport(Request $request)
+    // {
+    //     // CSVインポートの処理をここに実装
+    //     // 例えば、CSVファイルを読み込み、OrderItemモデルにデータを保存するなど
+    //     // Goodby\CSV\Import\Standard\LexerやInterpreterを使用してCSVを解析することができます。
+    //     // 詳細な実装は要件に応じて調整してください。
+    //     $file = $request->file('file');
+    //     $lexer_config = new LexerConfig();
+    //     $lexer = new Lexer($lexer_config);
+
+    //     $interpreter = new Interpreter();
+    //     $interpreter->unstrict();
+
+    //     $rows = array();
+    //     $interpreter->addObserver(function (array $row) use (&$rows) {
+    //         $rows[] = $row;
+    //     });
+
+    //     $lexer->parse($file, $interpreter);
+    //     foreach ($rows as $key => $value) {
+
+    //         if (count($value) == 7) {
+    //             Product::create([
+    //                 'name' => $value[0],
+    //                 'description' => $value[1],
+    //                 'price' => $value[2],
+    //                 'category_id' => $value[3],
+    //                 'image' => $value[4],
+    //                 'recommend_flag' => $value[5],
+    //                 'carriage_flag' => $value[6],
+    //             ]);
+    //         }
+    //     }
+
+    //     return response()->json(
+    //         ['data' => '成功'],
+    //         200,
+    //         [],
+    //         JSON_UNESCAPED_UNICODE
+    //     );
+    
+    // }
+        
+    
+
+
 
 }

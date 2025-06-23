@@ -341,5 +341,63 @@
 
 </div>
 
+<div class="btn-group pull-right" style="margin-right: 10px">
+  <a href="#" class="btn btn-sm btn-primary csv-import"><i class="fa fa-upload"></i><span class="hidden-xs"> CSVインポート</span></a>
+  <input type="file" id="files" name="product" style="display: none">
+</div>
+
+{{-- <script>
+  $(function () {
+      // 「CSVインポート」ボタンをクリックしたら、隠しファイル選択ダイアログを開く
+      $('.csv-import').on('click', function (e) {
+          e.preventDefault(); // <a>タグのデフォルトの挙動（hrefへの遷移）をキャンセル
+          $('#files').click();
+      });
+  
+      // ファイルが選択されたらAjaxでアップロード
+      $('#files').on('change', function () {
+          var file = $(this)[0].files[0];
+          if (!file) {
+              return; // ファイルが選択されていない場合は何もしない
+          }
+  
+          var formData = new FormData();
+          formData.append('_token', '{{ csrf_token() }}'); // CSRFトークン
+          formData.append('csv_file', file); // ファイルデータ
+  
+          $.ajax({
+              url: "{{ route('admin.csv.importStore') }}", // 正しいPOSTルートを指定
+              type: 'POST',
+              data: formData,
+              processData: false, // FormDataを使用する場合は必須
+              contentType: false, // FormDataを使用する場合は必須
+              success: function (response) {
+                  // 成功時の処理
+                  alert(response.message); // 例: ポップアップメッセージ
+                  location.reload(); // ページをリロードしてグリッドを更新
+              },
+              error: function (xhr, status, error) {
+                  // エラー時の処理
+                  var errorMessage = 'CSVファイルのインポートに失敗しました。';
+                  if (xhr.responseJSON && xhr.responseJSON.message) {
+                      errorMessage = xhr.responseJSON.message;
+                  } else if (xhr.responseText) {
+                      try {
+                          var jsonError = JSON.parse(xhr.responseText);
+                          if (jsonError.errors && jsonError.errors.csv_file) {
+                              errorMessage = jsonError.errors.csv_file[0];
+                          }
+                      } catch (e) {
+                          // JSONパースエラーの場合は何もしない
+                      }
+                  }
+                  alert(errorMessage);
+                  console.error('AJAX Error:', xhr.responseText);
+              }
+          });
+      });
+  });
+</script> --}}
+
 
 @endsection

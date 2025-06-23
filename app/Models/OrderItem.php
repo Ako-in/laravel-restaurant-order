@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use App\Models\Order;
+use App\Models\Menu;
+use App\Models\OrderItem;
 use Kyslik\ColumnSortable\Sortable;
 
 class OrderItem extends Model

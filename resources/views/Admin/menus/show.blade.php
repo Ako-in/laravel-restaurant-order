@@ -52,12 +52,27 @@
   {{$menu->is_recommended ? '⚪︎' : '-'}} 
 </div>
 
-<div class="mb-2">
-  @if ($menu->image_file !== '')
-      <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-100">
-  @else
-      <img src="{{ asset('/images/no_image.jpg') }}" class="w-100">
-  @endif
+{{-- <div class="container mb-2">
+  <div class="w-48 h-48 overflow-hidden flex items-center justify-center mx-auto rounded-lg">
+
+    @if ($menu->image_file !== '')
+      <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="flex-shrink-0 min-w-full min-h-full object-cover">
+    @else
+        <img src="{{ asset('storage/images/noimage.png') }}" class="flex-shrink-0 min-w-full min-h-full object-cover">
+    @endif
+  </div>
+  
+</div> --}}
+<div class="container mb-2">
+  <div class="w-48 h-48 overflow-hidden flex items-center justify-center mx-auto rounded-lg">
+
+    @if ($menu->image_file !== '')
+      <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="flex-shrink-0 min-w-full min-h-full object-cover">
+    @else
+        <img src="{{ asset('storage/images/noimage.png') }}" class="flex-shrink-0 min-w-full min-h-full object-cover">
+    @endif
+  </div>
+  
 </div>
 
 <div>

@@ -15,14 +15,14 @@ class MenuSeeder extends Seeder
      */
     public function run()
     {
-        // 基本的なランダムメニューを50件生成
-        Menu::factory()->count(50)->create();
+        // 基本的なランダムメニューを3件生成
+        Menu::factory()->count(3)->create();
 
         // 例: 在庫切れのメニューを5件生成
-        Menu::factory()->outOfStock()->count(5)->create();
+        // Menu::factory()->outOfStock()->count(1)->create();
 
         // 例: おすすめメニューを10件生成
-        Menu::factory()->popular()->count(10)->create();
+        // Menu::factory()->popular()->count(2)->create();
 
         // 特定の属性を上書きして数件生成
         Menu::factory()->count(3)->create([

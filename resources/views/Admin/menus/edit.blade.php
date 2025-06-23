@@ -8,7 +8,7 @@
     <a href="{{ route('admin.menus.index') }}"> Back</a>
   </div>
 
-  <form action="{{ route('admin.menus.update',$menu->id) }}" method="POST">
+  <form action="{{ route('admin.menus.update',$menu->id) }}" enctype="multipart/form-data" method="POST">
     @csrf
     @method('PUT')
 
@@ -98,16 +98,23 @@
       @if ($menu->image_file !== '')
           <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-48 h-48 object-cover rounded-lg mx-auto">
       @else
-          <img src="{{ asset('/images/no_image.jpg') }}" class="w-48 h-48 object-cover rounded-lg mx-auto">
+          <img src="{{ asset('storage/images/noimage.png') }}" class="w-48 h-48 object-cover rounded-lg mx-auto">
       @endif
     </div>
+    <div class="flex flex-col mt-4">
+      <label for="image" class="text-gray-800">Imageを変更する</label>
+      <input type="file" name="image_file" id="image_file" class="border border-gray-200 px-4 py-2 mt-2">
+      @error('image_file')
+          <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+      @enderror
+  </div>
     
 
 
 
 
     <div>
-        <button type="submit">Submit</button>
+        <button type="submit">編集</button>
     </div>
 
   </form>
