@@ -96,9 +96,9 @@
     
     <div class="mb-2">
       @if ($menu->image_file !== '')
-          <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-48 h-48 object-cover rounded-lg mx-auto">
+          <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" style="max-width: 200px; height: auto;">
       @else
-          <img src="{{ asset('storage/images/noimage.png') }}" class="w-48 h-48 object-cover rounded-lg mx-auto">
+          <img src="{{ asset('storage/images/noimage.png') }}" style="max-width: 200px; height: auto;">
       @endif
     </div>
     <div class="flex flex-col mt-4">
@@ -109,6 +109,8 @@
       @enderror
   </div>
     
+
+
 
 
 

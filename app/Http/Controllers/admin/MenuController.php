@@ -9,6 +9,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage; // DBファサードをインポート
+// use Intervention\Image\Facades\Image;
 
 class MenuController extends Controller
 {
@@ -128,30 +129,49 @@ class MenuController extends Controller
         $menu->status = $validatedData['status'];
         // 画像アップロード
         $imagePath = null;
-        if ($request->hasFile('image_file')) {
-            $imagePath = $request->file('image_file')->store('images', 'public');
-            $menu->image_file = $imagePath;
-        
-        // if ($request->hasFile('image')) {
-        //     $image = $request->file('image');
-        //     $imagePath = $image->store('images', 'public'); // publicディスクに保存
-        } else {
-            // return redirect()->back()->withErrors(['image' => 'Image file is required.']);
-            $menu->image_file = 'storage/images/noimage.png';
-        }
-
-    
-        // 画像アップロードの処理
         // if ($request->hasFile('image_file')) {
-        //     $path = $request->file('image_file')->store('images', 'public'); // 'menus'ではなく'images'に統一
-        //     $menu->image_file = $imagePath; // ★ここを修正 (カラム名を 'image_file' に)
-        //     // $imagePath = $request->file('image_file')->store('images', 'public');
-        //     // $menu->image_file = $imagePath; // ★ここを修正 (コメントアウトを解除)
+        //     $imagePath = $request->file('image_file')->store('images', 'public'); // 'public'ディスクに保存
+        //     $menu->image_file = $imagePath; // カラム名を 'image_file' に
         // } else {
         //     // 画像がアップロードされなかった場合のデフォルト設定
         //     // 例えば、`noimage.png` をデフォルトにする場合
-        //     $menu->image_file = 'images/noimage.png'; // storage/images/noimage.png を指すように
+        //     $menu->image_file = 'storage/images/noimage.png'; // storage/images/noimage.png を指すように
         // }
+
+        //     // 画像をストレージに保存（リサイズなし）
+        //     // $image->storeAs('images', $filename, 'public'); // ★ここを修正
+
+        //     $menu->image_file = $path; // カラム名を 'image_file' に
+
+        //     $imagePath = $request->file('image_file')->store('images', 'public');
+        //     // $menu->image_file = $imagePath;
+
+        //     // 画像を読み込み、リサイズして保存
+        //     // $img = Image::make($image)->fit(400, 400)->encode(); // 400x400ピクセルにリサイズし、アスペクト比を維持して切り抜き
+        //     // Storage::disk('public')->put($imagePath, (string) $img); // 画像をストレージに保存
+        //     $image->storeAs('images', $filename, 'public');
+        //     $menu->image_file = $imagePath; // カラム名を 'image_file' に)
+        
+        // if ($request->hasFile('image_file')) {
+        //     $image = $request->file('image_file');
+        //     $imagePath = $image->store('images', 'public'); // publicディスクに保存
+        // } else {
+        // //     // return redirect()->back()->withErrors(['image' => 'Image file is required.']);
+        //     $menu->image_file = 'storage/images/noimage.png';
+        // }
+
+    
+        // 画像アップロードの処理
+        if ($request->hasFile('image_file')) {
+            $imagePath = $request->file('image_file')->store('images', 'public'); // 'menus'ではなく'images'に統一
+            $menu->image_file = $imagePath; // ★ここを修正 (カラム名を 'image_file' に)
+        //     // $imagePath = $request->file('image_file')->store('images', 'public');
+        //     // $menu->image_file = $imagePath; // ★ここを修正 (コメントアウトを解除)
+        } else {
+            // 画像がアップロードされなかった場合のデフォルト設定
+            // 例えば、`noimage.png` をデフォルトにする場合
+            $menu->image_file = 'storage/images/noimage.png'; // storage/images/noimage.png を指すように
+        }
         // dd($imagePath);
         
         $menu->save(); // **データベースに保存**
@@ -226,7 +246,14 @@ class MenuController extends Controller
             if ($menu->image_file && Storage::disk('public')->exists($menu->image_file)) {
                 Storage::disk('public')->delete($menu->image_file);
             }
-            $path = $request->file('image_file')->store('images', 'public'); // 'menus'ではなく'images'に統一
+            $path = $request->file('image_file')->store('images','public');
+            // $filename = time() . '.'. $image->getClientOriginalExtension();
+            // $path = 'images/'. $filename;
+
+            //画像とりこみ保存
+            // $image->storeAs('images', $filename, 'public'); // 'menus'ではなく'images'に統一
+            // $img = Image::make($image)->fit(400, 400)->encode(); // 400x400ピクセルにリサイズし、アスペクト比を維持して切り抜き
+            // Storage::disk('public')->put($path, (string) $img); // 画像をストレージに保存
             $menu->image_file = $path; // カラム名を 'image_file' に
             // $path = $request->file('image_file')->store('menus', 'public'); // 'public'ディスクに保存
             // $menu->image = $path;

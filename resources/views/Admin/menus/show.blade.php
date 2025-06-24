@@ -67,9 +67,9 @@
   <div class="w-48 h-48 overflow-hidden flex items-center justify-center mx-auto rounded-lg">
 
     @if ($menu->image_file !== '')
-      <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="flex-shrink-0 min-w-full min-h-full object-cover">
+      <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" style="max-width: 200px; height: auto;">
     @else
-        <img src="{{ asset('storage/images/noimage.png') }}" class="flex-shrink-0 min-w-full min-h-full object-cover">
+        <img src="{{ asset('storage/images/noimage.png') }}" style="max-width: 200px; height: auto;">
     @endif
   </div>
   
