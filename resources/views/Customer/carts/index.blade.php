@@ -12,13 +12,16 @@
   @endif
 
   @if($carts->count() > 0)
+  <div class="d-flex justify-content-center">
     <table>
         <tr>
-            <th>商品名</th>
-            <th>数量</th>
-            <th>価格</th>
-            <th>小計（税抜）</th>
-            <th>小計（税込）</th>
+            <th class="text-center"></th>
+            <th class="text-center">商品名</th>
+            <th class="text-center"></th>
+            <th class="text-center">数量</th>
+            <th class="text-center">価格</th>
+            <th class="text-center">小計（税抜）</th>
+            <th class="text-center">小計（税込）</th>
         </tr>
         {{-- @foreach($carts as $cart)
         <tr>
@@ -31,7 +34,17 @@
         <tbody>
           @foreach($carts as $cart)
           <tr>
+            <td class="text-center">{{ $loop->iteration }}.</td>
               <td>{{ $cart->name }}</td>
+              <td>
+                <div class="mb-2">
+                @if ($cart->menu && $cart->menu->image_file !== '')
+                    <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" style="max-width: 100px; height: auto;">
+                @else
+                    <img src="{{ asset('storage/images/noimage.png') }}" style="max-width: 100px; height: auto;">
+                @endif
+                </div>
+              </td>
               <td>
                   <form action="{{ route('customer.carts.update', $cart->rowId) }}" method="POST">
                       @csrf
@@ -50,9 +63,9 @@
                       
                   </form>
               </td>
-              <td>{{ number_format($cart->price) }}円</td>
-              <td>{{ number_format($cart->qty * $cart->price) }}円</td>
-              <td>{{ number_format(round($cart->qty * $cart->price * (1 + config('cart.tax') / 100))) }}円</td>
+              <td class="text-end">{{ number_format($cart->price) }}円</td>
+              <td class="text-end">{{ number_format($cart->qty * $cart->price) }}円</td>
+              <td class="text-end">{{ number_format(round($cart->qty * $cart->price * (1 + config('cart.tax') / 100))) }}円</td>
               {{-- <td>
                   <form action="{{ route('customer.carts.destroy', $cart->rowId) }}" method="POST">
                       @csrf
@@ -91,7 +104,7 @@
       </tbody>
         
     </table>
-    
+  </div>  
   @else
       <p>カートに商品がありません。</p>
   @endif
@@ -103,15 +116,18 @@
   
 
 </div> 
-<div class="d-flex justify-content-end mt-3"> 
-  <form action="{{route('customer.orders.complete')}}"method="POST">
+<hr>
+<div class="d-flex justify-content-center">
+{{-- <div class="d-flex justify-content-end mt-3">  --}}
+  {{-- <form action="{{route('customer.orders.complete')}}"method="POST">
     
-  </form>
+  </form> --}}
   {{-- <a href="{{route('carts.edit',$cart->id)}}" class="btn btn-primary">Edit</a>
   <a href="{{route('carts.destroy',$cart->id)}}" class="btn btn-danger">Delete</a> --}}
-  <p class="">合計:{{$totalIncludeTax}}円(税込)</p>
-  <div class="d-flex justify-content-end mt-3">
-    <a href="{{route('customer.menus.index')}}" class="btn btn-success">他のメニューを探す</a>
+  <p class="mb-0 me-3 fs-5">{{$itemCount}}点</p>
+  <p class="mb-0 me-3 fs-5">合計:{{$totalIncludeTax}}円(税込)</p>
+  {{-- <div class="d-flex justify-content-end mt-3"> --}}
+    <a href="{{route('customer.menus.index')}}" class="btn btn-success me-3">他のメニューを探す</a>
     @if ($totalIncludeTax > 0)
 
       <form action="{{ route('customer.orders.store') }}" method="POST">
@@ -124,7 +140,7 @@
         <a href="{{route('customer.orders.store')}}"class="btn disabled">注文送信</a>
       @endif
 
-  </div>
+  {{-- </div> --}}
     
 
 </div>

@@ -56,8 +56,17 @@ class CartController extends Controller
         // dd($carts);
 
         $menu = Menu::all();
+        $itemCount = $carts->sum('qty');
+        $menus = [];
+        foreach ($carts as $cartItem) {
+            // $cartItem->id はMenuのIDに紐付いていることを前提とします
+            $menu = Menu::find($cartItem->id);
+            if ($menu) {
+                $menus[$cartItem->rowId] = $menu;
+            }
+        }
 
-        return view('customer.carts.index', compact('carts', 'totalIncludeTax','subTotal','menu'));
+        return view('customer.carts.index', compact('carts', 'totalIncludeTax','subTotal','menu','itemCount'));
     }
 
     /**
