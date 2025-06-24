@@ -34,7 +34,7 @@
             <!-- 他のフィールド（name, price, descriptionなど） -->
             <div class="mb-3">
                 <label for="name" class="form-label">名前</label>
-                <input type="text" name="name" value="{{ $menu->name }}" placeholder="Name">
+                <input type="text" name="name" value="{{ $menu->name }}" placeholder="Name" class="form-select mb-3">
                 {{-- <input type="text" name="name" id="name" class="form-select"value="{{ old('name') }}"> --}}
                 @error('name')
                     <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
@@ -58,10 +58,10 @@
                 @enderror
             </div>
         
-            <div class="mb-3">
+            <div class="mb-3 text-center">
                 <label for="image" class="form-label">画像</label>
                 <input type="file" name="image_file" id="image_file" class="form-control">
-                <div class="">
+                <div class="mt-3">
                   @if ($menu->image_file !== '')
                       <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" style="max-width: 200px; height: auto;">
                   @else
