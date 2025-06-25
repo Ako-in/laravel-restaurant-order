@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 
-<h2>カート一覧</h2>
+<h4 class="mt-4">カート一覧</h4>
 
 <div class="container">
   {{-- <a href="{{ route('customer.menus.index') }}">メニュー一覧に戻る</a> --}}

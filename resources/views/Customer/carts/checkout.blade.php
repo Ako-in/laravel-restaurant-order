@@ -13,8 +13,8 @@
     </div>
 @endif
 
-<div class="container">
-    <strong>テーブル番号：{{$tableNumber}}の決済画面へ進みます。（この後のキャンセルはできません）</strong>
+<div class="container mt-4">
+    <strong class="">テーブル番号：{{$tableNumber}}の決済画面へ進みます。（この後のキャンセルはできません）</strong>
     <hr>
     @if($orders->count() > 0)
          <table class="table table-bordered table-striped">
