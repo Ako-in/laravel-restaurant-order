@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<h4>メニュー一覧</h4>
+<h4 class="mt-4">メニュー一覧</h4>
 <p>営業時間 {{$startTime}}-{{$closeTime}}(ラストオーダー{{$lastOrderTime}})</p>
 
 {{-- 営業時間以外の場合にメッセージを表示、写真をグレースケール、カートに追加ボタンを非表示 --}}

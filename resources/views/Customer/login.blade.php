@@ -1,13 +1,3 @@
-{{-- <form method="POST" action="{{ route('customer.login') }}">
-  @csrf
-  <label for="table_number">Table Number:</label>
-  <input type="text" name="table_number" required>
-  
-  <label for="password">Password:</label>
-  <input type="password" name="password" required>
-
-  <button type="submit">Login</button>
-</form> --}}
 
 
 <!DOCTYPE html>
@@ -15,23 +5,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>テーブルログイン</title>
+
+    <title>UrbanSpoonテーブルログイン</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 
 <body>
-    <h2>テーブルログイン</h2>
-    <form action="{{ route('customer.login') }}" method="POST">
-        @csrf
-        <div>
-            <label for="table_number">テーブル番号</label>
-            <input type="text" name="table_number" id="table_number" required>
+    <div class="container login-container">
+        <div class="">
+            <h2 class="text-center mt-4">UrbanSpoonテーブルログイン</h2>
+            <p class="text-align-center">ログイン操作は係員が行います。しばらくお待ちくださいませ。</p>
         </div>
-        <div>
-            <label for="password">パスワード</label>
-            <input type="password" name="password" id="password" required>
-        </div>
-        <button type="submit">ログイン</button>
-    </form>
+        
+
+        {{-- <img src="" alt="" style="background-image: url('{{ asset('storage/images/top2.jpg') }}')> --}}
+        <form action="{{ route('customer.login') }}" method="POST">
+            @csrf
+            <div class="mb-2">
+                <label for="table_number" class="form-label">テーブル番号</label>
+                <input type="text" name="table_number" class="form-control"id="table_number" required>
+            </div>
+            <div class="mb-2">
+                <label for="password" class="form-label">パスワード</label>
+                <input type="password" class="form-control"name="password" id="password" required>
+            </div>
+            <button type="submit"class="btn btn-primary">ログイン</button>
+        </form>
+    </div>
+    
     
     @if ($errors->any())
         <div style="color: red;">
@@ -41,4 +43,5 @@
         </div>
     @endif
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </html>
