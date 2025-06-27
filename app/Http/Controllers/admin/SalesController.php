@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 // use Illuminate\Validation\Rule;
 use Illuminate\Support\Carbon;
+use Symfony\Component\HttpFoundation\StreamedResponse; // CSV export StreamedResponse をインポート
 
 // use Encore\Admin\Grid;
 // use Encore\Admin\Form;
@@ -461,6 +462,102 @@ class SalesController extends Controller
         return view('admin.sales.chart',compact('labels','orderAmounts','orderCounts','startDate','endDate','salesItems','totalSalesAmountAcrossFilter','itemSalesSummary','itemCategorySummary'));
 
     }
+
+    public function headings(): array
+    {
+        // CSVのヘッダー行を定義
+        return [
+            'ID',
+            'Order ID',
+            'メニュー名',
+            '単価',
+            '数量',
+            '小計',
+            '注文日',
+            '注文ステータス',
+            'Created At'
+        ];
+    }
+
+    public function exportCsv(Request $request):StreamedResponse
+    {
+        // CSVエクスポートの処理をここに実装
+        // 例えば、CSVファイルを生成し、レスポンスとして返すなど
+        // Goodby\CSV\Export\Standard\Exporterを使用してCSVを生成することができます。
+        $fileName = 'sales_data_' . Carbon::now()->format('Ymd_His') . '.csv';
+
+        // headings() メソッドからヘッダーを取得
+        $csvHeaders = $this->headings(); 
+
+        $response = new StreamedResponse(function () use ($fileName, $csvHeaders) {
+            $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF"); // UTF-8 BOMを追加してExcelでの文字化けを防ぐ
+
+            $delimiter = ','; // CSVの区切り文字を設定
+            // ヘッダー行を書き込む
+            fputcsv($handle, $csvHeaders, $delimiter);
+
+            // データを書き込む
+            $salesItems = OrderItem::query()
+                ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                ->join('menus', 'order_items.menu_id', '=', 'menus.id')
+                ->where('orders.status', 'completed')
+                ->select(
+                    'order_items.id',
+                    'orders.id as order_id',
+                    'menus.name as menu_name',
+                    'order_items.price',
+                    'order_items.qty',
+                    \DB::raw('order_items.price * order_items.qty as subtotal'),
+                    'orders.created_at as order_date',
+                    'orders.status',
+                    'order_items.created_at'
+                )
+                ->get();
+
+            foreach ($salesItems as $item) {
+                // 例: menu_nameから改行コードを削除
+                $cleanedMenuName = str_replace(["\r", "\n"], '', $item->menu_name);
+                // statusフィールドも念のため改行コードを削除
+                $cleanedStatus = str_replace(["\r", "\n"], '', $item->status);
+                fputcsv($handle, [
+                    $item->id,
+                    $item->order_id,
+                    $cleanedMenuName, // 改行コードを削除したメニュー名
+                    // $item->menu_name,
+                    $item->price,
+                    $item->qty,
+                    $item->subtotal,
+                    $item->order_date,
+                    // $item->status,
+                    $cleanedStatus, // 改行コードを削除したステータス
+                    $item->created_at,
+                ], $delimiter);//デリミタを指定
+            }
+
+            fclose($handle);
+        });
+
+        // レスポンスヘッダーを設定
+        $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        $response->headers->set('Content-Disposition', "attachment; filename=\"$fileName\"");
+
+        return $response;
+
+    }
+    /**
+     * 配列内の文字列をSJIS-winにエンコードするヘルパーメソッド
+     * 日本語文字化け対策
+     * @param array $row
+     * @return array
+     */
+    // public function encodeToSjis(array $row){
+    //     foreach ($row as $key => $value) {
+    //         // mb_convert_encoding関数を使用して、UTF-8からSJIS-winに変換
+    //         $row[$key] = mb_convert_encoding($value, 'SJIS-win', 'UTF-8');
+    //     }
+    //     return $row;
+    // }
 
     // public function grid()
     // {

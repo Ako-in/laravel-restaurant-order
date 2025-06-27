@@ -74,12 +74,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // カテゴリ管理
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 
-    // 発注管理
-    Route::resource('incomings', \App\Http\Controllers\Admin\IncomingController::class);
+    // 発注管理(未実装)
+    // Route::resource('incomings', \App\Http\Controllers\Admin\IncomingController::class);
 
-    // CSVインポート
+    // CSVエクスポート
     // Route::get('csv/import', [\App\Http\Controllers\Admin\CsvImportController::class, 'import'])->name('csv.import');
-    Route::post('csv/importStore', [\App\Http\Controllers\Admin\CsvImportController::class, 'importStore'])->name('csv.importStore');
+    Route::get('sales/exportCsv', [\App\Http\Controllers\Admin\SalesController::class, 'exportCsv'])->name('sales.exportCsv');
 
 
 });

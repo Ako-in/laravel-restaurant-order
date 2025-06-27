@@ -341,9 +341,30 @@
 
 </div>
 
-<div class="btn-group pull-right" style="margin-right: 10px">
+{{-- <div class="btn-group pull-right" style="margin-right: 10px">
   <a href="#" class="btn btn-sm btn-primary csv-import"><i class="fa fa-upload"></i><span class="hidden-xs"> CSVインポート</span></a>
   <input type="file" id="files" name="product" style="display: none">
+</div> --}}
+
+<div class="container my-4">
+  <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">売上データダウンロード</h5>
+      </div>
+      <div class="card-body">
+          <p>現在の売上データをCSVファイルとしてダウンロードできます。</p>
+
+          <div class="btn-group mb-3" role="group" aria-label="CSV Export">
+              <a href="{{ route('admin.sales.exportCsv') }}" class="btn btn-primary" download="sales_data.csv">
+                  <i class="fa fa-download"></i> 売上データをダウンロード
+              </a>
+          </div>
+
+          {{-- ダウンロード後にメッセージを表示したい場合はここに要素を追加できますが、
+               通常はブラウザが自動的にファイルをダウンロードするため不要です。 --}}
+          <div id="export_messages" class="mt-3"></div>
+      </div>
+  </div>
 </div>
 
 {{-- <script>
