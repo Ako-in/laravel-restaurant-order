@@ -498,25 +498,28 @@ class SalesController extends Controller
         // 開始日と終了日を取得
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+        $allData = $request->boolean('all'); //全件
 
         Log::info('CSV export request received.');
         Log::info('Request Start Date: ' . ($startDate ?? 'Not set') . ', Request End Date: ' . ($endDate ?? 'Not set'));
 
-        $response = new StreamedResponse(function () use ($fileName, $csvHeaders, $startDate, $endDate) {
+        $response = new StreamedResponse(function () use ($fileName, $csvHeaders, $startDate, $endDate, $allData) {
             $handle = fopen('php://output', 'w');// PHPの出力バッファをファイルハンドルとして開く
             fwrite($handle, "\xEF\xBB\xBF"); // UTF-8 BOMを追加してExcelでの文字化けを防ぐ
 
             $delimiter = ','; // CSVの区切り文字を設定
 
             $dateRangeText = "売上集計期間: ";
-            if ($startDate && $endDate) {
+            if($allData) {
+                $dateRangeText .= "全期間";
+            } elseif($startDate && $endDate) {
                 $dateRangeText .= Carbon::parse($startDate)->format('Y年m月d日') . " から " . Carbon::parse($endDate)->format('Y年m月d日');
             } elseif ($startDate) {
                 $dateRangeText .= Carbon::parse($startDate)->format('Y年m月d日') . " 以降";
             } elseif ($endDate) {
                 $dateRangeText .= Carbon::parse($endDate)->format('Y年m月d日') . " まで";
             } else {
-                $dateRangeText .= "全期間";
+                $dateRangeText .= "期間指定なし（全件取得の可能性あり）";
             }
             fputcsv($handle, [$dateRangeText], $delimiter);
             fputcsv($handle, [], $delimiter); // 空行
@@ -539,16 +542,17 @@ class SalesController extends Controller
             // dd($startDate, $endDate);
 
             // 取得した日付範囲でデータを絞り込む
-            if ($startDate) {
-                $salesItemsQuery->whereDate('orders.created_at', '>=', $startDate);
+            if (!$allData){
+                if($startDate) {
+                    $salesItemsQuery->whereDate('orders.created_at', '>=', $startDate);
+                }
+                if ($endDate) {
+                    $salesItemsQuery->whereDate('orders.created_at', '<=', $endDate);
+                }
             }
-            if ($endDate) {
-                $salesItemsQuery->whereDate('orders.created_at', '<=', $endDate);
-            }
-
+            
              Log::info('CSV export process started. (inside closure)');
              Log::info('Start Date (inside closure): ' . ($startDate ?? 'Not set') . ', End Date (inside closure): ' . ($endDate ?? 'Not set'));
-
 
             // データを取得して、ループでCSVに書き込む
             $salesItems = $salesItemsQuery->select(

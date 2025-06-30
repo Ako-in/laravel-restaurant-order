@@ -259,11 +259,17 @@
         let url = "{{ route('admin.sales.exportCsv') }}"; // ベースとなるCSVエクスポートURL
         const params = new URLSearchParams(); // クエリパラメータを構築するためのオブジェクト
 
-        if(startDate){　//取得した日付に値があれば、URLパラメータとして追加
+        //　開始日と終了日がある時
+        if(startDate){//取得した日付に値があれば、URLパラメータとして追加
           params.append('start_date', startDate);
         }
         if(endDate){
           params.append('end_date', endDate);
+        }
+
+        if(!startDate && !endDate){
+          // 開始日も終了日も指定されていない場合は、全期間のデータを取得するための処理を追加
+          params.append('all', 'true'); // 例として、全期間を示すパラメータを追加
         }
         // event.preventDefault(); // デフォルトのリンク動作を防ぐ
 
@@ -276,7 +282,7 @@
         window.location.href = url; // 直接URLにリダイレクトしてダウンロードを開始
 
 
-        // console.log('CSV Download URL:', url); // デバッグ用にURLをコンソールに出力
+        console.log('CSV Download URL:', url); // デバッグ用にURLをコンソールに出力
         
       });
 
