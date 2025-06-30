@@ -59,7 +59,6 @@ class OrderController extends Controller
 
         $orderedMenu = OrderItem::with('menu')->get();
         $menu_search = $request->input('menu_search');
-        
 
 
         return view('admin.orders.index', compact('orders','orderDate','date','menu_search','menu_search_type','orderedMenu'));

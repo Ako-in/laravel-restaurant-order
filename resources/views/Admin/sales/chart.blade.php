@@ -249,6 +249,39 @@
       // }
     }
 
+    // CSVダウンロードリンクのクリックイベント
+    const csvExportLink = document.getElementById('csvExportLink');
+    if(csvExportLink){
+      csvExportLink.addEventListener('click', function(event) {
+        const startDate = document.getElementById('start_date').value; // 開始日
+        const endDate = document.getElementById('end_date').value; // 終了日
+
+        let url = "{{ route('admin.sales.exportCsv') }}"; // ベースとなるCSVエクスポートURL
+        const params = new URLSearchParams(); // クエリパラメータを構築するためのオブジェクト
+
+        if(startDate){　//取得した日付に値があれば、URLパラメータとして追加
+          params.append('start_date', startDate);
+        }
+        if(endDate){
+          params.append('end_date', endDate);
+        }
+        // event.preventDefault(); // デフォルトのリンク動作を防ぐ
+
+        // 構築したクエリパラメータがあればURLに追加
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+
+        // リンクのhref属性を更新し、ダウンロードを開始
+        window.location.href = url; // 直接URLにリダイレクトしてダウンロードを開始
+
+
+        // console.log('CSV Download URL:', url); // デバッグ用にURLをコンソールに出力
+        
+      });
+
+    }
+
 
 
 
@@ -261,7 +294,7 @@
 </script>
 
 <div class="container">
-  <h2 class="mb-4">売上検索</h2>
+  <h2 class="mb-2">売上検索</h2>
 
   {{-- 検索フォーム --}}
   <div class="card">
@@ -275,15 +308,35 @@
           <label for="end_date">終了日：</label>
           <input type="date"class="form-control"id="end_date"name="end_date" value="{{$endDate}}">
         </div>
-        <button type="submit" class="btn btn-primary">検索</button>
-        <a href="{{route('admin.sales.chart')}}" class="btn btn-secondary">リセット</a>
+        <button type="submit" class="btn btn-primary mt-2">検索</button>
         
+        <a href="{{route('admin.sales.chart')}}" class="btn btn-secondary mt-2">リセット</a>
+        <div class="container my-4">
+          <div class="card shadow-sm">
+              <div class="card-header bg-primary text-white">
+                  <h5 class="mb-0">売上データダウンロード</h5>
+              </div>
+              <div class="card-body">
+                  <p>検索した日付範囲の売り上げデータをCSVファイルでダウンロードできます。</p>
+        
+                  <div class="btn-group mb-2" role="group" aria-label="CSV Export">
+                      <a href="#" id="csvExportLink"class="btn btn-primary" download="sales_data.csv">
+                          <i class="fa fa-download"></i> 売上データをダウンロード
+                      </a>
+                  </div>
+        
+                  {{-- ダウンロード後にメッセージを表示したい場合はここに要素を追加できますが、
+                       通常はブラウザが自動的にファイルをダウンロードするため不要です。 --}}
+                  {{-- <div id="export_messages" class="mt-3"></div> --}}
+              </div>
+          </div>
+        </div>
       </form>
     </div>
   </div>
 
   {{-- 検索結果を表示 --}}
-  <div class="alert alert-info" role="alert">
+  <div class="alert alert-info mt-2" role="alert">
     @if($startDate && $endDate)
       {{\Carbon\Carbon::parse($startDate)->format('Y年m月d日')}}から{{\Carbon\Carbon::parse($endDate)->format('Y年m月d日')}}までの売上アイテム{{$salesItems->total()}}件、売上金**{{number_format($totalSalesAmountAcrossFilter)}}**円
     @elseif ($startDate)
@@ -308,7 +361,10 @@
               <tr>
                 {{-- <th>注文ID</th> --}}
                 {{-- <th>注文日</th> --}}
+                <th>No.</th>
+                <th>メニューID</th>
                 <th>メニュー名</th>
+                <th>カテゴリ</th>
                 <th>単価</th>
                 <th>数量</th>
                 <th>売上合計（円）</th>
@@ -317,9 +373,15 @@
             <tbody>
               @foreach($itemSalesSummary as $summary)
               <tr>
+                <td>
+                  {{$loop->iteration}} {{-- ループのインデックスを表示 --}}
+                </td>
+                <td>{{$summary->menu_id}}</td>
+                
                 {{-- <td>{{$item->order_id}}</td> --}}
                 {{-- <td>{{\Carbon\Carbon::parse($item->order_date)->format('Y/m/d H:i')}}</td> --}}
                 <td>{{$summary->menu_name}}</td>
+                <td>{{$summary->category_name}}</td>
                 <td>{{number_format($summary->menu_price)}}</td>
 
                 {{-- <td>{{$item->qty}}</td> --}}
@@ -346,7 +408,7 @@
   <input type="file" id="files" name="product" style="display: none">
 </div> --}}
 
-<div class="container my-4">
+{{-- <div class="container my-4">
   <div class="card shadow-sm">
       <div class="card-header bg-primary text-white">
           <h5 class="mb-0">売上データダウンロード</h5>
@@ -362,10 +424,10 @@
 
           {{-- ダウンロード後にメッセージを表示したい場合はここに要素を追加できますが、
                通常はブラウザが自動的にファイルをダウンロードするため不要です。 --}}
-          <div id="export_messages" class="mt-3"></div>
+          {{-- <div id="export_messages" class="mt-3"></div>
       </div>
   </div>
-</div>
+</div> --}}
 
 {{-- <script>
   $(function () {

@@ -378,9 +378,12 @@ class SalesController extends Controller
         $itemSalesSummaryQuery = OrderItem::query()
         ->join('orders', 'order_items.order_id', '=', 'orders.id')
         ->leftJoin('menus', 'order_items.menu_id', '=', 'menus.id')
+        ->leftJoin('categories', 'menus.category_id', '=', 'categories.id')
         ->select(
+            'menus.id as menu_id',
             'menus.name as menu_name',
             'menus.price as menu_price',
+            'categories.name as category_name',
             \DB::raw('SUM(order_items.price * order_items.qty) as total_item_amount'), // アイテムごとの合計金額
             \DB::raw('SUM(order_items.qty) as total_item_qty'), // アイテムごとの合計数量
             \DB::raw('SUM(order_items.price * order_items.qty) / SUM(order_items.qty) as average_unit_price')
@@ -468,8 +471,10 @@ class SalesController extends Controller
         // CSVのヘッダー行を定義
         return [
             'ID',
-            'Order ID',
+            '注文ID',
+            'メニューID',
             'メニュー名',
+            'カテゴリ名',
             '単価',
             '数量',
             '小計',
@@ -481,50 +486,98 @@ class SalesController extends Controller
 
     public function exportCsv(Request $request):StreamedResponse
     {
-        // CSVエクスポートの処理をここに実装
-        // 例えば、CSVファイルを生成し、レスポンスとして返すなど
-        // Goodby\CSV\Export\Standard\Exporterを使用してCSVを生成することができます。
+        // CSVファイル名を生成
         $fileName = 'sales_data_' . Carbon::now()->format('Ymd_His') . '.csv';
+
+        // dd($fileName); 
+        // Log::info('Generated File Name: ' . $fileName); 
 
         // headings() メソッドからヘッダーを取得
         $csvHeaders = $this->headings(); 
 
-        $response = new StreamedResponse(function () use ($fileName, $csvHeaders) {
-            $handle = fopen('php://output', 'w');
+        // 開始日と終了日を取得
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        Log::info('CSV export request received.');
+        Log::info('Request Start Date: ' . ($startDate ?? 'Not set') . ', Request End Date: ' . ($endDate ?? 'Not set'));
+
+        $response = new StreamedResponse(function () use ($fileName, $csvHeaders, $startDate, $endDate) {
+            $handle = fopen('php://output', 'w');// PHPの出力バッファをファイルハンドルとして開く
             fwrite($handle, "\xEF\xBB\xBF"); // UTF-8 BOMを追加してExcelでの文字化けを防ぐ
 
             $delimiter = ','; // CSVの区切り文字を設定
+
+            $dateRangeText = "売上集計期間: ";
+            if ($startDate && $endDate) {
+                $dateRangeText .= Carbon::parse($startDate)->format('Y年m月d日') . " から " . Carbon::parse($endDate)->format('Y年m月d日');
+            } elseif ($startDate) {
+                $dateRangeText .= Carbon::parse($startDate)->format('Y年m月d日') . " 以降";
+            } elseif ($endDate) {
+                $dateRangeText .= Carbon::parse($endDate)->format('Y年m月d日') . " まで";
+            } else {
+                $dateRangeText .= "全期間";
+            }
+            fputcsv($handle, [$dateRangeText], $delimiter);
+            fputcsv($handle, [], $delimiter); // 空行
+
+
             // ヘッダー行を書き込む
             fputcsv($handle, $csvHeaders, $delimiter);
 
-            // データを書き込む
-            $salesItems = OrderItem::query()
+            // データを取得するクエリを構築
+            // OrderItemモデルを使用して、注文アイテムのデータを取得するためのクエリを作成
+            $salesItemsQuery = OrderItem::query()
                 ->join('orders', 'order_items.order_id', '=', 'orders.id')
                 ->join('menus', 'order_items.menu_id', '=', 'menus.id')
-                ->where('orders.status', 'completed')
-                ->select(
-                    'order_items.id',
-                    'orders.id as order_id',
-                    'menus.name as menu_name',
-                    'order_items.price',
-                    'order_items.qty',
-                    \DB::raw('order_items.price * order_items.qty as subtotal'),
-                    'orders.created_at as order_date',
-                    'orders.status',
-                    'order_items.created_at'
-                )
-                ->get();
+                ->leftJoin('categories', 'menus.category_id', '=', 'categories.id') // カテゴリ名を取得するため結合
+                ->where('orders.status', 'completed'); // 完了した注文のみを対象
+            
+            // $startDate = $request->input('start_date'); // リクエストから開始日を取得    
+            // $endDate = $request->input('end_date'); // リクエストから終了日を取得
+
+            // dd($startDate, $endDate);
+
+            // 取得した日付範囲でデータを絞り込む
+            if ($startDate) {
+                $salesItemsQuery->whereDate('orders.created_at', '>=', $startDate);
+            }
+            if ($endDate) {
+                $salesItemsQuery->whereDate('orders.created_at', '<=', $endDate);
+            }
+
+             Log::info('CSV export process started. (inside closure)');
+             Log::info('Start Date (inside closure): ' . ($startDate ?? 'Not set') . ', End Date (inside closure): ' . ($endDate ?? 'Not set'));
+
+
+            // データを取得して、ループでCSVに書き込む
+            $salesItems = $salesItemsQuery->select(
+                'order_items.id',
+                'orders.id as order_id',
+                'order_items.menu_id',
+                'menus.name as menu_name',
+                'categories.name as category_name', 
+                'order_items.price',
+                'order_items.qty',
+                \DB::raw('order_items.price * order_items.qty as subtotal'),
+                'orders.created_at as order_date',
+                'orders.status',
+                'order_items.created_at'
+            )->get();
 
             foreach ($salesItems as $item) {
-                // 例: menu_nameから改行コードを削除
+                // menu_nameから改行コードを削除
                 $cleanedMenuName = str_replace(["\r", "\n"], '', $item->menu_name);
                 // statusフィールドも念のため改行コードを削除
                 $cleanedStatus = str_replace(["\r", "\n"], '', $item->status);
+                //各行のデータをCSVに書き込む
                 fputcsv($handle, [
                     $item->id,
                     $item->order_id,
+                    $item->menu_id,
                     $cleanedMenuName, // 改行コードを削除したメニュー名
                     // $item->menu_name,
+                    $item->category_name, // カテゴリ名
                     $item->price,
                     $item->qty,
                     $item->subtotal,
@@ -535,114 +588,21 @@ class SalesController extends Controller
                 ], $delimiter);//デリミタを指定
             }
 
-            fclose($handle);
+            fclose($handle);// ファイルハンドルを閉じる
         });
 
+        // $fileName = 'sales_data_' . Carbon::now()->format('Ymd_His') . '.csv';
+        // dd($fileName);
+        // Log::info('Generated File Name: ' . $fileName);
+
         // レスポンスヘッダーを設定
+        // Content-Type: CSVファイルであることをブラウザに伝える
         $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+        // Content-Disposition: ファイルとしてダウンロードさせるための設定とファイル名の指定
         $response->headers->set('Content-Disposition', "attachment; filename=\"$fileName\"");
 
-        return $response;
+        return $response;//レスポンスをブラウザに返す
 
     }
-    /**
-     * 配列内の文字列をSJIS-winにエンコードするヘルパーメソッド
-     * 日本語文字化け対策
-     * @param array $row
-     * @return array
-     */
-    // public function encodeToSjis(array $row){
-    //     foreach ($row as $key => $value) {
-    //         // mb_convert_encoding関数を使用して、UTF-8からSJIS-winに変換
-    //         $row[$key] = mb_convert_encoding($value, 'SJIS-win', 'UTF-8');
-    //     }
-    //     return $row;
-    // }
-
-    // public function grid()
-    // {
-    //     $grid = new Grid(new OrderItem());
-    //     $grid->model()->whereHas('order', function ($query) {
-    //         $query->where('status', 'completed'); // 完了した注文のみを対象
-    //     });
-    //     $grid->column('id', 'ID')->sortable();
-    //     $grid->column('order_id', 'Order ID')->sortable();
-    //     $grid->column('menu.name', 'Menu Name')->sortable();
-    //     $grid->column('price', 'Price')->sortable();
-    //     $grid->column('qty', 'Quantity')->sortable();
-    //     $grid->column('subtotal', 'Subtotal')->display(function () {
-    //         return number_format($this->price * $this->qty, 2);
-    //     })->sortable();
-    //     $grid->column('order.created_at', 'Order Date')->sortable();
-    //     $grid->column('order.status', 'Order Status')->sortable();
-    //     $grid->column('created_at', 'Created At')->sortable();
-    //     $grid->column('updated_at', 'Updated At')->sortable();
-        
-    //     // $grid->tools(function ($tools) {
-    //     //     $tools->append(new CsvImport());
-    //     // });
-    //     // CSVインポートツールを追加
-    //     $grid->tools(function (Grid\Tools $tools) {
-    //         // Adminツールは、AdminのURLヘルパーを使ってルーティングするのがベスト
-    //         // ルート名 'admin.csv.importStore' が有効であれば route() も使える
-    //         $tools->append(new CsvImport(url('csv/importStore')));
-    //     });
-    //     return $grid;
-    // }
-
-    // protected function form()
-    // {
-    //     $form = new Form(new OrderItem());
-
-    //     return $form;
-
-    // }
-
-    // public function csvImport(Request $request)
-    // {
-    //     // CSVインポートの処理をここに実装
-    //     // 例えば、CSVファイルを読み込み、OrderItemモデルにデータを保存するなど
-    //     // Goodby\CSV\Import\Standard\LexerやInterpreterを使用してCSVを解析することができます。
-    //     // 詳細な実装は要件に応じて調整してください。
-    //     $file = $request->file('file');
-    //     $lexer_config = new LexerConfig();
-    //     $lexer = new Lexer($lexer_config);
-
-    //     $interpreter = new Interpreter();
-    //     $interpreter->unstrict();
-
-    //     $rows = array();
-    //     $interpreter->addObserver(function (array $row) use (&$rows) {
-    //         $rows[] = $row;
-    //     });
-
-    //     $lexer->parse($file, $interpreter);
-    //     foreach ($rows as $key => $value) {
-
-    //         if (count($value) == 7) {
-    //             Product::create([
-    //                 'name' => $value[0],
-    //                 'description' => $value[1],
-    //                 'price' => $value[2],
-    //                 'category_id' => $value[3],
-    //                 'image' => $value[4],
-    //                 'recommend_flag' => $value[5],
-    //                 'carriage_flag' => $value[6],
-    //             ]);
-    //         }
-    //     }
-
-    //     return response()->json(
-    //         ['data' => '成功'],
-    //         200,
-    //         [],
-    //         JSON_UNESCAPED_UNICODE
-    //     );
     
-    // }
-        
-    
-
-
-
 }
