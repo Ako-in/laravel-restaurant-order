@@ -74,8 +74,39 @@
     </footer> --}}
     @include('layouts.footer')
   </div>
+
+  <div class="modal fade" id="unpaidAlertModal" tabindex="-1" aria-labelledby="unpaidAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="unpaidAlertModalLabel">ログアウトできません。</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+            </div>
+            <div class="modal-body">
+              未決済の注文があります。先に精算を完了してください。
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+  </div>
   
   
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+  {{-- ログアウトのモーダル --}}
+  <script>
+    document.getElementById('logout-btn').addEventListener('click',function(){
+        // 未決済の注文がある場合はモーダルを表示
+        @if ($hasUnpaidOrders)
+            var unpaidAlertModal = new bootstrap.Modal(document.getElementById('unpaidAlertModal'));
+            unpaidAlertModal.show();
+        @else
+            // 未決済の注文がない場合はログアウトフォームを送信
+            document.getElementById('logout-form').submit();
+        @endif
+    })
+  </script>
 </body>
 </html>

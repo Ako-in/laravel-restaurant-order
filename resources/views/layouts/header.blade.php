@@ -44,10 +44,29 @@
                 <a href="{{route('customer.carts.index')}}" class="nav-link text-white me-3 fw-bold">カート</a>
                 {{-- <a href="{{route('customer.carts.history')}}" class="nav-link text-dark me-3 fw-bold">注文履歴</a> --}}
                 <a href="{{route('customer.carts.checkout')}}" class="nav-link text-white me-3 fw-bold">注文履歴・決済画面</a>
-                <a href="{{ route('customer.logout') }}" class="nav-link text-white me-3 fw-bold" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a>
+                {{-- <a href="{{ route('customer.logout') }}" class="nav-link text-white me-3 fw-bold" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a> --}}
+                {{-- ログアウト --}}
                 <form id="logout-form" action="{{ route('customer.logout') }}" method="POST">
                     @csrf
+                    <button type="button"id="logout-btn"class="btn btn-danger">ログアウト</button>
                 </form>
+                {{-- <div class="modal fade" id="unpaidAlertModal" tabindex="-1" aria-labelledby="unpaidAlertModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="unpaidAlertModalLabel">ログアウトできません。</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+                          </div>
+                          <div class="modal-body">
+                            未決済の注文があります。先に精算を完了してください。
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                          </div>
+                      </div>
+                  </div>
+                </div> --}}
+                
               </li>
           </ul>
         </div>

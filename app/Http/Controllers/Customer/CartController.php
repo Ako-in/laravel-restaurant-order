@@ -66,7 +66,9 @@ class CartController extends Controller
             }
         }
 
-        return view('customer.carts.index', compact('carts', 'totalIncludeTax','subTotal','menu','itemCount'));
+
+
+        return view('customer.carts.index', compact('carts', 'totalIncludeTax','subTotal','menu','itemCount', 'menus'));
     }
 
     /**

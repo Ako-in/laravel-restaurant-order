@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Menu;
 use App\Models\Category;
+use App\Models\OrderItem;
+use App\Models\Order;
 use App\Models\Customer;
 use Carbon\Carbon;
 
@@ -137,6 +139,13 @@ class MenuController extends Controller
         $menus = $query->paginate(15); // 例: 1ページあたり3件表示
 
 
+        // $hasUnpaidOrder = false;
+        // if (Auth::check()) {
+        //     // ユーザーの未払いの注文を確認
+        //     $hasUnpaidOrder = Order::where('table_number', Auth::id())
+        //         ->where('is_paid', false)
+        //         ->exists();
+        // }
         return view('customer.menus.index',compact(
             'menus',
             'customer',
@@ -153,6 +162,7 @@ class MenuController extends Controller
             'newItem',
             'hasStock',
             'stockLow',
+            // 'hasUnpaidOrder',
         ));
     }
 

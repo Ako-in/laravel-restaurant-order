@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Order;
 
 class Customer extends Authenticatable
 {
@@ -20,5 +21,11 @@ class Customer extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    public function orders()
+    {
+        // hasMany
+        return $this->hasMany(Order::class,'table_number');
+    }
 
 }

@@ -14,8 +14,16 @@
 <body>
     <div class="container login-container">
         <div class="">
-            <h2 class="text-center mt-4">UrbanSpoonテーブルログイン</h2>
-            <p class="text-align-center">ログイン操作は係員が行います。しばらくお待ちくださいませ。</p>
+            <div class="d-flex justify-content-center align-items-center flex-wrap">
+                {{-- タイトルとロゴ --}}
+                <img src="{{ asset('storage/images/logo.png') }}" alt="Urban Spoon Logo" class="me-2 rounded-circle" style="max-height:60px;"> 
+                <h2 class="text-center mt-4 mb-4">UrbanSpoonテーブルログイン</h2>
+            </div>
+            
+            
+            <div style="background-image: url('{{ asset('storage/images/top2.jpg') }}'); background-size: cover; background-position: center; height: 200px; margin-bottom: 20px;">
+            </div>
+            <p class="text-align-center text-center">ログイン操作は係員が行います。しばらくお待ちくださいませ。</p>
         </div>
         
 
