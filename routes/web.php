@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\CategoryController;
 // use App\Http\Controllers\Admin\IncomingController;
 use App\Http\Controllers\Admin\CsvImportController;
+use App\Http\Controllers\Admin\SalesTargetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,8 +79,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Route::resource('incomings', \App\Http\Controllers\Admin\IncomingController::class);
 
     // CSVエクスポート
-    // Route::get('csv/import', [\App\Http\Controllers\Admin\CsvImportController::class, 'import'])->name('csv.import');
     Route::get('sales/exportCsv', [\App\Http\Controllers\Admin\SalesController::class, 'exportCsv'])->name('sales.exportCsv');
+
+    // 売上目標
+    Route::get('sales_target', [SalesTargetController::class, 'index'])->name('sales_target.index');
+    Route::get('sales_target/create', [SalesTargetController::class, 'create'])->name('sales_target.create');
+    Route::post('sales_target', [SalesTargetController::class, 'store'])->name('sales_target.store');
+    Route::get('sales_target/{id}/edit', [SalesTargetController::class, 'edit'])->name('sales_target.edit');
+    Route::put('sales_target/{id}', [SalesTargetController::class, 'update'])->name('sales_target.update');
+
+    // Route::resource('sales_target', SalesTargetController::class)->except(['delete', 'destroy']);
 
 
 });

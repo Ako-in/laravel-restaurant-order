@@ -43,6 +43,7 @@
 
 </head>
 
+@stack('scripts')
 <body>
   <div class="wrapper">
     @include('layouts.adminheader')
