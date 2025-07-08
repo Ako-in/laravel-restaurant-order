@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\SalesTarget; // 売上目標モデルをインポート
+use App\Models\OrderItem; // 売上目標の合計を取得するためにOrderItemモデルをインポート
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log; // ログ出力のためにインポート
 
@@ -16,11 +17,88 @@ class SalesTargetController extends Controller
         // $monthlySalesTargets = []; // 月ごとの売上目標を取得するロジックを実装
         // 管理者向けの売上目標の一覧を表示
 
+        
+
         $allSalesTargets = SalesTarget::all(); // 売上目標の全データを取得
         // $start_year = $salesTargets->format('Y');
         $monthlySalesTargets = $allSalesTargets->where('period_type', 'monthly'); // 月間売上目標のデータ  
         $yearlySalesTargets = $allSalesTargets->where('period_type', 'yearly'); // 年間売上目標のデータ
-        return view('admin.sales_target.index',compact('allSalesTargets','monthlySalesTargets', 'yearlySalesTargets'));
+
+        $currentMonthlySalesSum = OrderItem::whereHas('order', function ($query) {
+            $query->where('status', 'completed');
+        })
+            ->where('created_at', '>=', Carbon::now()->startOfMonth()) // 現在の月の開始日から
+            ->sum('subtotal'); // 現在の月の売上目標の合計を取得
+        $currentYearlySalesSum = OrderItem::whereHas('order', function ($query) {
+            $query->where('status', 'completed');
+        })
+            ->where('created_at', '>=', Carbon::now()->startOfYear()) // 現在の年の開始日から
+            ->sum('subtotal'); // 現在の年の売上目標の合計を取得
+
+        // 各月の実売上累計を取得
+        $monthlySalesData = null;
+        for ($month = 1; $month <= 12; $month++) {
+            $monthlySalesData[$month] = OrderItem::whereHas('order', function ($query) {
+                $query->where('status', 'completed');
+            })
+                ->whereMonth('created_at', $month) // 月ごとにフィルタリング
+                ->sum('subtotal'); // 月ごとの売上合計を取得
+        }
+
+        // 各年の実売上累計を取得
+        $yearlySalesData = null;
+        $currentYear = Carbon::now()->year;
+        for ($year = $currentYear - 5; $year <= $currentYear; $year++) {
+            $yearlySalesData[$year] = OrderItem::whereHas('order', function ($query) {
+                $query->where('status', 'completed');
+            })
+                ->whereYear('created_at', $year) // 年ごとにフィルタリング
+                ->sum('subtotal'); // 年ごとの売上合計を取得
+        }
+
+        //未達成金額（月、年）
+        $unachieved_amount = null;
+        if(count($monthlySalesTargets) > 0) {
+            foreach ($monthlySalesTargets as $target) {
+                $month = Carbon::parse($target->start_date)->month; // 月を取得
+                $unachieved_amount[$month] = $target->target_amount - ($monthlySalesData[$month] ?? 0);
+            }
+        }
+        if(count($yearlySalesTargets) > 0) {
+            foreach ($yearlySalesTargets as $target) {
+                $year = Carbon::parse($target->start_date)->year; // 年を取得
+                $unachieved_amount[$year] = $target->target_amount - ($yearlySalesData[$year] ?? 0);
+            }
+        }
+
+        //達成率（月、年）
+        $achievement_rate = null;
+        if(count($monthlySalesTargets) > 0) {
+            foreach ($monthlySalesTargets as $target) {
+                $month = Carbon::parse($target->start_date)->month; // 月を取得
+                $achievement_rate[$month] = ($monthlySalesData[$month] ?? 0) / $target->target_amount * 100;
+            }
+        }
+
+        if(count($yearlySalesTargets) > 0) {
+            foreach ($yearlySalesTargets as $target) {
+                $year = Carbon::parse($target->start_date)->year; // 年を取得
+                $achievement_rate[$year] = ($yearlySalesData[$year] ?? 0) / $target->target_amount * 100;
+            }
+        }
+
+
+        return view('admin.sales_target.index',compact(
+            'allSalesTargets',
+            'monthlySalesTargets', 
+            'yearlySalesTargets',
+            'currentMonthlySalesSum',
+            'currentYearlySalesSum',
+            'monthlySalesData',
+            'yearlySalesData',
+            'unachieved_amount',
+            'achievement_rate',
+        ));
     }
 
     public function create(Request $request)

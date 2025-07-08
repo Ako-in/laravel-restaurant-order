@@ -24,7 +24,7 @@
                     <a href="{{route('admin.sales.chart')}}"class="nav-link">売上</a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link">売上目標</a>
+                    <a href="{{route('admin.sales_target.index')}}" class="nav-link">売上目標</a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('admin.logout') }}" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a>

@@ -29,7 +29,6 @@
             <table class="table table-striped table-hover">
               <thead>
                   <tr>
-                      {{-- <th>ID</th> --}}
                       <th>期間タイプ</th>
                       <th>年度</th>
                       <th>月</th>
@@ -37,35 +36,37 @@
                       <th>累計</th>
                       <th>未達成金額</th>
                       <th>達成率</th>
-                      {{-- <th>開始日</th>
-                      <th>終了日</th> --}}
                       <th>登録日</th>
                       <th>更新日</th>
                   </tr>
               </thead>
       
               <tbody>
-                <thead>
                   @foreach ($monthlySalesTargets as $salesTarget)
-                      <tr>
-                          {{-- <td>{{ $salesTarget->id }}</td> --}}
-                          <td>{{$salesTarget->period_type}}</td>
-                          <td>{{\Carbon\Carbon::parse($salesTarget->start_date)->format('Y')}}</td>
-                          <td>{{\Carbon\Carbon::parse($salesTarget->start_date)->format('m')}}</td>
-                          
-                          <td>{{ number_format($salesTarget->target_amount) }} 円</td>
-                          <td>累計金額を入れる</td>
-                          <td>未達成金額を入れる</td>
-                          <td>達成率を入れる</td>
-                          {{-- <td>{{ $achievement_rate }} %</td> --}}
+                      @php
+                        $year = \Carbon\Carbon::parse($salesTarget->start_date)->year;
+                        $month = \Carbon\Carbon::parse($salesTarget->start_date)->month;
+                        $currentActualSales = $monthlySalesData[$month] ?? 0;
+                        $targetAmount = $salesTarget->target_amount;
+                        $unachieved = $targetAmount - $currentActualSales;
+                        // $rate = ($targetAmount > 0) ? ($currentActualSales / $target_amount * 100) : 0;
+                        // $currentMonthlySalesSum = $salesTarget->current_monthly_sales_sum ?? 0;
+                        // $unachieved = $salesTarget->target_amount - $currentMonthlySalesSum;
+                        $rate = $salesTarget->target_amount > 0 ? round(($currentMonthlySalesSum / $salesTarget->target_amount) * 100, 2) : 0;  
+                      @endphp
       
-                          {{-- <td>{{ $salesTarget->start_date->format('Y-m-d') }}</td> --}}
-                          {{-- <td>{{ $salesTarget->end_date->format('Y-m-d') }}</td> --}}
-                          <td>{{ $salesTarget->created_at->format('Y-m-d H:i') }}</td>
-                          <td>{{ $salesTarget->updated_at->format('Y-m-d H:i') }}</td>
+                      <tr>
+                        <td>{{$salesTarget->period_type}}</td>
+                        <td>{{$year}}</td>
+                        <td>{{$month}}</td>
+                        <td>{{ number_format($targetAmount) }} 円</td>
+                        <td>{{ number_format($currentActualSales) }} 円</td>
+                        <td>{{ number_format($unachieved) }} 円</td> {{-- 修正した変数名 $unachieved を使用 --}}
+                        <td>{{ number_format($rate, 2) }} %</td>
+                        <td>{{ $salesTarget->created_at->format('Y-m-d H:i') }}</td>
+                        <td>{{ $salesTarget->updated_at->format('Y-m-d H:i') }}</td>
                       </tr>
                   @endforeach
-                </thead>
 
               </tbody>
             </table>
@@ -78,48 +79,46 @@
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>
-                        {{-- <th>ID</th> --}}
                         <th>期間タイプ</th>
                         <th>年度</th>
+                        <th>月</th>
                         <th>売上目標金額</th>
                         <th>累計</th>
                         <th>未達成金額</th>
                         <th>達成率</th>
-                        {{-- <th>開始日</th>
-                        <th>終了日</th> --}}
                         <th>登録日</th>
                         <th>更新日</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                  <thead>
                     @foreach ($yearlySalesTargets as $salesTarget)
+                    @php
+                            $year = \Carbon\Carbon::parse($salesTarget->start_date)->year;
+                            // この年の実売上データを $yearlySalesData 配列から取得
+                            $currentActualSales = $yearlySalesData[$year] ?? 0;
+                            $targetAmount = $salesTarget->target_amount;
+                            // 未達成金額を計算 (変数名を $unachieved に統一)
+                            $unachieved = $targetAmount - $currentActualSales;
+                            // 達成率を計算 (targetAmountが0の場合は0%とする)
+                            $rate = ($targetAmount > 0) ? ($currentActualSales / $targetAmount * 100) : 0;
+                      @endphp
                         <tr>
-                            {{-- <td>{{ $salesTarget->id }}</td> --}}
-                            <td>{{$salesTarget->period_type}}</td>
-                            <td>{{\Carbon\Carbon::parse($salesTarget->start_date)->format('Y')}}</td>
-                            
-                            <td>{{ number_format($salesTarget->target_amount) }} 円</td>
-                            <td>累計金額を入れる</td>
-                            <td>未達成金額を入れる</td>
-                            <td>達成率%を入れる</td>
-                            {{-- <td>{{ $achievement_rate }} %</td> --}}
-
-                            {{-- <td>{{ $salesTarget->start_date->format('Y-m-d') }}</td> --}}
-                            {{-- <td>{{ $salesTarget->end_date->format('Y-m-d') }}</td> --}}
+                          <td>{{$salesTarget->period_type}}</td>
+                            <td>{{$year}}</td> 
+                            <td>-</td>
+                            <td>{{ number_format($targetAmount) }} 円</td>
+                            <td>{{ number_format($currentActualSales) }} 円</td>
+                            <td>{{ number_format($unachieved) }} 円</td>
+                            <td>{{ number_format($rate, 2) }} %</td>
                             <td>{{ $salesTarget->created_at->format('Y-m-d H:i') }}</td>
                             <td>{{ $salesTarget->updated_at->format('Y-m-d H:i') }}</td>
                         </tr>
                     @endforeach
-                  </thead>
-
-                  
-                  
                 </tbody>
             </table>
             @endif
-            
+
         </div>
     </div>
 
