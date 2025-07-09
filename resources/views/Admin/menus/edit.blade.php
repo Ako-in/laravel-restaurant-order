@@ -28,7 +28,7 @@
                     @endforeach
                 </select>
                 @error('category_id')
-                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    <p class="text-danger mt-2">{{ $message }}</p>
                 @enderror
             </div>
             <!-- 他のフィールド（name, price, descriptionなど） -->
@@ -37,7 +37,7 @@
                 <input type="text" name="name" value="{{ $menu->name }}" placeholder="Name" class="form-select mb-3">
                 {{-- <input type="text" name="name" id="name" class="form-select"value="{{ old('name') }}"> --}}
                 @error('name')
-                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    <p class="text-danger mt-2">{{ $message }}</p>
                 @enderror
             </div>
         
@@ -45,7 +45,7 @@
                 <label for="price" class="form-label">価格(税抜)</label>
                 <input type="number" name="price" id="price" class="form-select" value="{{$menu->price}}"placeholder="{{$menu->price}}">
                 @error('price')
-                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    <p class="text-danger mt-2">{{ $message }}</p>
                 @enderror
             </div>
         
@@ -54,7 +54,7 @@
                 </label>
                 <textarea name="description" id="description" rows="4" class="form-select"value={{ $menu->description }}placeholder="{{$menu->description}}"></textarea>
                 @error('description')
-                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    <p class="text-danger mt-2">{{ $message }}</p>
                 @enderror
             </div>
         
@@ -70,7 +70,7 @@
                 </div>
                 
                 @error('image_file')
-                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    <p class="text-danger mt-2">{{ $message }}</p>
                 @enderror
             </div>
         
@@ -81,7 +81,7 @@
                     <option value="inactive">Inactive</option>
                 </select>
                 @error('status')
-                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    <p class="text-danger mt-2">{{ $message }}</p>
                 @enderror
             </div>
         
@@ -89,7 +89,7 @@
                 <label for="stock" class="form-label">在庫</label>
                 <input type="number" name="stock" id="stock" class="form-select" min="0" value="{{$menu->stock}}"placeholder="{{$menu->stock}}">
                 @error('stock')
-                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    <p class="text-danger mt-2">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -104,7 +104,7 @@
                 <label><input type="radio" name="is_new" value="" {{ old('is_new', $menu->is_new) == null ? 'checked' : '' }}> なし</label>
                 
                 @error('status')
-                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    <p class="text-danger mt-2">{{ $message }}</p>
                 @enderror
 
             </div>
@@ -117,7 +117,7 @@
                 <label><input type="radio" name="is_recommended" value="1" {{ old('is_recommended', $menu->is_recommended) == 1 ? 'checked' : '' }}> あり</label>
                 <label><input type="radio" name="is_recommended" value="" {{ old('is_recommended', $menu->is_recommended) == null ? 'checked' : '' }}> なし</label>
                 @error('status')
-                    <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                    <p class="text-danger mt-2">{{ $message }}</p>
                 @enderror
             </div>
         

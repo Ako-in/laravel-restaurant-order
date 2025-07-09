@@ -204,9 +204,25 @@ class SalesTargetController extends Controller
 
         // ここで $startDate が null のままでないことを確認
         // もし null のままなら、データベースへの挿入時にエラーになります。
-        if (is_null($startDate) || is_null($endDate)) {
-            \Log::error("Sales target creation failed: start_date or end_date is null.");
-            return redirect()->back()->withErrors(['general' => '日付の設定に問題が発生しました。'])->withInput();
+        // if (is_null($startDate) || is_null($endDate)) {
+        //     \Log::error("Sales target creation failed: start_date or end_date is null.");
+        //     return redirect()->back()->withErrors(['general_message' => '日付の設定に問題が発生しました。'])->withInput();
+        // }
+
+        // すでに存在する場合のエラーメッセージ
+        // 既存の売上目標をチェック
+        $existQuery = SalesTarget::where('period_type', $periodType)
+        ->whereYear('start_date', $startYear); // 開始年でフィルタリング
+
+        if ($periodType === 'monthly') {
+            // 月間目標の場合、さらに月でフィルタリング
+            $existQuery->whereMonth('start_date', (int)$startMonth);
+        }
+
+        // 既に存在する目標があるか確認
+        if ($existQuery->exists()) {
+            Log::info('Duplicate sales target detected: ' . $startYear . '-' . $startMonth . ' (' . $periodType . ')'); // デバッグログを追加
+            return redirect()->back()->withInput()->with('exist_message', '指定された期間の売上目標は既に登録されています。');
         }
 
         // 売上目標のデータを保存   
@@ -262,39 +278,39 @@ class SalesTargetController extends Controller
 
     public function update(Request $request, $id)
     {
-        // バリデーションルールはstoreと類似
+        // updateは売り上げ目標金額のみ更新可能
         $validation = [
             'target_amount' => 'required|numeric|min:0',
-            'period_type'=> 'required|in:monthly,yearly',
-            'start_year' => 'required|integer',
-            'start_month' => 'required_if:period_type,monthly|nullable|integer|min:1|max:12',
+            // 'period_type'=> 'required|in:monthly,yearly',
+            // 'start_year' => 'required|integer',
+            // 'start_month' => 'required_if:period_type,monthly|nullable|integer|min:1|max:12',
         ];
         $validatedData = $request->validate($validation);
 
         $salesTarget = SalesTarget::findOrFail($id);
 
         $targetAmount = $validatedData['target_amount'];
-        $periodType = $validatedData['period_type'];
-        $startYear = $validatedData['start_year'];
-        $startMonth = $validatedData['start_month'];
+        // $periodType = $validatedData['period_type'];
+        // $startYear = $validatedData['start_year'];
+        // $startMonth = $validatedData['start_month'];
 
         $startDate = null;
         $endDate = null;
 
-        if($periodType === 'monthly'){
-            if ($startMonth !== null) {
-                $startDate = Carbon::create($startYear, $startMonth, 1)->startOfMonth()->format('Y-m-d');
-                $endDate = Carbon::create($startYear, $startMonth, 1)->endOfMonth()->format('Y-m-d');
-            }
-        } elseif ($periodType === 'yearly') {
-            $startDate = Carbon::create($startYear, 4, 1)->format('Y-m-d'); // 例: 4月1日始まり
-            $endDate = Carbon::create($startYear + 1, 3, 31)->format('Y-m-d'); // 例: 翌年3月31日
-        }
+        // if($periodType === 'monthly'){
+        //     if ($startMonth !== null) {
+        //         $startDate = Carbon::create($startYear, $startMonth, 1)->startOfMonth()->format('Y-m-d');
+        //         $endDate = Carbon::create($startYear, $startMonth, 1)->endOfMonth()->format('Y-m-d');
+        //     }
+        // } elseif ($periodType === 'yearly') {
+        //     $startDate = Carbon::create($startYear, 4, 1)->format('Y-m-d'); // 例: 4月1日始まり
+        //     $endDate = Carbon::create($startYear + 1, 3, 31)->format('Y-m-d'); // 例: 翌年3月31日
+        // }
 
         $salesTarget->update([
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'period_type' => $periodType,
+            // 'start_date' => $startDate,
+            // 'end_date' => $endDate,
+            // 'period_type' => $periodType,
             'target_amount' => $targetAmount,
         ]);
         

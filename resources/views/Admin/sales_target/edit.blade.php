@@ -28,10 +28,13 @@
   </div>
 @endif
 
+
+
+
 <div class="container py-4">
   <div>
       <div class="d-flex justify-content-center mb-2"> {{-- タイトルを中央寄せ --}}
-          <h4 class="mb-0">売上目標作成(年間、月間)</h4>
+          <h4 class="mb-0">売上目標編集(年間、月間)</h4>
       </div>
       <div class="mb-4"> {{-- 戻るボタンの親divに下マージン --}}
           <a href="{{ route('admin.sales_target.index') }}" class="btn btn-primary">戻る</a>
@@ -39,13 +42,14 @@
   </div>
   <div class="row justify-content-center">
       <div class="col-md-8">
-          <form action="{{ route('admin.sales_target.store') }}" method="POST" enctype="multipart/form-data">
+          <form action="{{ route('admin.sales_target.update',$salesTarget->id) }}" method="POST" enctype="multipart/form-data">
               @csrf
+              @method('PUT')
 
               {{-- 売り上げ目標額 --}}
               <div class="mb-3">
                   <label class="target_amount" class="form-label">売上目標額：</label>
-                  <input type="number" name="target_amount" id="target_amount" class="form-select mb-3" value="{{ old('target_amount') }}" required>
+                  <input type="number" name="target_amount" id="target_amount" class="form-select mb-3" value="{{ number_format($salesTarget->target_amount) }}" placeholder="{{ number_format($salesTarget->target_amount) }}" required>
                   @error('target_amount')
                       <div class="text-danger mt-2">{{ $message }}</div>
                   @enderror
@@ -54,28 +58,34 @@
               {{-- 目標の種類 --}}
               <div class="mb-3">
                 <label for="period_type"class="form-label">目標の種類：</label>
-                <select name="period_type" id="period_type" class="form-select"required>
+                <p class="form-label">{{$salesTarget->period_type}}</p>
+              
+                {{-- <select name="period_type" id="period_type" class="form-select"required>
                   
                     <option value="">目標の種類を選択してください</option>
-                    <option value="yearly" {{ old('period_type') == 'yearly' ? 'selected' : '' }}>年間目標</option>
-                    <option value="monthly" {{ old('period_type') == 'monthly' ? 'selected' : '' }}>月間目標</option>
+                    <option value="yearly" {{ old('period_type',$salesTarget->period_type) == 'yearly' ? 'selected' : '' }}>年間目標</option>
+                    <option value="monthly" {{ old('period_type',$salesTarget->period_type) == 'monthly' ? 'selected' : '' }}>月間目標</option>
+                    {{-- <option value="yearly" {{ old('period_type') == 'yearly' ? 'selected' : '' }}>年間目標</option>
+                    <option value="monthly" {{ old('period_type') == 'monthly' ? 'selected' : '' }}>月間目標</option> --}}
                     {{-- <option value="daily" {{ old('period_type') == 'daily' ? 'selected' : '' }}>日別目標</option> --}}
-                </select>
+                {{-- </select>  --}}
                 @error('period_type')
                   <div class="text-danger mt-2">{{ $message }}</div>
                 @enderror
               </div>
 
               {{-- 開始年月選択グループ 初期は非表示--}}
-              <div id="start_date_group_wrapper"class="mb-3"style="display:none;">
+              <div id="start_date_group_wrapper"class="mb-3">
                 {{-- <div id="start_date_group" class="flex flex-col mt-4"> JavaScriptで表示/非表示を制御 --}}
-                  <label class="start_date">開始年月</label>
-                  <div class="row g-2">
+                  <label class="start_date">開始年月:</label>
+                  <p class="select-form">{{$salesTarget->start_date}}</p>
+                  {{-- <p class="select-form">{{$salesTarget->Month}}</p> --}}
+                  {{-- <div class="row g-2">
                     <div class="col-md-6"> 
                       <select name="start_year" id="start_year"class="form-select">
                         <option value="">年度を選択してください</option>
                         @foreach ($years as $year)
-                            <option value="{{ $year }}" {{ old('start_year') == $year ? 'selected' : '' }}>{{ $year }}年</option>
+                            <option value="{{ $year }}" {{ old('start_year', $selectedYear) == $year ? 'selected' : '' }}>{{ $year }}年</option>
                         @endforeach
                       </select>
                       @error('start_year')
@@ -88,18 +98,17 @@
                         {{-- @foreach ($months as $month)
                             <option value="{{ $month }}" {{ old('start_month') == $month ? 'selected' : '' }}>{{ $month }}</option>
                         @endforeach --}}
-                        @foreach (range(1, 12) as $monthNum) {{-- Make sure this line is exactly like this --}}
-                        <option value="{{ sprintf('%02d', $monthNum) }}" {{ old('start_month') == sprintf('%02d', $monthNum) ? 'selected' : '' }}>
+                        {{-- @foreach (range(1, 12) as $monthNum) {{-- Make sure this line is exactly like this --}}
+                        {{-- <option value="{{ sprintf('%02d', $monthNum) }}" {{ old('start_month',$selectedMonth) == sprintf('%02d', $monthNum) ? 'selected' : '' }}>
                             {{ $monthNum }}月 {{-- And this line as well, to display "1月", "2月", etc. --}}
-                        </option>
+                        {{-- </option>
                     @endforeach
                       </select>  
                       @error('start_month')
                           <div class="text-danger mt-2">{{ $message }}</div>
                       @enderror
                     </div>
-                  </div>
-                  
+                  </div> --}}
 
                   {{-- 開始日(年月日)表示グループ --}}
                 <div id="start_date_display_group" class="mb-3"style="display:none;">
@@ -199,14 +208,20 @@
               </div> --}}
               
           
-              <button type="submit" class="btn btn-primary mt-3">売上登録作成</button>
+              <button type="submit" class="btn btn-secondary mt-3">売上登録編集</button>
           </form>
+
+          <div class="mt-3">
+            <hr>
+            <p>過去の更新履歴</p>
+            
+          </div>
       </div>
   </div>
 </div>
 @endsection
 
-@push('scripts')
+{{-- @push('scripts')
 <script>
   document.addEventListener('DOMContentLoaded',function(){
     console.log('DOMContentLoadedイベントが発火しました');
@@ -352,4 +367,4 @@
 });
 </script>
 @endpush
-
+ --}}

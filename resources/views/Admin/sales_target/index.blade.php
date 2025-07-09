@@ -10,7 +10,7 @@
         <div class="card-body">
             <a href="{{ route('admin.sales_target.create') }}" class="btn btn-primary">新規売上目標作成</a>
 
-            @if(session('flash_message'))
+            {{-- @if(session('flash_message'))
                 <div class="alert alert-success mt-3">
                     {{ session('flash_message') }}
                 </div>
@@ -21,6 +21,20 @@
                     {{ session('error_message') }}
                 </div>
             @endif
+
+            {{-- startDateがNullの時のアラートを表示 --}}
+            {{-- @if(session('general_message'))
+              <div class="alert alert-danger mt-3">
+                {{ session('general_message') }}
+              </div>
+            @endif
+
+            {{-- すでに目標が設定されている時のアラートを表示 --}}
+            {{-- @if(session('exist_message')) --}}
+              {{-- <div class="alert alert-danger mt-3">
+                {{ session('exist_message') }}
+              </div>
+            @endif --}}
 
             <h4 class="mt-4">月間売上目標</h4>
             @if($monthlySalesTargets->isEmpty())
@@ -38,6 +52,7 @@
                       <th>達成率</th>
                       <th>登録日</th>
                       <th>更新日</th>
+                      <th>編集</th>
                   </tr>
               </thead>
       
@@ -52,7 +67,8 @@
                         // $rate = ($targetAmount > 0) ? ($currentActualSales / $target_amount * 100) : 0;
                         // $currentMonthlySalesSum = $salesTarget->current_monthly_sales_sum ?? 0;
                         // $unachieved = $salesTarget->target_amount - $currentMonthlySalesSum;
-                        $rate = $salesTarget->target_amount > 0 ? round(($currentMonthlySalesSum / $salesTarget->target_amount) * 100, 2) : 0;  
+                        // $rate = $salesTarget->target_amount > 0 ? round(($currentMonthlySalesSum / $salesTarget->target_amount) * 100, 2) : 0;  
+                        $rate = ($targetAmount > 0) ? ($currentActualSales / $targetAmount * 100) : 0;
                       @endphp
       
                       <tr>
@@ -65,6 +81,9 @@
                         <td>{{ number_format($rate, 2) }} %</td>
                         <td>{{ $salesTarget->created_at->format('Y-m-d H:i') }}</td>
                         <td>{{ $salesTarget->updated_at->format('Y-m-d H:i') }}</td>
+                        <td>
+                          <a href="{{ route('admin.sales_target.edit', $salesTarget->id) }}" class="btn btn-sm btn-primary">編集</a>
+                        </td>
                       </tr>
                   @endforeach
 
@@ -88,6 +107,7 @@
                         <th>達成率</th>
                         <th>登録日</th>
                         <th>更新日</th>
+                        <th>編集</th>
                     </tr>
                 </thead>
 
@@ -113,6 +133,9 @@
                             <td>{{ number_format($rate, 2) }} %</td>
                             <td>{{ $salesTarget->created_at->format('Y-m-d H:i') }}</td>
                             <td>{{ $salesTarget->updated_at->format('Y-m-d H:i') }}</td>
+                            <td>
+                              <a href="{{ route('admin.sales_target.edit', $salesTarget->id) }}" class="btn btn-sm btn-primary">編集</a>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
