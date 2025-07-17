@@ -51,7 +51,7 @@ class Order extends Model
         return $query->orderBy('total_sales', $direction);
     }
 
-    public function order_items()
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }

@@ -36,13 +36,13 @@ class OrderController extends Controller
         // dd($date->order_date);
         // dd($date);
         // $query = Order::with('order_items.menu')->get();
-        $query = Order::with('order_items.menu');
+        $query = Order::with('orderItems.menu');
         if(!empty($date)){
             $query->whereDate('created_at', $date);
         }
 
         if(!empty($menu_search)){
-            $query->whereHas('order_items.menu', function($q) use ($menu_search, $menu_search_type){
+            $query->whereHas('orderItems.menu', function($q) use ($menu_search, $menu_search_type){
                 if($menu_search_type === 'name'){
                     $q->where('name','like','%'.$menu_search.'%');
                 }else{
@@ -81,7 +81,7 @@ class OrderController extends Controller
             if ($qty > 0) {
                 $menu = Menu::find($menu_id);//priceで取得できるように定義
                 if($menu){
-                    $order->order_items()->create([
+                    $order->orderItems()->create([
                     'menu_id' => $menu_id,
                     'menu_name' => $menu->name, // メニュー名も保存
                     'qty' => $qty,
@@ -169,9 +169,9 @@ class OrderController extends Controller
     // }
 
     public function showConfirm($id){
-        $order = Order::with('order_items')->find($id);
+        $order = Order::with('orderItems')->find($id);
 
-        if (!$order || $order->order_items->isEmpty()) {
+        if (!$order || $order->orderItems->isEmpty()) {
             return redirect()->back()->with('warning', '空の注文です');
         }
 
@@ -179,9 +179,9 @@ class OrderController extends Controller
     }
 
     public function storeConfirmedOrder($id){
-        $originalOrder = Order::with('order_items')->find($id);
+        $originalOrder = Order::with('orderItems')->find($id);
 
-        if (!$originalOrder || $originalOrder->order_items->isEmpty()) {
+        if (!$originalOrder || $originalOrder->orderItems->isEmpty()) {
             return redirect()->back()->with('warning', '空の注文は登録できません');
         }
         if (!$originalOrder->table_number) {
@@ -202,7 +202,7 @@ class OrderController extends Controller
             // 'created_at'=>$originalOrder->created_at,
         ]);
 
-        foreach($originalOrder->order_items as $item){
+        foreach($originalOrder->orderItems as $item){
             // MenuId, MenuName, QTY のどれかが空ならスキップ
             // if (empty($item->menu_id) || empty($item->menu_name) || empty($item->qty)) {
             //     // continue;
@@ -221,7 +221,7 @@ class OrderController extends Controller
             //     'created_at'=>$item->created_at,
             //     'updated_at'=>$item->updated_at,
             // ]);
-            $confirmedOrder->order_items()->create([
+            $confirmedOrder->orderItems()->create([
                 'menu_id'=>$item->menu_id,
                 'qty'=>$item->qty,
                 'status'=> 'pending', // デフォルトのステータス
@@ -382,11 +382,12 @@ class OrderController extends Controller
 
             Log::info('OrderItemがデータベースに保存されました。');
 
-            $order = $item->order->fresh('order_items');
+            $order = $item->order->fresh('orderItems');
             $this->updateAllStatus($order); // 注文全体のステータスを更新
 
             DB::commit();
-            return redirect()->back()->with('flash_message', '注文アイテムのステータスを更新しました。');
+            // return redirect()->back()->with('flash_message', '注文アイテムのステータスを更新しました。');
+            return redirect()->route('admin.orders.showConfirm', ['id' => $order->id])->with('success', '個別ステータス更新しました');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("注文アイテムステータス更新中にエラー: " . $e->getMessage(), ['order_item_id' => $item->id]);
@@ -397,8 +398,9 @@ class OrderController extends Controller
     public function updateAllStatus(Order $order)
     // 注文全体のステータスを更新
     {
-        $order->load('order_items');
-        $totalItems = $order->order_items->count();
+        // $order->load('order_items');
+        $order->load('orderItems');
+        $totalItems = $order->orderItems->count();
 
         if($totalItems === 0){
             $order->status = 'canceled'; // 注文アイテムがない場合はキャンセル
@@ -407,10 +409,10 @@ class OrderController extends Controller
             // return redirect()->back()->with('warning', '注文アイテムがありません。');
         }
 
-        $pendingCount = $order->order_items->where('status', 'pending')->count();
-        $ongoingCount = $order->order_items->where('status', 'ongoing')->count();
-        $completedCount = $order->order_items->where('status', 'completed')->count();
-        $canceledCount = $order->order_items->where('status', 'canceled')->count();
+        $pendingCount = $order->orderItems->where('status', 'pending')->count();
+        $ongoingCount = $order->orderItems->where('status', 'ongoing')->count();
+        $completedCount = $order->orderItems->where('status', 'completed')->count();
+        $canceledCount = $order->orderItems->where('status', 'canceled')->count();
 
         $currentOverallStatus = $order->status;// 現在の注文全体のステータスを取得
 
@@ -431,9 +433,10 @@ class OrderController extends Controller
             $order->status = $newOverallStatus;
             $order->save();
             // return redirect()->back()->with('flash_message', '注文全体のステータスを更新しました。');
+            return redirect()->route('admin.orders.storeConfirmed', ['id' => $order->id])->with('success', '注文全体のステータスを更新しました。');
         }
 
-        $calculatedTotalAmount = $order->order_items
+        $calculatedTotalAmount = $order->orderItems
         ->where('status', '!=', 'canceled') // キャンセルされたアイテムを除外
         ->sum('subtotal');
 
@@ -504,8 +507,8 @@ class OrderController extends Controller
             $item->save();
 
             // 注文全体の合計金額を再計算して更新
-            $order = $item->order->fresh('order_items');
-            $newTotalAmount = $order->order_items->sum('subtotal');
+            $order = $item->order->fresh('orderItems');
+            $newTotalAmount = $order->orderItems->sum('subtotal');
             $order->total_amount = $newTotalAmount;
             $order->save();
 
@@ -524,7 +527,8 @@ class OrderController extends Controller
             if ($newQty === 0) {
                 return redirect()->back()->with('flash_message', '注文アイテム「' . $item->menu_name . '」の数量を0に設定しました（実質キャンセル）。');
             } else {
-                return redirect()->back()->with('flash_message', '注文アイテム「' . $item->menu_name . '」の数量が更新されました。');
+                return redirect(route('admin.orders.showConfirm', ['id' => $order->id]))->with('success','数量を更新しました。');
+                // return redirect()->back()->with('flash_message', '注文アイテム「' . $item->menu_name . '」の数量が更新されました。');
             }
 
 
@@ -541,14 +545,14 @@ class OrderController extends Controller
         // プリント画面表示、プリントボタン
         // dd('print通過');//ok
         // $order = Order::find($id);//orderを取得
-        $order = Order::with('order_items.menu')->find($id);
+        $order = Order::with('orderItems.menu')->find($id);
         // dd($order);
         $table_number = $order->table_number;
         // dd($table_number);//nullになってる->ok
-        $order_items = DB::table('order_items')
-            ->join('menus', 'order_items.menu_id', '=', 'menus.id')//メニュー名を取得するためにjoin
-            ->where('order_items.order_id', $id)//特定の注文を絞るためにWhere
-            ->select('order_items.*', 'menus.name as menu_name')//必要なカラムだけを取得して、別名
+        $order_items = DB::table('orderItems')
+            ->join('menus', 'orderItems.menu_id', '=', 'menus.id')//メニュー名を取得するためにjoin
+            ->where('orderItems.order_id', $id)//特定の注文を絞るためにWhere
+            ->select('orderItems.*', 'menus.name as menu_name')//必要なカラムだけを取得して、別名
             ->get();
 
         // dd($order_items);//取得できない、空のまま

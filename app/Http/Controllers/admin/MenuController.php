@@ -265,8 +265,8 @@ class MenuController extends Controller
         // }
         $menu->save();
 
-        return redirect()->route('admin.menus.index')->with('flash_message', 'メニューを編集しました。');
-
+        // return redirect()->route('admin.menus.index')->with('flash_message', 'メニューを編集しました。');
+        return redirect()->route('admin.menus.index')->with('success', 'メニューが正常に更新されました。');
     }
 
     /**

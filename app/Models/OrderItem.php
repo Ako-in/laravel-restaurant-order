@@ -55,7 +55,7 @@ class OrderItem extends Model
         return $this->belongsTo(Menu::class);
     }
 
-    public function order_items()
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }

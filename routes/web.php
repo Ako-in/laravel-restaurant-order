@@ -31,7 +31,7 @@ Route::get('/', function () {
 //     Route::resource('menus', MenuController::class);
 // });
 // ====================管理者用=====================
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('menus', \App\Http\Controllers\Admin\MenuController::class);
     
     Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
