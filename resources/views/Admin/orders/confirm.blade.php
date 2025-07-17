@@ -16,7 +16,7 @@
     <p><strong>注文ID:</strong> {{ $order->id }}</p>
     <p><strong>テーブル番号:</strong> {{ $order->table_number }}</p>
     <p class="fw-bold fs-4">注文合計:
-        {{ number_format($order->order_items->sum(function($item) {
+        {{ number_format($order->orderItems->sum(function($item) {
             return ($item->price ?? 0) * ($item->qty ?? 0);
         })) }}円
     </p>
@@ -66,7 +66,7 @@
     </tr>
 
     {{-- @foreach($orders as $order) --}}
-    @foreach ($order->order_items as $item)
+    @foreach ($order->orderItems as $item)
     <tr>
         {{-- <td>{{ $order->created_at }}</td> 注文日時 --}}
         {{-- <td>{{$order->id}}</td>注文ID --}}
@@ -78,7 +78,7 @@
         {{-- <td>{{ number_format($item->subtotalTax) }}円</td> 小計税込 --}}
         <td>{{number_format($item -> price * $item -> qty)}}</td>{{--小計--}}
         {{-- <td>{{ number_format($order->subtotal) }}円</td> --}}
-        {{-- <td>{{ number_format($order->order_items->sum(function($item) {
+        {{-- <td>{{ number_format($order->orderItems->sum(function($item) {
             return $item->price * $item->qty;
         })) }}円</td> --}}
         {{-- <td>{{$order->table_number}}</td> --}}
@@ -194,7 +194,7 @@
     
         {{-- 戻るボタン --}}
         <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">一覧へ戻る</a>
-        <p class="mt-3">注文合計：{{ number_format($order->order_items->sum(function($item) {
+        <p class="mt-3">注文合計：{{ number_format($order->orderItems->sum(function($item) {
             return $item->price * $item->qty;
         })) }}円</p>
 

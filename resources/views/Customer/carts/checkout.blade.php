@@ -40,7 +40,7 @@
                     $totalAmount = 0; // 合計金額の初期化
                 @endphp --}}
                 @foreach($orders as $order)
-                    @foreach ($order->order_items as $item)
+                    @foreach ($order->orderItems as $item)
                     <tr>
                         <td>{{ $order->created_at }}</td>
                         <td>{{$order->id}}</td>

@@ -385,14 +385,14 @@ class CartController extends Controller
         Log::info('注文ヘッダーを作成', ['order_id' => $order->id]);
 
         foreach ($carts as $cart) {
-            Log::info('カート内容をorder_itemsに保存', ['cart' => $cart]);
+            Log::info('カート内容をorderItemsに保存', ['cart' => $cart]);
 
             // バリデーションエラー
             if (!$cart->id || !$cart->name || !$cart->qty || $cart->price <= 0) {
                 throw new \Exception('無効な注文データが含まれています');
             }
 
-            // order_items に商品詳細を保存
+            // orderItems に商品詳細を保存
             OrderItem::create([
                 'order_id' => $order->id,
                 'menu_id' => $cart->id,
@@ -402,7 +402,7 @@ class CartController extends Controller
                 'subtotal' => $cart->qty * $cart->price,
             ]);
         }
-        Log::info('注文詳細をorder_itemsに保存完了');
+        Log::info('注文詳細をorderItemsに保存完了');
         DB::commit();
 
         // 注文完了後、カートを削除
@@ -467,7 +467,7 @@ class CartController extends Controller
     public function checkout(){
         $tableNumber = session()->get('table_number');
         $orders = Order::where('table_number', $tableNumber)
-        ->with('order_items') // order_items を eager load
+        ->with('orderItems') // orderItems を eager load
         ->where('is_paid', false)//未払いの注文のみ
         // ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
         ->orderBy('created_at', 'desc')
@@ -485,7 +485,7 @@ class CartController extends Controller
 
         foreach ($orders as $order) {
             // $hasUnpaidOrders = true; // 有効な未払いの注文がある
-            foreach ($order->order_items as $item) {
+            foreach ($order->orderItems as $item) {
                 if($item->status === 'pending'){
                     $hasPendingItems = true; // 個別アイテムにPendingがある
                 }
@@ -539,7 +539,7 @@ class CartController extends Controller
         // ->where('user_id', Auth::id())
         ->where('is_paid', false)
         ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
-        ->with('order_items') // order_items を eager load
+        ->with('orderItems') // orderItems を eager load
         ->get();
 
         $taxRate = (float) config('cart.tax') / 100; // Laravelの設定から税率を取得(10%)
@@ -549,9 +549,9 @@ class CartController extends Controller
 
 
         foreach ($orders as $order) {
-            // 各注文のorder_itemsから商品情報を取得し、Stripeのline_itemsに追加
-            // ここで $order->order_items をループすることで、各アイテム ($item) が定義
-            foreach ($order->order_items as $item) {
+            // 各注文のorderItemsから商品情報を取得し、Stripeのline_itemsに追加
+            // ここで $order->orderItems をループすることで、各アイテム ($item) が定義
+            foreach ($order->orderItems as $item) {
                 //数量が0以下、キャンセルされたアイテムはline_itemsに追加せずスキップ
                if(!isset($item->qty) || !is_numeric($item->qty) || (int) $item->qty <= 0 || strtolower($item->status) === 'canceled'){
                     Log::warning('checkoutStore: スキップされた注文アイテム（無効な数量またはキャンセル済み）', [

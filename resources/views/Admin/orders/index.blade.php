@@ -91,11 +91,11 @@
         <td>{{ $order->menu_name ?? '不明' }}</td>
         <td>{{ $order->qty }}</td> --}}
         <td>
-            @if($order->order_items->isNotEmpty())
-                @foreach($order->order_items as $item)
+            @if($order->orderItems->isNotEmpty())
+                @foreach($order->orderItems as $item)
                     {{-- {{$item->menu_id }}<br> --}}
                     {{ $item->menu_id ?? '不明' }}<br>
-                {{-- {{ $order->order_items->first()->menu_id }} --}}
+                {{-- {{ $order->orderItems->first()->menu_id }} --}}
                 @endforeach
             @else
                 - 
@@ -103,11 +103,11 @@
         </td>
         
         <td>
-            @if($order->order_items->isNotEmpty())
-                @foreach($order->order_items as $item)
+            @if($order->orderItems->isNotEmpty())
+                @foreach($order->orderItems as $item)
                     {{-- {{ $item->menu_name }}<br> --}}
                     {{ $item->menu_name ?? '不明' }}<br>
-                {{-- {{ $order->order_items->first()->menu_name }} --}}
+                {{-- {{ $order->orderItems->first()->menu_name }} --}}
                 @endforeach
             @else
                 -
@@ -115,11 +115,11 @@
         </td>
         
         <td>
-            @if($order->order_items->isNotEmpty())
-                @foreach($order->order_items as $item)
+            @if($order->orderItems->isNotEmpty())
+                @foreach($order->orderItems as $item)
                     {{-- {{ $item->qty }}<br> --}}
                     {{ $item->qty ?? '-' }}<br>
-                {{-- {{ $order->order_items->first()->qty }} --}}
+                {{-- {{ $order->orderItems->first()->qty }} --}}
                 @endforeach
             @else
                 -
@@ -127,11 +127,11 @@
         </td>
 
         <td>
-            @if($order->order_items->isNotEmpty())
-                @foreach($order->order_items as $item)
+            @if($order->orderItems->isNotEmpty())
+                @foreach($order->orderItems as $item)
                     {{-- {{ number_format($item->subtotal) }}円<br> --}}
                     {{ number_format($item->subtotal) }}円<br>
-                {{-- {{ number_format($order->order_items->first()->subtotal) }}円 --}}
+                {{-- {{ number_format($order->orderItems->first()->subtotal) }}円 --}}
                 @endforeach
             @else
                 -
@@ -158,8 +158,8 @@
             {{$menu->stock}}
         </td> --}}
         {{-- <td>
-            @if ($order->order_items->isNotEmpty())
-                {{ $order->order_items->first()->menu->stock }}
+            @if ($order->orderItems->isNotEmpty())
+                {{ $order->orderItems->first()->menu->stock }}
             @else
                 -
             @endif

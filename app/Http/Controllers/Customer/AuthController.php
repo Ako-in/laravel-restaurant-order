@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
@@ -31,12 +32,15 @@ class AuthController extends Controller
         //     return redirect()->route('customer.dashboard');
         // }
 
-        return back()->withErrors(['table_number' => 'ログイン情報が正しくありません']);
+        return redirect()->route('customer.login')->withErrors(['table_number' => 'ログイン情報が正しくありません']);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::guard('customer')->logout();
-        return redirect()->route('customer.login');
+        // セッションを無効化し、CSRFトークンを再生成
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('customer.login')->with('success', 'ログアウトしました。');
     }
 }
