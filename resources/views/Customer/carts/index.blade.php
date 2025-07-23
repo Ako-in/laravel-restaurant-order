@@ -38,7 +38,8 @@
               <td>{{ $cart->name }}</td>
               <td>
                 <div class="mb-2">
-                @if ($cart->menu && $cart->menu->image_file !== '')
+
+                @if ($menu->image_file !== '')
                     <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" style="max-width: 100px; height: auto;">
                 @else
                     <img src="{{ asset('storage/images/noimage.png') }}" style="max-width: 100px; height: auto;">

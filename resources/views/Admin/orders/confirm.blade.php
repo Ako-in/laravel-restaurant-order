@@ -187,7 +187,7 @@
 
     {{-- orders.printへ遷移 --}}
     <div class="">
-        <form method="GET" action="{{ route('admin.orders.print', $order->id) }}">
+        <form method="POST" action="{{ route('admin.orders.print', $order->id) }}">
             @csrf
             <button type="submit" class="btn btn-primary">注文伝票を出力</button>
         </form>

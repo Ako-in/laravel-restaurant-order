@@ -42,15 +42,6 @@
           <form action="{{ route('admin.sales_target.store') }}" method="POST" enctype="multipart/form-data">
               @csrf
 
-              {{-- 売り上げ目標額 --}}
-              <div class="mb-3">
-                  <label class="target_amount" class="form-label">売上目標額：</label>
-                  <input type="number" name="target_amount" id="target_amount" class="form-select mb-3" value="{{ old('target_amount') }}" required>
-                  @error('target_amount')
-                      <div class="text-danger mt-2">{{ $message }}</div>
-                  @enderror
-              </div>
-
               {{-- 目標の種類 --}}
               <div class="mb-3">
                 <label for="period_type"class="form-label">目標の種類：</label>
@@ -65,6 +56,8 @@
                   <div class="text-danger mt-2">{{ $message }}</div>
                 @enderror
               </div>
+
+
 
               {{-- 開始年月選択グループ 初期は非表示--}}
               <div id="start_date_group_wrapper"class="mb-3"style="display:none;">
@@ -136,6 +129,14 @@
                   </select> --}}
 
                 {{-- </div> --}}
+              </div>
+              {{-- 売り上げ目標額 --}}
+              <div class="mb-3">
+                <label class="target_amount" class="form-label">売上目標額：</label>
+                <input type="number" name="target_amount" id="target_amount" class="form-select mb-3" value="{{ old('target_amount') }}" required>
+                @error('target_amount')
+                    <div class="text-danger mt-2">{{ $message }}</div>
+                @enderror
               </div>
                 
                 {{-- <div>

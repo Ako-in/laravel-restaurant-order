@@ -65,9 +65,14 @@ class MenuController extends Controller
 
         // メニュー検索（キーワード、カテゴリ、価格帯）
         $categoryId = $request->input('category');
+        $categoryName = Null;
         if ($categoryId) {
             // menusテーブルのcategory_idカラムがある場合
             $query->where('category_id', $categoryId);
+            // $category = Category::find($categoryId);
+            // if ($category) {
+            //     $categoryName = $category->name;
+            // }
             $totalCount = $query->count(); // カテゴリで絞り込んだ後の総数を取得
         }
 

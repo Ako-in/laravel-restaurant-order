@@ -29,23 +29,22 @@
 
 {{-- 検索ボックス --}}
 <form method="GET" action="{{ route('customer.menus.index') }}" class="mb-3">
-  {{-- <p class="">かんたん検索</p> --}}
   <div class="row g-2 ">
-    <div class="">
+    <div class=""style="background-color:ivory;">
 
-      <div class="rounded"style="background-color:rgb(236, 149, 188);">
+      <div class="mb-3">
         <p class="text-center mb-0 fw-bold">==ワンクリック検索==</p>
         <div class="d-flex align-items-center justify-content-center flex-wrap mb-2">
-          <button type="submit" name="recommend" value="1" class="btn btn-info me-2">おすすめから探す</button>
-          <button type="submit" name="new_item" value="1" class="btn btn-info me-2">新商品から探す</button>
-          <button type="submit" name="has_stock" value="1" class="btn btn-info me-2">在庫ありから探す</button>
-          <button type="submit" name="stock_low" value="1"class="btn btn-info me-2">残りわずか</button>
+          <button type="submit" name="recommend" value="1" class="btn btn-outline-primary me-2">おすすめから探す</button>
+          <button type="submit" name="new_item" value="1" class="btn btn-outline-primary me-2">新商品から探す</button>
+          <button type="submit" name="has_stock" value="1" class="btn btn-outline-primary me-2">在庫ありから探す</button>
+          <button type="submit" name="stock_low" value="1"class="btn btn-outline-primary me-2">残りわずか</button>
           
         </div>
       </div>
       
 
-      <div class="col-12 d-flex align-items-end justify-content-start flex-wrap text-center rounded"style="background-color:ivory;">
+      <div class="col-12 d-flex align-items-end justify-content-start flex-wrap text-center rounded">
         <p class="text-center mb-0 w-100 fw-bold">★★かんたん検索★★</p>
         <div class="d-flex flex-wrap align-items-end justify-content-center w-100 pb-2">
 
@@ -90,25 +89,19 @@
           <button type="submit" class="btn btn-primary me-2">検索</button>
           <a href="{{ route('customer.menus.index') }}" class="btn btn-secondary">リセット</a>
         </div>
-
-
-
       </div>
     </div>
-    
-
-    
-  
-    
 </form>
     <div class="container mt-4">
       <div>
         @if($search)
           {{-- <p>検索結果: {{ $search }}は{{$totalCount}}件です</p> --}}
           <p>{{$search}}の商品一覧{{$totalCount}}件</p>
-        {{-- @elseif($categoryId)
-          <p>カテゴリ: {{ $categoryName }}は{{$totalCount}}件です</p>
-          <p>{{$categoryName}}の商品一覧{{$totalCount}}件</p> --}}
+        @elseif($categoryId)
+          @if(isset($categoryName) && $categoryName)
+          {{-- <p>カテゴリ: {{ $categoryName }}は{{$totalCount}}件です</p> --}}
+            <p>{{$categoryName}}の商品一覧{{$totalCount}}件</p> 
+          @endif
         @elseif($priceRange)
           {{-- <p>価格帯: {{ $priceRange }}円は{{$totalCount}}件です</p> --}}
           <p>{{$priceRange}}の商品一覧{{$totalCount}}件</p>
@@ -137,7 +130,7 @@
                 <h5 class="card-title">商品名：{{$menu->name}}:{{$menu->id}}</h5>
                 <p class="card-text">Price:{{$menu->price}}円（税抜）</p>
                 <p class="text-danger">営業時間外です。</p>
-                <p class="text-muted">在庫数: {{ $menu->stock }}</p> {{-- ★営業時間外でも在庫数を表示 --}}
+                {{-- <p class="text-muted">在庫数: {{ $menu->stock }}</p> ★営業時間外でも在庫数を表示 --}}
                 <p class="">
                   @if($menu->is_new)
                     <div><span class="badge bg-secondary grayscale">新商品</span></div>
@@ -280,8 +273,8 @@
       /* 画像をグレーにするCSS */
       .grayscale {
           filter: grayscale(100%);
-          opacity: 0.7; /* 少し透明度も加えることで、在庫がないことをより明確に */
+          opacity: 0.7; 
       }
-      </style>
+    </style>
         
 @endsection
