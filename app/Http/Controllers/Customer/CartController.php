@@ -11,6 +11,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 // use Darryldecode\Cart\Facades\CartFacade as Cart;
+use Gloudemans\Shoppingcart\Exceptions\CartAlreadyStoredException;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -89,12 +90,13 @@ class CartController extends Controller
      */
     public function store(Request $request)
     {
+        // dd('carts.storeが通っているか？');
         //バリデーション追加
         $menuId = $request->input('id');
         $menu = Menu::findOrFail($menuId);
 
         $validator = Validator::make($request->all(), [
-            // 'id' => 'required|integer| exists:menus,id',
+            // 'menu_id' => 'required|integer| exists:menus,id',
             // 'name' => 'required|string',
             'qty' => 'required|integer|min:1|max:' . $menu->stock, // 在庫数を最大値としてバリデーション
             // 'qty' => 'required|integer|min:1|max:'.$menu->stock',
@@ -103,6 +105,9 @@ class CartController extends Controller
             // 'table_number'=>'required|integer',
         ],[
             'qty.max' => '選択できる数量は在庫数（' . $menu->stock . '個）までです。',
+            // 'menu_id.required'=>'メニューが選択されていません。',
+            // 'table_number.required'=>'テーブル番号が指定されていません。',
+
             // 'qty.min' => '数量は1個以上を入力してください。',
             // 'required' => ':attributeは必須項目です。',
             // 'integer' => ':attributeは整数で入力してください。',
@@ -227,12 +232,43 @@ class CartController extends Controller
      */
     public function update(Request $request, $rowId)
     {
+        $request->validate([
+            'qty' => 'required|integer|min:1',
+        ]);
+
+        $instanceName = 'customer_' . Auth::id();
+        Cart::instance($instanceName);
+
+        // カートアイテムの数量を更新
+        Cart::update($rowId, $request->qty);
+
+        try {
+            Cart::instance($instanceName)->store(Auth::id());
+        } catch (CartAlreadyStoredException $e) {
+            // カートがすでに保存されている場合のエラーなので、無視する
+            // 必要であればログに記録: logger()->info("Cart already stored for user ID: " . Auth::id() . " during update.");
+        } catch (\Exception $e) {
+            // その他の予期せぬエラーの場合
+            // logger()->error("Failed to store cart during update: " . $e->getMessage());
+            // 必要であれば、エラーメッセージをセッションにフラッシュしてリダイレクト
+            // return redirect()->back()->with('error', 'カートの保存中にエラーが発生しました。');
+        }
+
+        // Cart::instance($instanceName)->store(Auth::id());
+        // if (!Cart::instance($instanceName)->stored(Auth::id())) {
+        //     try {
+        //         Cart::instance($instanceName)->store(Auth::id());
+        //     } catch (\Exception $e) {
+        //         // すでに保存されている場合の例外は無視するか、ログに記録
+        //         // logger()->warning("Cart already stored for user ID: " . Auth::id() . " during update.");
+        //     }
+        // }
         // カートの中身をデバッグ
         //  dd(Cart::instance(Auth::id())->content());
         //カートの中身を更新
-        Cart::instance('customer_'.Auth::id())->update($rowId, $request->qty);
-        // return redirect()->route('customer.carts.index')->with('flash_message', '数量を更新しました');
-        return to_route('customer.carts.index')->with('flash_message', '数量を更新しました');
+        // Cart::instance('customer_'.Auth::id())->update($rowId, $request->qty);
+        return redirect()->route('customer.carts.index')->with('flash_message', '数量を更新しました');
+        // return to_route('customer.carts.index')->with('flash_message', '数量を更新しました');
     }
 
     /**
@@ -533,14 +569,17 @@ class CartController extends Controller
         // セッションから table_number で注文を取得
         // $orders = Order::where('table_number', session()->get('table_number'))->get();
         $tableNumber = session()->get('table_number');
+        $customerId= Auth::id();
 
         // ログインユーザーの未払いの注文を取得
         $orders = Order::where('table_number', $tableNumber)
-        // ->where('user_id', Auth::id())
+        ->where('table_number', $tableNumber)
         ->where('is_paid', false)
         ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
         ->with('orderItems') // orderItems を eager load
         ->get();
+
+        // dd($orders);
 
         $taxRate = (float) config('cart.tax') / 100; // Laravelの設定から税率を取得(10%)
         // $unitAmount = (int) round($item->price * (1 + $taxRate)); // 税抜き単価に税率を乗じて、税込単価を計算
@@ -587,6 +626,8 @@ class CartController extends Controller
                 }
             }
         }
+
+        // dd($line_items); 
         // foreach ($orders as $order) {
         //     //qtyが存在し、整数であることを確認
         //     if(isset($order->qty) && is_numeric($order->qty) &&(int) $order->qty > 0){
@@ -613,15 +654,22 @@ class CartController extends Controller
         // }
 
         // line_items が空の場合の処理
-        if (empty($line_items)) {
-            return redirect()->route('customer.carts.index')->withErrors('決済する商品がありません。カートをご確認ください。');
-        }
+        // if (empty($line_items)) {
+        //     return redirect()->route('customer.carts.index')->withErrors('決済する商品がありません。カートをご確認ください。');
+        // }
+
+        // $checkout_session = Session::create([
+        //     'line_items' => $line_items,
+        //     'mode' => 'payment',
+        //     'success_url' => route('customer.carts.checkoutSuccess'),
+        //     'cancel_url' => route('customer.carts.checkout'),
+        // ]);
 
         $checkout_session = Session::create([
             'line_items' => $line_items,
             'mode' => 'payment',
-            'success_url' => route('customer.carts.checkoutSuccess'),
-            'cancel_url' => route('customer.carts.checkout'),
+            'success_url' => route('customer.carts.checkoutSuccess', [], true), // 絶対パスを生成
+            'cancel_url' => route('customer.carts.checkout', [], true), // 絶対パスを生成
         ]);
 
         return redirect($checkout_session->url);
