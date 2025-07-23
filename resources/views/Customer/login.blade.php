@@ -30,15 +30,18 @@
         {{-- <img src="" alt="" style="background-image: url('{{ asset('storage/images/top2.jpg') }}')> --}}
         <form action="{{ route('customer.login') }}" method="POST">
             @csrf
-            <div class="mb-2">
-                <label for="table_number" class="form-label">テーブル番号</label>
-                <input type="text" name="table_number" class="form-control"id="table_number" required>
+            <div class="text-center">
+                <div class="mb-2 col-3 mx-auto">
+                    <label for="table_number" class="form-label">テーブル番号</label>
+                    <input type="text" name="table_number" class="form-control login-input"id="table_number" required>
+                </div>
+                <div class="mb-2 col-3 mx-auto">
+                    <label for="password" class="form-label">パスワード</label>
+                    <input type="password" class="form-control login-input"name="password" id="password" required>
+                </div>
+                <button type="submit"class="btn btn-primary">ログイン</button>
             </div>
-            <div class="mb-2">
-                <label for="password" class="form-label">パスワード</label>
-                <input type="password" class="form-control"name="password" id="password" required>
-            </div>
-            <button type="submit"class="btn btn-primary">ログイン</button>
+            
         </form>
     </div>
     
