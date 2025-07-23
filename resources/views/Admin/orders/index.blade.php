@@ -25,9 +25,12 @@
 <div class="form-group row mb-3">
     <form method="GET"action="{{route('admin.orders.index')}}"class="admin-search-box mb-3">
         <label for="order_date" class="col-md-5 col-form-label text-md-left fw-bold">◆日付から検索する</label>
-        <div class="input-group">
-            <input type="text" class="form-control" id="order_date" name="order_date" value="{{$date}}">
-            <button type="submit" class="btn">検索</button>
+        <div class="col-md-4">
+            <div class="input-group">
+                <input type="text" class="form-control" id="order_date" name="order_date" value="{{$date}}">
+                <button type="submit" class="btn">検索</button>
+            </div>
+            
         </div>
     </form>
     
