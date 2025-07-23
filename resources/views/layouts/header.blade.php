@@ -21,10 +21,12 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark w-100"
      style="position: relative; z-index: 2;"> 
+    <img src="{{Storage::url('images/toppage.jpg')}}" alt="" style="max-height: 60px;">
     {{-- <img src="{{asset('storage/images/toppage.jpg')}}" alt="" style="max-height: 60px;"> --}}
       <div class="container-fluid">
         <a href="{{ route('customer.menus.index') }}" class="navbar-brand d-flex align-items-center text-white"> 
-            <img src="{{ asset('storage/images/logo.png') }}" alt="Urban Spoon Logo" class="me-2 rounded-circle" style="max-height:60px;"> 
+            {{-- <img src="{{ asset('storage/images/logo.png') }}" alt="Urban Spoon Logo" class="me-2 rounded-circle" style="max-height:60px;">  --}}
+            <img src="{{ Storage::url('images/logo.png') }}" alt="Urban Spoon Logo" class="me-2 rounded-circle" style="max-height:60px;"> 
             <span class="fw-bold fs-2">Urban Spoon注文アプリ</span>
         </a>
 
