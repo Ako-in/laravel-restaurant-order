@@ -60,7 +60,7 @@ class MenuController extends Controller
         $search = $request->input('search');
         if($search) {
             $query->where('name', 'like', '%' . $search . '%');
-            $totalCount = $query->count(); // 検索結果の総数を取得
+            // $totalCount = $query->count(); // 検索結果の総数を取得
         }
 
         // メニュー検索（キーワード、カテゴリ、価格帯）
@@ -73,7 +73,7 @@ class MenuController extends Controller
             // if ($category) {
             //     $categoryName = $category->name;
             // }
-            $totalCount = $query->count(); // カテゴリで絞り込んだ後の総数を取得
+            // $totalCount = $query->count(); // カテゴリで絞り込んだ後の総数を取得
         }
 
         $priceRange = $request->input('price_range');
@@ -81,7 +81,7 @@ class MenuController extends Controller
             // 価格帯のフォーマットは "min-max" であると仮定
             list($minPrice, $maxPrice) = explode('-', $priceRange);
             $query->whereBetween('price', [(int)$minPrice, (int)$maxPrice]);
-            $totalCount = $query->count(); // 価格帯で絞り込んだ後の総数を取得
+            // $totalCount = $query->count(); // 価格帯で絞り込んだ後の総数を取得
         }
 
         // 新しい検索ボタンのパラメータ
@@ -103,6 +103,11 @@ class MenuController extends Controller
         // 在庫ありのみ
         if ($hasStock) {
             $query->where('stock', '>', 0); // 在庫数が0より大きいメニューを絞り込む
+        }
+
+        //残りわずか
+        if ($stockLow) {
+            $query->where('stock', '>', 0)->where('stock', '<', 5); // 在庫が1〜4のものを検索
         }
 
         // if($keyword !== null){
@@ -140,8 +145,10 @@ class MenuController extends Controller
         // 常に最新のものが上に来るように並べ替え
         $query->orderBy('created_at', 'desc');
 
+        $totalCount = $query->count();
+
         // 全ての検索条件が適用されたクエリに対してページネーションを適用
-        $menus = $query->paginate(15); // 例: 1ページあたり3件表示
+        $menus = $query->paginate(8); // 例: 1ページあたり8件表示
 
 
         // $hasUnpaidOrder = false;

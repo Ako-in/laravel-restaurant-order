@@ -93,20 +93,26 @@
     </div>
 </form>
     <div class="container mt-4">
+
       <div>
+        {{-- 検索条件が1つでもあれば件数を表示する --}}
+        @if($search || $categoryId || $priceRange || $recommend || $newItem || $hasStock || $stockLow)
+          <p>検索結果: {{ $totalCount }}件</p>
+        @endif
+      </div>
+
+      {{-- <div>
         @if($search)
-          {{-- <p>検索結果: {{ $search }}は{{$totalCount}}件です</p> --}}
           <p>{{$search}}の商品一覧{{$totalCount}}件</p>
         @elseif($categoryId)
           @if(isset($categoryName) && $categoryName)
-          {{-- <p>カテゴリ: {{ $categoryName }}は{{$totalCount}}件です</p> --}}
             <p>{{$categoryName}}の商品一覧{{$totalCount}}件</p> 
           @endif
         @elseif($priceRange)
-          {{-- <p>価格帯: {{ $priceRange }}円は{{$totalCount}}件です</p> --}}
           <p>{{$priceRange}}の商品一覧{{$totalCount}}件</p>
         @endif
-      </div>
+      </div> --}}
+
       <div class="row w-100">
         @foreach($menus as $menu)
           {{-- メニューのステータスが 'inactive' の場合は、このループの残りの処理をスキップ --}}
@@ -127,7 +133,7 @@
                 @endif
               </div>
               <div class="card-body">
-                <h5 class="card-title">商品名：{{$menu->name}}:{{$menu->id}}</h5>
+                <h5 class="card-title">商品名：{{$menu->name}}</h5>
                 <p class="card-text">Price:{{$menu->price}}円（税抜）</p>
                 <p class="text-danger">営業時間外です。</p>
                 {{-- <p class="text-muted">在庫数: {{ $menu->stock }}</p> ★営業時間外でも在庫数を表示 --}}
@@ -158,7 +164,7 @@
                   @endif
                 </div>
                 <div class="card-body">
-                  <h5 class="card-title">商品名：{{$menu->name}}:{{$menu->id}}</h5>
+                  <h5 class="card-title">商品名：{{$menu->name}}</h5>
                   <p class="card-text">Price:{{$menu->price}}円（税抜）</p>
                   <p class="text-danger">在庫なし</p>
                   <p class="">
@@ -196,7 +202,7 @@
                   <p class="text-danger">在庫なし</p>
                 @elseif($menu->stock > 0 && $menu->stock < 5)
                   {{-- 在庫が1−4の時、残りわずかを表示 --}}
-                  <p class="text-warning">残りわずか</p>
+                  <div><span class="badge bg-warning">残りわずか</span></div>
                 @endif
 
                 {{-- カート内超過による在庫なし表示 --}}
@@ -265,7 +271,6 @@
         
       </div>
       <div class="d-flex justify-content-center">
-        {{-- {{$menus->links()}} --}}
         {{$menus->appends(request()->query())->links()}}
       </div>
     </div>
