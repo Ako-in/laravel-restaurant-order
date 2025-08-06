@@ -150,6 +150,7 @@ class MenuController extends Controller
         // 全ての検索条件が適用されたクエリに対してページネーションを適用
         $menus = $query->paginate(8); // 例: 1ページあたり8件表示
 
+        
 
         // $hasUnpaidOrder = false;
         // if (Auth::check()) {

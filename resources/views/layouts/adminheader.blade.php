@@ -1,7 +1,7 @@
 <header>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-          {{-- ブランドロゴ（左寄せ） --}}
+          {{-- タイトル（左寄せ） --}}
           <a href="{{ route('admin.home') }}" class="navbar-brand">Urban Spoon管理画面</a>
 
           {{-- ナビゲーションアイテム（右寄せ） --}}
