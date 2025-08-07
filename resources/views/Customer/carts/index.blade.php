@@ -38,12 +38,16 @@
               <td>{{ $cart->name }}</td>
               <td>
                 <div class="mb-2">
-
-                @if ($menu->image_file !== '')
+                  @php
+                    $menus = collect($menus);
+                    $menu = $menus->where('id', $cart->id)->first();
+                  @endphp
+                {{-- <div class="mb-2"> --}}
+                  @if ($menu && $menu->image_file)
                     <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" style="max-width: 100px; height: auto;">
-                @else
+                  @else
                     <img src="{{ asset('storage/images/noimage.png') }}" style="max-width: 100px; height: auto;">
-                @endif
+                  @endif
                 </div>
               </td>
               <td>

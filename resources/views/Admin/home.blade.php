@@ -4,8 +4,8 @@
 
 <div class="col container">
   <div class="row justify-content-center">
-      <div class="col-xxl-9 col-xl-10 col-lg-11">
-          <div class="row row-cols-md-3 row-cols-2 g-3 mb-5">
+      <div class="col-xl-10 col-lg-11">
+          <div class="row row-cols-md-1 row-cols-2 g-3 mb-5 mt-3">
             <div class="col">
                 <!-- カード全体をリンクで囲み、カスタムクラスでボタンのようにスタイルを設定 -->
                 <a href="{{ route('admin.orders.index') }}" class="card-link-button text-decoration-none">

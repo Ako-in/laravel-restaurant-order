@@ -2,7 +2,7 @@
 
 @section('content')
 
-<p>カテゴリ一覧</p>
+{{-- <p>カテゴリ一覧</p> --}}
 
 <div class="container">
   <div class="row">
@@ -11,7 +11,7 @@
     </div>
     
 </div>
-<a href="{{route('admin.categories.create')}}" class="btn btn-primary px-4 py-2 mt-4">カテゴリ作成</a>
+<a href="{{route('admin.categories.create')}}" class="btn btn-primary px-4 py-2 mt-4 mb-4">カテゴリ作成</a>
 
 
 <div class="d-flex flex-wrap">

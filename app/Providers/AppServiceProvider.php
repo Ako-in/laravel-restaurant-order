@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\URL;
+use Stripe\Stripe; 
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,5 +31,7 @@ class AppServiceProvider extends ServiceProvider
         if (App::environment(['production'])) {
             URL::forceScheme('https');
         }
+        // Stripeのシークレットキーを設定
+        Stripe::setApiKey(env('STRIPE_SECRET'));
     }
 }

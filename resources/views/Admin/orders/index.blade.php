@@ -28,10 +28,13 @@
         <div class="col-md-4">
             <div class="input-group">
                 <input type="text" class="form-control" id="order_date" name="order_date" value="{{$date}}">
-                <button type="submit" class="btn">検索</button>
+                <button type="submit" class="btn btn-primary">検索</button>
+                {{-- クリアボタン --}}
+                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">クリア</a>
             </div>
             
         </div>
+        
     </form>
     
 </div>
@@ -57,7 +60,10 @@
                     <option value="name" {{ $menu_search_type === 'name' ? 'selected' : '' }}>名前</option>
                     <option value="id" {{ $menu_search_type === 'id' ? 'selected' : '' }}>ID</option>
                 </select>
-                <button type="submit" class="btn">検索</button>
+                {{-- <button type="submit" class="btn">検索</button> --}}
+                <button type="submit" class="btn btn-primary">検索</button>
+                {{-- クリアボタン --}}
+                <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">クリア</a>
             </div>
         </div>
     </form>
@@ -68,32 +74,32 @@
 
 
 <table>
-    <tr style="border-bottom: 1px solid black;">
-        <th>注文日時</th>
-        <th>注文ID</th>
-        <th>テーブル番号</th>
-        <th>メニューID</th>
-        <th>メニュー名</th>
-        <th>数量</th>
-        <th>小計税抜</th>
+    <tr style="border-bottom: 1px solid black; text-align: center;">
+        <th style="padding: 10px;">注文日時</th>
+        <th style="padding: 10px;">注文ID</th>
+        <th style="padding: 10px;">テーブル番号</th>
+        <th style="padding: 10px;">メニューID</th>
+        <th style="padding: 10px;">メニュー名</th>
+        <th style="padding: 10px;">数量</th>
+        <th style="padding: 10px;">小計税抜</th>
         {{-- <th>合計金額</th> --}}
         
         {{-- <th>詳細</th> --}}
-        <th>ステータス</th>
+        <th style="padding: 10px;">ステータス</th>
         {{-- <th>在庫数(Pendingから変更後在庫も更新)</th> --}}
-        <th>詳細</th>
-        <th>支払い</th>
+        <th style="padding: 10px;">詳細</th>
+        <th style="padding: 10px;">支払い</th>
     </tr>
     @foreach($orders as $order)
-    <tr style="border-bottom: 0.5px solid black;">
-        <td>{{ $order->created_at }}</td>
-        <td>{{$order->id}}</td>
+    <tr style="border-bottom: 0.5px solid black; text-align: center;">
+        <td style="padding: 10px;">{{ $order->created_at }}</td>
+        <td style="padding: 10px;">{{$order->id}}</td>
     
-        <td>{{$order->table_number}}</td>
+        <td style="padding: 10px;">{{$order->table_number}}</td>
         {{-- <td>{{$order->menu_id ?? '不明'}}</td>
         <td>{{ $order->menu_name ?? '不明' }}</td>
         <td>{{ $order->qty }}</td> --}}
-        <td>
+        <td style="padding: 10px;">
             @if($order->orderItems->isNotEmpty())
                 @foreach($order->orderItems as $item)
                     {{-- {{$item->menu_id }}<br> --}}
@@ -105,7 +111,7 @@
             @endif
         </td>
         
-        <td>
+        <td style="padding: 10px;">
             @if($order->orderItems->isNotEmpty())
                 @foreach($order->orderItems as $item)
                     {{-- {{ $item->menu_name }}<br> --}}
@@ -117,7 +123,7 @@
             @endif
         </td>
         
-        <td>
+        <td style="padding: 10px;">
             @if($order->orderItems->isNotEmpty())
                 @foreach($order->orderItems as $item)
                     {{-- {{ $item->qty }}<br> --}}
@@ -129,7 +135,7 @@
             @endif
         </td>
 
-        <td>
+        <td style="padding: 10px;">
             @if($order->orderItems->isNotEmpty())
                 @foreach($order->orderItems as $item)
                     {{-- {{ number_format($item->subtotal) }}円<br> --}}
@@ -144,7 +150,7 @@
         {{-- <td>{{ number_format($order->subtotal) }}円</td> --}}
         {{-- <td>{{$order->table_number}}</td> --}}
         {{-- <td><a href="{{ route('admin.orders.show', $order->id) }}">詳細</a></td> --}}
-        <td>
+        <td style="padding: 10px;">
             @if($order->status === 'pending')
                 <span style="color: orange;">保留中</span>
             @elseif($order->status === 'ongoing')
@@ -167,12 +173,12 @@
                 -
             @endif
         </td> --}}
-        <td>
+        <td style="padding: 10px;">
             <a href="{{ route('admin.orders.showConfirm', ['id' => $order->id]) }}" class="btn btn-info">
                 注文確認画面
             </a>
         </td>
-        <td>
+        <td style="padding: 10px;">
             @if($order->is_paid === 1)
                 <span style="color: green;">済</span>
             @elseif($order->is_paid === 0)

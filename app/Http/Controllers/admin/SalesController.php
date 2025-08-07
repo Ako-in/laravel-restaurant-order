@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 // use Illuminate\Validation\Rule;
 use Illuminate\Support\Carbon;
+use App\Models\SalesTarget;
 use Symfony\Component\HttpFoundation\StreamedResponse; // CSV export StreamedResponse をインポート
 
 // use Encore\Admin\Grid;
@@ -70,6 +71,19 @@ class SalesController extends Controller
                 ];
             }
         }
+
+        // // 目標額のデータを取得する
+        // $salesTargets = SalesTarget::orderBy('year')->orderBy('month')->get();
+
+        // // グラフのデータ形式に合わせて整形する
+        // $targetAmounts = $salesTargets->mapWithKeys(function ($item) {
+        //     // 月と年のキーを結合
+        //     return ["{$item->year}-{$item->month}" => $item->target_amount];
+        // })->all();
+        
+
+    
+        
 
         // if ($request->has('sort_sales_daily')) {
         //     $sortOrder = $request->input('sort_sales_daily');
@@ -374,6 +388,23 @@ class SalesController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
+        // 目標額のデータを取得
+        // ここで取得したデータを $salesTargets に格納
+        $salesTargets = \App\Models\SalesTarget::where('period_type', 'monthly')
+        ->orderBy('start_date', 'asc')
+        ->get();
+
+        $targetAmounts = array_fill(0, 12, 0); // 12ヶ月分の配列を0で初期化
+
+        foreach ($salesTargets as $target) {
+            $month = \Carbon\Carbon::parse($target->start_date)->month;
+            $monthIndex = $month - 1; //月（1-12）を配列のインデックス（0-11）に変換
+
+            if ($monthIndex >= 0 && $monthIndex < 12) {
+                $targetAmounts[$monthIndex] = $target->target_amount;
+            }
+        }
+
         // --- アイテム別の合計売上集計 ---
         $itemSalesSummaryQuery = OrderItem::query()
         ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -462,8 +493,19 @@ class SalesController extends Controller
         ->orderBy('total_category_amount', 'desc')
         ->get();
 
-        return view('admin.sales.chart',compact('labels','orderAmounts','orderCounts','startDate','endDate','salesItems','totalSalesAmountAcrossFilter','itemSalesSummary','itemCategorySummary'));
-
+        return view('admin.sales.chart', [
+            'labels' => $labels,
+            'orderAmounts' => $orderAmounts,
+            'orderCounts' => $orderCounts,
+            'targetAmounts' => $targetAmounts,
+            // 'salesTargets'=>$salesTargets, 
+            'itemCategorySummary' => $itemCategorySummary,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'salesItems' => $salesItems,
+            'totalSalesAmountAcrossFilter' => $totalSalesAmountAcrossFilter,
+            'itemSalesSummary' => $itemSalesSummary,
+        ]);
     }
 
     public function headings(): array

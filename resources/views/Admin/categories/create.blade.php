@@ -1,11 +1,9 @@
-
-
-@extends('layouts.admin')
+{{-- @extends('layouts.admin')
     @section('content')
-        <div class="container mx-auto px-4 py-8">
+        <div class="container">
             <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-semibold text-gray-800">カテゴリ新規作成</h3>
-                <a href="{{ route('admin.categories.index') }}" class="bg-blue-500 hover:bg-blue-600 text-black px-4 py-2 rounded">Back</a>
+                <h3 class="">カテゴリ新規作成</h3>
+                <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">戻る</a>
             </div>
             <div class="mt-4">
                 <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
@@ -17,26 +15,48 @@
                           <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
                       @enderror
                   </div> --}}
-
-                  <div class="flex flex-col mt-4">
-                      <label for="name" class="text-gray-800">Name</label>
-                      <input type="text" name="name" id="name" class="border border-gray-200 px-4 py-2 mt-2"value="{{ old('name') }}">
+{{-- 
+                  <div class="flex mt-4 mb-4">
+                      <label for="name" class="">カテゴリ名</label>
+                      <input type="text" name="name" id="name" class=""value="{{ old('name') }}">
                       @error('name')
-                          <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
+                          <p class="">{{ $message }}</p>
                       @enderror
                   </div>
               
-                  <div class="flex flex-col mt-4">
-                      <label for="description" class="text-gray-800">Description</label>
-                      <textarea name="description" id="description" rows="4" class="border border-gray-200 px-4 py-2 mt-2"{{ old('description') }}></textarea>
-                      @error('description')
-                          <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
-                      @enderror
-                  </div>
-              
-                  <button type="submit" class="bg-blue-500 text-black px-4 py-2 mt-4">カテゴリ作成</button>
+                  <button type="submit" class="btn btn-primary">カテゴリ作成</button>
               </form>
               
             </div>
         </div>
     @endsection
+ --}}
+
+@extends('layouts.admin')
+
+@section('content')
+<div class="container mt-4">
+    <div class="mb-4">
+        <h4>カテゴリ新規作成</h4>
+        <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">戻る</a>
+    </div>
+
+    <div class="card p-4">
+        <form action="{{ route('admin.categories.store') }}" method="POST">
+            @csrf
+
+            <div class="mb-3">
+                <label for="name" class="form-label">カテゴリ名</label>
+                <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}">
+                @error('name')
+                    <div class="invalid-feedback d-block">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+        
+            <button type="submit" class="btn btn-primary">カテゴリ作成</button>
+        </form>
+    </div>
+</div>
+@endsection

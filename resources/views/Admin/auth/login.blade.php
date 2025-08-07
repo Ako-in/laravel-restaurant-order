@@ -28,7 +28,7 @@
                         <input id="password" type="password" class="form-control" name="password" required autocomplete="new-password" placeholder="パスワード">
                     </div>
 
-                    <div class="form-group mb-3">
+                    {{-- <div class="form-group mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
 
@@ -36,7 +36,7 @@
                                     次回から自動的にログインする
                                 </label>
                             </div>
-                    </div>
+                    </div> --}}
 
                     <div class="form-group d-flex justify-content-center mb-4">
                         <button type="submit" class="btn text-black shadow-sm w-100 ">ログイン</button>

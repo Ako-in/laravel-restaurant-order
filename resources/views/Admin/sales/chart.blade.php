@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
+<h4>売上管理</h4>
 
 <div class="container d-flex">
   {{-- 棒グラフ用 --}}
@@ -33,11 +34,21 @@
     // ControllerからJSへデータを渡す、JSで読み書きしやすいJSON形式に変換する
     var orderAmounts = @json($orderAmounts);
     var orderCounts = @json($orderCounts);
+    var targetAmounts = @json($targetAmounts);
     var chart = new Chart(ctx, {
         type: 'bar',//売上は棒グラフ　 // グラフのタイプ('line','bubble','pie'などに変更可能)
         data: {
             labels: @json($labels), //SalesCOntroller@chartで定義したものを使う
             datasets: [{
+              
+              label: '2025年月間売上目標金額（円）',
+                data: targetAmounts,
+                backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 1,//境界線の太さ
+                yAxisID: 'y-amount', // 金額用Y軸ID。複数のY軸を使用する時に、どのデータを紐付けるかを指定。
+
+            },{
                 label: '2025年月間売上金額（円）',
                 data: orderAmounts,
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -63,7 +74,7 @@
           plugins: { // pluginsオブジェクトがない場合は追加する
             title: {
               display: true, // タイトルを表示
-              text: '2025年度月間売上金額と件数', // 表示したいタイトルテキスト
+              text: '2025年度目標vs月間売上金額と件数', // 表示したいタイトルテキスト
               font: {
                 size: 18, // タイトルのフォントサイズ
                 weight: 'bold' // タイトルを太字にする
@@ -300,7 +311,7 @@
 </script>
 
 <div class="container">
-  <h2 class="mb-2">売上検索</h2>
+  <h3 class="mb-2">売上検索</h3>
 
   {{-- 検索フォーム --}}
   <div class="card">

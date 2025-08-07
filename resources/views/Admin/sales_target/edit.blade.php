@@ -211,11 +211,14 @@
               <button type="submit" class="btn btn-secondary mt-3">売上登録編集</button>
           </form>
 
-          <div class="mt-3">
-            <hr>
+          {{-- <div class="mt-3">
             <p>過去の更新履歴</p>
-            
-          </div>
+            <hr>
+
+
+
+
+          </div> --}}
       </div>
   </div>
 </div>

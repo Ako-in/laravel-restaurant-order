@@ -1,75 +1,104 @@
+# ▪️Larvel飲食店オーダー管理アプリ：Urbanspoon 
+<img src="storage/app/public/images/toppage.jpg" height="300px" alt="Urbanspoon トップページ">
+
+https://urbanspoon.sakura.ne.jp/customer/login  
+https://urbanspoon.sakura.ne.jp/admin/login  
+
+## 開発理由  
+昨今の飲食店のオーダーシステムはトレンドで今後も増えていく傾向があると感じ、  
+注文システム以外にも店舗側が管理しやすくなるシステムを目指して
+アプリ作成を決めました。  
+
+
+## 使用技術 
+バックエンド   
+- PHP(8.3.13)  
+- Laravel(9.52.20)  
+
+フロントエンド  
+- JavaScript  　
+- HTML/CSS  　
+- Bootstrap 
+
+データベース  
+- MySQL  
+　
+- git    　
+- さくらインターネット  　
+
+## 機能一覧
+<カスタマー側>
+- ログイン機能
+- 検索機能
+各種ワンクリック検索、絞り込み検索
+- カート機能
+カートに入れる
+カート内編集(数量修正、削除)
+- 注文確定機能
+- 注文履歴一覧表示機能
+- クレジット決済機能
+- ログアウト
+
+<アドミン(店舗)側>
+- ログイン機能
+- 注文一覧機能
+新規注文表示  
+注文数量修正  
+注文個別ステータス変更（メニュー別）  
+注文全体ステータス表示(複数注文の時)  
+- 新規メニュー・カテゴリ作成機能
+
+- 在庫管理機能
+- 売上一覧機能  
+月別売上グラフ表示(目標、実績、売上件数)  
+カテゴリ別売上割合表示  
+売上CSVファイルダウンロード機能  
+全件売上金額、アイテム表示  
+- 売上目標設定機能  
+年間・月間売上目標設定  
+目標表示  
+目標編集  
+- ログアウト
+
+## アプリの特徴  
+### カスタマー側の表示  
+
+<img src="storage/app/public/images/readme/customer/urbanspoon:customer:login2.png" height="250px" alt="Urbanspoon カスタマーログイン">
+
+<img src="storage/app/public/images/readme/customer/urbanspoon:customer:toppagemenu.png" height="250px" alt="Urbanspoon カスタマーメニュートップページ">
+
+<img src="storage/app/public/images/readme/customer/urbanspoon:customer:cart.png" height="250px" alt="Urbanspoon カスタマーカート">
+
+<img src="storage/app/public/images/readme/customer/urbanspoon:customer:carteditqty.png" height="250px" alt="Urbanspoon カスタマーカート数量変更">
+
+<img src="storage/app/public/images/readme/customer/urbanspoon:customer:cartDelete.png" height="250px" alt="Urbanspoon カスタマーカート削除">
+
+<img src="storage/app/public/images/readme/customer/urbanspoon:customer:orderhistory.png" height="250px" alt="Urbanspoon カスタマー注文履歴">
+
+<img src="storage/app/public/images/readme/customer/urbanspoon:customer:payment.png" height="250px" alt="Urbanspoon カスタマー支払い">
+
+<img src="storage/app/public/images/readme/customer/urbanspoon:customer:afterpayment.png" height="250px" alt="Urbanspoon カスタマー支払い完了">
+
+### 　管理者側の表示  
+<img src="storage/app/public/images/readme/admin/urbanspoon:admin:login.png" height="250px" alt="Urbanspoon 管理者ログイン">
+
+<img src="storage/app/public/images/readme/admin/urbanspoon:admin:toppage.png" height="250px" alt="Urbanspoon 管理者トップページ">
+
+<img src="storage/app/public/images/readme/admin/urbanspoon:admin:orderlist.png" height="250px" alt="Urbanspoon 管理者注文リスト">
+
+<img src="storage/app/public/images/readme/admin/urbanspoon:admin:orderconfirm.png" height="250px" alt="Urbanspoon 管理者注文詳細">
+
+<img src="storage/app/public/images/readme/admin/urbanspoon:admin:menutop2.png" height="250px" alt="Urbanspoon 管理者メニュー一覧">
+
+<img src="storage/app/public/images/readme/admin/urbanspoon:admin:menuedit.png" height="250px" alt="Urbanspoon 管理者メニュー編集">
+
+
+
+## 苦労したこと
+
+## 今後の展望
 
 
 
 
 
-
-
-
-
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
-
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

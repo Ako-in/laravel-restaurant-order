@@ -148,3 +148,4 @@
 
 
     {{-- {{ $salesTargets->links() }} ページネーションリンク --}}
+@endsection
