@@ -124,7 +124,6 @@
     
     if(itemCategorySummary.length > 0){
 
-    
     var categoryPieLabels = itemCategorySummary.map(summary => summary.category_name);
     var categoryPieData = itemCategorySummary.map(summary => parseFloat(summary.total_category_amount));//数値で表示
 

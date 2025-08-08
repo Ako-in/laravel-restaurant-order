@@ -144,8 +144,5 @@
 
         </div>
     </div>
-
-
-
     {{-- {{ $salesTargets->links() }} ページネーションリンク --}}
 @endsection

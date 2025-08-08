@@ -7,6 +7,7 @@
       <div class="col-xl-10 col-lg-11">
           <div class="row row-cols-md-1 row-cols-2 g-3 mb-5 mt-3">
             <div class="col">
+                
                 <!-- カード全体をリンクで囲み、カスタムクラスでボタンのようにスタイルを設定 -->
                 <a href="{{ route('admin.orders.index') }}" class="card-link-button text-decoration-none">
                     <div class="card bg-light shadow-sm h-100 d-flex align-items-center justify-content-center">
@@ -17,7 +18,7 @@
                         </div>
                     </div>
                 </a>
-                
+            
             </div>
             <div class="col">
                 <!-- カード全体をリンクで囲み、カスタムクラスでボタンのようにスタイルを設定 -->

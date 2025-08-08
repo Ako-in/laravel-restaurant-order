@@ -120,40 +120,41 @@
             @continue
           @endif
 
-        {{-- 営業時間外の判定 --}}
+          {{-- 営業時間外の判定 --}}
           @if($isOrderableTime === false)
-          {{-- 営業時間外の場合、メニューをグレースケールにする --}}
-          <div class="col-md-3 mb-4">
-            <div class="card h-100" style="width: 18rem;">
-              <div class="mb-2">
-                @if ($menu->image_file !== '')
-                    <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-100 grayscale">
-                @else
-                    <img src="{{ asset('/images/noimage.jpg') }}" class="w-100 grayscale">
-                @endif
-              </div>
-              <div class="card-body">
-                <h5 class="card-title">商品名：{{$menu->name}}</h5>
-                <p class="card-text">Price:{{$menu->price}}円（税抜）</p>
-                <p class="text-danger">営業時間外です。</p>
-                {{-- <p class="text-muted">在庫数: {{ $menu->stock }}</p> ★営業時間外でも在庫数を表示 --}}
-                <p class="">
-                  @if($menu->is_new)
-                    <div><span class="badge bg-secondary grayscale">新商品</span></div>
+            {{-- 営業時間外の場合、メニューをグレースケールにする --}}
+            <div class="col-md-3 mb-4">
+              <div class="card h-100" style="width: 18rem;">
+                <div class="mb-2">
+                  @if ($menu->image_file !== '')
+                      <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-100 grayscale">
+                  @else
+                      <img src="{{ asset('/images/noimage.jpg') }}" class="w-100 grayscale">
                   @endif
-                  @if($menu->is_recommended)
-                    <div><span class="badge bg-danger grayscale">おすすめ</span></div>
-                  @endif
-                  @if($lowStock)
-                    <div><span class="badge bg-warning graysclae">残りわずか</span></div>
-                </p>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">商品名：{{$menu->name}}</h5>
+                  <p class="card-text">Price:{{$menu->price}}円（税抜）</p>
+                  <p class="text-danger">営業時間外です。</p>
+                  {{-- <p class="text-muted">在庫数: {{ $menu->stock }}</p> ★営業時間外でも在庫数を表示 --}}
+                  <p class="">
+                    @if($menu->is_new)
+                      <div><span class="badge bg-secondary grayscale">新商品</span></div>
+                    @endif
+                    @if($menu->is_recommended)
+                      <div><span class="badge bg-danger grayscale">おすすめ</span></div>
+                    @endif
+                    @if($lowStock)
+                      <div><span class="badge bg-warning graysclae">残りわずか</span></div>
+                    @endif
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-          @continue
-        @endif
+            @continue
+          @endif
 
-
+          
           @if($menu->stock <= 0)
             {{-- 在庫が０の時、在庫なしを表示 --}}
             <div class="col-md-3 mb-4">
@@ -227,7 +228,7 @@
                   @endif
                   @if($menu->stock > 0 && $menu->stock < 5)
                   {{-- 在庫が1−4の時、残りわずかを表示 --}}
-                  <div><span class="badge bg-warning">残りわずか</span></div>
+                    <div><span class="badge bg-warning">残りわずか</span></div>
                   @endif
                 </p>
                 
@@ -251,7 +252,7 @@
                         <input class="flex"type="text" id="request"></input> --}}
                         {{-- <button type="submit" class="btn btn-primary">カートに追加する</button> --}}
                     @else
-                        <p class="text-danger">Out of stock</p>
+                        <p class="text-danger">在庫なし</p>
                     @endif
 
                   </div>
