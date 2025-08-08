@@ -1,25 +1,25 @@
 <?php
 
-namespace App\Admin\Extensions\Tools;
+namespace App\admin\Extensions\Tools;
 
-use Encore\Admin\Admin;
-use Encore\Admin\Grid\Tools\AbstractTool;
+use Encore\admin\admin;
+use Encore\admin\Grid\Tools\AbstractTool;
 
 class CsvImport extends AbstractTool
 {
-   protected $action;//コンストラクタで受け取るURLを保持するため
+  protected $action; //コンストラクタで受け取るURLを保持するため
 
-   public function __construct($action) //コンストラクタでPOSTリクエストのURLを受け取る
-   {
-      $this->action = $action;
-   }
+  public function __construct($action) //コンストラクタでPOSTリクエストのURLを受け取る
+  {
+    $this->action = $action;
+  }
 
-   protected function script()
-   {
-      // CSRFトークンをJavaScriptに渡すための設定
-      $token = csrf_token();
-      // $this->actionを使ってURLを指定
-      return <<< SCRIPT
+  protected function script()
+  {
+    // CSRFトークンをJavaScriptに渡すための設定
+    $token = csrf_token();
+    // $this->actionを使ってURLを指定
+    return <<< SCRIPT
       $('.csv-import-button').click(function() {// クラス名を明確にする
         document.getElementById("csv_import_file_input").click();
       });
@@ -51,17 +51,17 @@ class CsvImport extends AbstractTool
         });
       });
       SCRIPT;
-   }
+  }
 
-   public function render()
-   {
-      Admin::script($this->script());//このツールが描画されるときにJavaScriptをページに追加
-      //  return view('csv_upload');
-      return <<<EOT
+  public function render()
+  {
+    admin::script($this->script()); //このツールが描画されるときにJavaScriptをページに追加
+    //  return view('csv_upload');
+    return <<<EOT
       <div class="btn-group pull-right" style="margin-right: 10px">
           <a class="btn btn-sm btn-primary csv-import-button"><i class="fa fa-upload"></i> CSVインポート</a>
           <input type="file" id="csv_import_file_input" style="display: none;">
       </div>
       EOT;
-   }
+  }
 }

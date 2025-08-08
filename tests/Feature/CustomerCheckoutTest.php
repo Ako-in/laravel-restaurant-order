@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Models\Customer;
+use App\Models\customer;
 use App\Models\Menu;
 use App\Models\Order; // Order モデルをuse
 use App\Models\OrderItem; // OrderItem モデルをuse
@@ -20,7 +20,7 @@ use Mockery; // Mockery をuse
 use Stripe\Stripe; // Stripe ファサードを使用する場合
 use Stripe\Checkout\Session as LaravelSession; // Stripe Checkout Session を使用する場合
 
-class CustomerCheckoutTest extends TestCase
+class customerCheckoutTest extends TestCase
 {
 
     /**
@@ -59,14 +59,14 @@ class CustomerCheckoutTest extends TestCase
             'stock' => 10,   // 在庫を設定
             'name' => 'テストメニュー', // メニュー名も設定
         ]);
-        $customer = Customer::factory()->create([
+        $customer = customer::factory()->create([
             'table_number' => '101',
             'password' => Hash::make('101pass'),
             // 'email' => 'test@example.com', // ★★★ ここを削除またはコメントアウト ★★★
         ]);
         $this->actingAs($customer, 'customer'); // カスタマーとしてログイン
 
-        Session::put('table_number',$customer->table_number);
+        Session::put('table_number', $customer->table_number);
 
         // カートに商品を追加
         $this->post(route('customer.carts.store'), [
@@ -103,7 +103,7 @@ class CustomerCheckoutTest extends TestCase
             'qty' => 2,
             'price' => $menu->price,
             'options' => json_encode(['table' => $customer->table_number, 'image' => $menu->image_path ?? null]),
-            'status'=>'completed',
+            'status' => 'completed',
         ]);
 
         $this->assertNotNull($order, 'テスト用に注文が作成されていません。');
@@ -122,7 +122,7 @@ class CustomerCheckoutTest extends TestCase
         Mockery::mock('overload:\Stripe\Checkout\Session')
             ->shouldReceive('create')
             ->once()
-            ->with(Mockery::on(function ($args) use ($expectedGrandTotalForStripe,$menu) { // ★★★ $customer を削除 ★★★
+            ->with(Mockery::on(function ($args) use ($expectedGrandTotalForStripe, $menu) { // ★★★ $customer を削除 ★★★
                 if (!isset($args['line_items']) || empty($args['line_items'])) {
                     return false;
                 }
@@ -192,7 +192,4 @@ class CustomerCheckoutTest extends TestCase
         ShoppingCartFacade::instance('customer_' . $customer->id)->restore($customer->id);
         $this->assertCount(0, ShoppingCartFacade::instance('customer_' . $customer->id)->content(), 'カートがクリアされていません。');
     }
-
-
-
 }

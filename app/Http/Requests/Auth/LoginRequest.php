@@ -27,19 +27,20 @@ class LoginRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules():array
+    public function rules(): array
     {
         return [
-            'email'=>['required','string','email'],
-            'password'=>['required','string'],
+            'email' => ['required', 'string', 'email'],
+            'password' => ['required', 'string'],
         ];
     }
 
-    public function authenticate(): void{
+    public function authenticate(): void
+    {
         $this->ensureIsNotRateLimited();
         $this->is('admin/*') ? $guard = 'admin' : $guard = 'customer';
 
-        if(! Auth::guard($guard)->attempt($this->only('email','password'), $this->boolean('remember'))){
+        if (! Auth::guard($guard)->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -70,8 +71,6 @@ class LoginRequest extends FormRequest
 
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
     }
-
-
 }

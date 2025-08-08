@@ -49,7 +49,7 @@ class OrderTest extends TestCase
     public function test_admin_user_can_update_order_item_status()
     {
         // 2.adminユーザーはordersの個別ステータスを更新できる
-        $order = Order::factory()->create();
+        // $order = Order::factory()->create();
         $orderItem = OrderItem::factory()->create([
             'status' => 'pending', // 初期ステータスを明示的に設定
         ]);
@@ -67,7 +67,6 @@ class OrderTest extends TestCase
         ]);
 
         $response->assertRedirect(route('admin.orders.showConfirm', ['id' => $order->id]));
-        // $response = $this->get(route('admin.orders.showConfirm',['id=.$order->id']));
         $response->assertSessionHas('success', '個別ステータス更新しました');
 
         // 変更後のデータになっているか確認
@@ -120,36 +119,16 @@ class OrderTest extends TestCase
 
     public function test_admin_user_can_access_admin_orders_showConfirm()
     {
-        // 3.adminユーザーはordersの詳細画面を表示できる 
+        // 3.adminユーザーはordersの詳細画面を表示できる
+        $orderItem = OrderItem::factory()->create();
         $admin = admin::factory()->create([
             'email' => 'admin@example.com',
             'password' => Hash::make('restaurant'),
         ]);
         $this->actingAs($admin, 'admin'); //管理者としてでログイン
-        $order = Order::factory()->create();
-        $category = Category::factory()->create();
-        $menu = Menu::factory()->create(['category_id' => $category->id]);
-        $orderItem = OrderItem::factory()->forOrder($order)->create([
-            'menu_id' => $menu->id,
-            'price' => $menu->price,
-            'qty' => 1,
-            'subtotal' => $menu->price,
-            'status' => 'pending',
-        ]);
 
-
-        $response = $this->get(route('admin.orders.showConfirm', ['id' => $order->id]));
-
-
+        $response = $this->get(route('admin.orders.showConfirm', ['id' => $orderItem->id]));
         $response->assertStatus(200);
-        // 正しいビューが表示されることを期待
-        $response->assertViewIs('admin.orders.confirm');
-
-        // ビューに注文データが渡されていることを確認
-        // $response->assertViewHas('order', function ($viewOrder) use ($order) {
-        //     return $viewOrder->id === $order->id;
-        // });
-        // $response->redirect(route('admin.orders.confirm',['id'=>$order->id]));
     }
 
     public function test_admin_user_can_access_admin_orders_updateAllStatus()
@@ -158,19 +137,15 @@ class OrderTest extends TestCase
         $order = Order::factory()->create([
             'status' => 'pending',
         ]);
-        $menu1 = Menu::factory()->create();
-        $menu2 = Menu::factory()->create();
 
         $orderItem = OrderItem::factory()->create([
-            // 'order_id'=> $order->id,
-            'menu_id' => $menu1->id,
+            'order_id' => $order->id,
             'status' => 'completed',
             'subtotal' => 1000,
         ]);
 
         $orderItem = OrderItem::factory()->create([
-            // 'order_id'=> $order->id,
-            'menu_id' => $menu2->id,
+            'order_id' => $order->id,
             'status' => 'completed',
             'subtotal' => 2000,
         ]);

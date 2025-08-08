@@ -6,8 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Models\Admin;
-use App\Models\Customer;
+use App\Models\admin;
+use App\Models\customer;
 use App\Models\Order;
 use App\Models\Menu;
 use App\Models\OrderItem;
@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Gloudemans\Shoppingcart\Facades\Cart as ShoppingCartFacade; // GloudemansのCartファサードを別名でuse
 
-class CustomerCartTest extends TestCase
+class customerCartTest extends TestCase
 {
     use RefreshDatabase;
     /**
@@ -36,18 +36,19 @@ class CustomerCartTest extends TestCase
     // =================
     // カスタマー側
     // =================
-    public function test_customer_user_can_add_orderItem_to_cart(){
-    //  ログインしたカスタマーユーザーはメニューをカートに入れることができる
+    public function test_customer_user_can_add_orderItem_to_cart()
+    {
+        //  ログインしたカスタマーユーザーはメニューをカートに入れることができる
         $menu = Menu::factory()->create();
-        $customer = Customer::factory()->create([
-            'table_number'=>'101',
-            'password'=>Hash::make('101pass'),
+        $customer = customer::factory()->create([
+            'table_number' => '101',
+            'password' => Hash::make('101pass'),
         ]);
-        $this->actingAs($customer,'customer');// カスタマーとしてでログイン
+        $this->actingAs($customer, 'customer'); // カスタマーとしてでログイン
         $response = $this->get(route('customer.menus.index'))->assertStatus(200);
-        
+
         // $response->assertStatus(200);
-        $response = $this->post(route('customer.carts.store'),[
+        $response = $this->post(route('customer.carts.store'), [
             'id' => $menu->id,
             'name' => $menu->name,
             'qty' => 1,
@@ -63,16 +64,17 @@ class CustomerCartTest extends TestCase
         ]);
     }
 
-    public function test_customer_user_can_edit_qty(){
+    public function test_customer_user_can_edit_qty()
+    {
         // //ログインしたカスタマーユーザーはカートの数量を変更できる
         $menu = Menu::factory()->create();
-        $customer = Customer::factory()->create([
-            'table_number'=>'101',
-            'password'=>Hash::make('101pass'),
+        $customer = customer::factory()->create([
+            'table_number' => '101',
+            'password' => Hash::make('101pass'),
         ]);
-        $this->actingAs($customer,'customer');// カスタマーとしてでログイン
+        $this->actingAs($customer, 'customer'); // カスタマーとしてでログイン
 
-        $response = $this->post(route('customer.carts.store'),[
+        $response = $this->post(route('customer.carts.store'), [
             'id' => $menu->id,
             'name' => $menu->name,
             'qty' => 1,
@@ -118,7 +120,7 @@ class CustomerCartTest extends TestCase
             'instance' => 'customer_' . $customer->id,
             // 'content' はここでは検証しない
         ]);
-        
+
         // $cartItem = Shoppingcart::where('table_number', $customer->table_number)
         // ->where('menu_id', $menu->id)
         // ->first();
@@ -145,19 +147,20 @@ class CustomerCartTest extends TestCase
 
     }
 
-    public function test_customer_user_can_delete_cart(){
+    public function test_customer_user_can_delete_cart()
+    {
         // ログインしたカスタマーユーザーはカートに入れたメニューを削除できる
         $menu = Menu::factory()->create();
-        $customer = Customer::factory()->create([
-            'table_number'=>'101',
-            'password'=>Hash::make('101pass'),
+        $customer = customer::factory()->create([
+            'table_number' => '101',
+            'password' => Hash::make('101pass'),
         ]);
-        $this->actingAs($customer,'customer');// カスタマーとしてでログイン
+        $this->actingAs($customer, 'customer'); // カスタマーとしてでログイン
 
-        $order = $this->post(route('customer.carts.store'),[
-            'table_number'=>$customer->table_number,
-            'menu_id'=>$menu->id,
-            'qty'=>1,
+        $order = $this->post(route('customer.carts.store'), [
+            'table_number' => $customer->table_number,
+            'menu_id' => $menu->id,
+            'qty' => 1,
         ]);
 
         $cartContent = ShoppingCartFacade::instance('customer_' . $customer->id)->content();
@@ -166,23 +169,19 @@ class CustomerCartTest extends TestCase
         // ★★★ ここで $rowId を定義 ★★★
         $rowId = $cartItem->rowId; // GloudemansパッケージのrowIdを取得
 
-        $response = $this->delete(route('customer.carts.destroy',$rowId),[
-            'table_number'=>$customer->table_number,
-            'menu_id'=>$menu->id,
-            'qty'=>0,
+        $response = $this->delete(route('customer.carts.destroy', $rowId), [
+            'table_number' => $customer->table_number,
+            'menu_id' => $menu->id,
+            'qty' => 0,
         ]);
 
-        $response ->assertRedirect(route('customer.carts.index'));
-        $response->assertSessionHas('success','カートから削除しました');
+        $response->assertRedirect(route('customer.carts.index'));
+        $response->assertSessionHas('success', 'カートから削除しました');
 
         $this->assertDatabaseMissing('shoppingcart', [
             'identifier' => $customer->id,
             'instance' => 'customer_' . $customer->id,
         ]);
         $response->assertViewHas(route('customer.carts.index'));
-
-
     }
-
-
 }

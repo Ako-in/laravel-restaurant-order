@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 // use Illuminate\Support\Facades\DB;
-use App\Models\Customer;
+use App\Models\customer;
 use Illuminate\Support\Facades\Hash;
 
 class TableUserSeeder extends Seeder
@@ -17,26 +17,24 @@ class TableUserSeeder extends Seeder
      */
     public function run()
     {
-        Customer::create([
+        customer::create([
             'table_number' => '101',
             'password' => Hash::make('table101pass')
         ]);
-        
-        Customer::create([
+
+        customer::create([
             'table_number' => '102',
             'password' => Hash::make('table102pass')
         ]);
 
-        Customer::create([
+        customer::create([
             'table_number' => '103',
             'password' => Hash::make('table103pass')
         ]);
 
-        Customer::create([
-            'table_number'=>'guest',
+        customer::create([
+            'table_number' => 'guest',
             'password' => Hash::make('guestpass')
         ]);
-
-        
     }
 }

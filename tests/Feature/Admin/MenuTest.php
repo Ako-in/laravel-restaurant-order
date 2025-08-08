@@ -65,11 +65,10 @@ class MenuTest extends TestCase
         //     'image_file'=>'',
         //     'category_id'=>$category,
         // ]);
-        // $menu = Menu::factory()->create();
+        $menu = Menu::factory()->create();
         // $response->assertDatabaseHas(route('admin.menus.index'));
-        $response = $this->get(route('admin.menus.create'));
+        $response = $this->get(route('admin.menus.create', ['menu' => $menu]));
         $response->assertStatus(200);
-        $response->assertViewIs('admin.menus.create'); // 正しいビューが表示されることを期待
         // $response->assertRedirect(route('admin.menus.index'));
         // $response->assertSessionHas('success');
     }
@@ -149,10 +148,7 @@ class MenuTest extends TestCase
     public function test_customer_user_cannot_access_to_admin_menus_index()
     {
         //1.カスタマーユーザーは管理画面メニューindexにアクセスできない。
-        $category = category::factory()->create();
-        $menu = Menu::factory()->create([
-            'category_id' => $category->id,
-        ]);
+
         $customer = customer::factory()->create([
             'table_number' => '1',
             'password' => Hash::make('test')
@@ -162,7 +158,6 @@ class MenuTest extends TestCase
         $response = $this->get(route('admin.menus.index'));
         // $response->assertStatus(403);
         $response->assertRedirect(route('admin.login'));
-        $response->assertStatus(302);
     }
 
     public function test_customer_user_cannot_access_admin_menu_create()

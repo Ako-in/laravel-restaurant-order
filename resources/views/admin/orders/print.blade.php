@@ -10,7 +10,7 @@
         <p><strong>テーブル番号：</strong> {{ $order->table_number }}</p>
         <p><strong>注文日時：</strong> {{ $order->created_at }}</p>
 
-        
+
         <h3>注文内容</h3>
         <table class="table table-bordered">
             <thead>
@@ -23,15 +23,14 @@
             </thead>
             <tbody>
                 {{-- @php $total = 0; @endphp --}}
-                
 
-                @foreach($order_items ??[] as $item)
-                {{-- @foreach($originalOrder->order_items as $item) --}}
+
+                @foreach ($order_items ?? [] as $item)
+                    {{-- @foreach ($originalOrder->order_items as $item) --}}
                     <tr>
-                        <td>{{$item->menu_name}}</td>
-                        <td>{{$item->qty}}</td>
+                        <td>{{ $item->menu_name }}</td>
+                        <td>{{ $item->qty }}</td>
                     </tr>
-
                 @endforeach
 
 
@@ -43,7 +42,7 @@
                 </tr>
             </tfoot> --}}
         </table>
-        <strong>合計{{$order_items->count()}}点</strong>
+        <strong>合計{{ $order_items->count() }}点</strong>
 
         {{-- 戻るボタン --}}
         <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">一覧へ戻る</a>

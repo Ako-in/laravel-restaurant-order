@@ -4,10 +4,10 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Admin;
+use App\Models\admin;
 use Illuminate\Support\Facades\Hash;
 
-class AdminSeeder extends Seeder
+class adminSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,7 +16,7 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-        $admin = new Admin();
+        $admin = new admin();
         $admin->email = 'admin@example.com';
         $admin->password = Hash::make('restaurant');
         $admin->save();

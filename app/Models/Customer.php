@@ -8,9 +8,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Order;
 
-class Customer extends Authenticatable
+class customer extends Authenticatable
 {
-    //authenticatable Auth::guard('customer')でCustomerモデルを指定
+    //authenticatable Auth::guard('customer')でcustomerモデルを指定
     use HasFactory, Notifiable;
 
     protected $fillable = [
@@ -25,7 +25,6 @@ class Customer extends Authenticatable
     public function orders()
     {
         // hasMany
-        return $this->hasMany(Order::class,'table_number');
+        return $this->hasMany(Order::class, 'table_number');
     }
-
 }

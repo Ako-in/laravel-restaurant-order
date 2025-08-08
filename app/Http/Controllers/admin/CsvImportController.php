@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -107,7 +107,7 @@ class CsvImportController extends Controller
 
     public function render()
    {
-      Admin::script($this->script());
+      admin::script($this->script());
       return <<<EOT
       <div class="btn-group pull-right" style="margin-right: 10px">
           <a class="btn btn-sm btn-primary csv-import-button"><i class="fa fa-upload"></i> CSVインポート</a>

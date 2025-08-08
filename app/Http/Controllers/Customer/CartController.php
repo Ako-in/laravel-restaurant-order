@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Customer;
+namespace App\Http\Controllers\customer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Models\ShoppingCart;
 use App\Models\Menu;
-use App\Models\Customer;
+use App\Models\customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 // use Darryldecode\Cart\Facades\CartFacade as Cart;
@@ -36,14 +36,14 @@ class CartController extends Controller
         // Log::info('カート一覧表示');
         // Log::info("カートのインスタンスを復元", ['instance' => 'customer_' . Auth::id()]);
         //カートの中身を取得
-        $carts = Cart::instance('customer_'.Auth::id())->content();
-        Log::info('indexカートの中身を取得',['carts' => $carts->toArray()]);
+        $carts = Cart::instance('customer_' . Auth::id())->content();
+        Log::info('indexカートの中身を取得', ['carts' => $carts->toArray()]);
         $subTotal = 0;
         $total = 0;
 
         // foreach ($carts as $c) {
         //     $subTotal += $c->qty * $c->price;
-            
+
         // }
         // $total += $subTotal;
         // Log::info('カートの中身を取得', ['carts' => $carts->toArray()]);
@@ -69,7 +69,7 @@ class CartController extends Controller
 
 
 
-        return view('customer.carts.index', compact('carts', 'totalIncludeTax','subTotal','menu','itemCount', 'menus'));
+        return view('customer.carts.index', compact('carts', 'totalIncludeTax', 'subTotal', 'menu', 'itemCount', 'menus'));
     }
 
     /**
@@ -103,7 +103,7 @@ class CartController extends Controller
             // 'price' => 'required|numeric',
             // 'image' => 'nullable|image|max:2048', // 画像のバリデーション
             // 'table_number'=>'required|integer',
-        ],[
+        ], [
             'qty.max' => '選択できる数量は在庫数（' . $menu->stock . '個）までです。',
             // 'menu_id.required'=>'メニューが選択されていません。',
             // 'table_number.required'=>'テーブル番号が指定されていません。',
@@ -125,13 +125,13 @@ class CartController extends Controller
         Log::info('カートに追加');
 
         // Cart::instance('customer_' . Auth::id())->restore(Auth::id());
-        
+
         //カートに商品を追加
         Cart::instance('customer_' . Auth::id())->add([
-            'id' => $request->id, 
-            'name' => $request->name, 
-            'qty' => $request->qty, 
-            'price' => $request->price, 
+            'id' => $request->id,
+            'name' => $request->name,
+            'qty' => $request->qty,
+            'price' => $request->price,
             'weight' => $request->weight ?? 0, // weight がない場合は 0 を設定
             'options' => [
                 // 'image' => $request->image,
@@ -139,10 +139,10 @@ class CartController extends Controller
                 // 'weight'=>0,//デフォルトで0
             ],
         ]);
-        
+
         // dd(config('cart.tax')); // 変更後の税率が表示されるか確認
 
-         // すでにカートが保存されているか確認して、保存されていなければ `store()` を実行
+        // すでにカートが保存されているか確認して、保存されていなければ `store()` を実行
         // try {
         //     Cart::instance('customer_' . Auth::id())->store(Auth::id());
         // } catch (\Exception $e) {
@@ -152,9 +152,9 @@ class CartController extends Controller
         // session()->save();
         // すでにカートが保存されているか確認
         $cartExists = DB::table('shoppingcart')
-        ->where('identifier', Auth::id())
-        ->where('instance', 'customer_' . Auth::id())
-        ->exists();
+            ->where('identifier', Auth::id())
+            ->where('instance', 'customer_' . Auth::id())
+            ->exists();
 
         if (!$cartExists) {
             try {
@@ -216,7 +216,7 @@ class CartController extends Controller
 
     //     foreach ($cart as $c) {
     //         $subTotal += $c->qty * $c->price;
-            
+
     //     }
     //     $total += $subTotal;
 
@@ -375,7 +375,7 @@ class CartController extends Controller
     //                 'updated_at' => now(),
     //             ]
     //         );
-            
+
     //         // Log::info('データ挿入結果:', ['inserted' => $inserted]);
 
     //     }
@@ -391,74 +391,74 @@ class CartController extends Controller
     // }
 
     public function storeOrder(Request $request)
-{
-    Log::info('注文確定処理開始１！！');
+    {
+        Log::info('注文確定処理開始１！！');
 
-    // カートの中身を取得
-    $carts = Cart::instance('customer_' . Auth::id())->content();
+        // カートの中身を取得
+        $carts = Cart::instance('customer_' . Auth::id())->content();
 
-    if ($carts->isEmpty()) {
-        return redirect()->route('customer.carts.index')->withErrors('カートが空です。');
-    }
-
-    DB::beginTransaction();
-    try {
-        // 注文ヘッダーを作成
-        $order = Order::create([
-            'table_number' => $carts->first()->options->table ?? '未指定',
-            'status' => 'pending', // デフォルトのステータス
-            'is_paid' => false, // デフォルトの支払いステータス
-            'menu_id' => $carts->first()->id, // 最初の商品のIDを保存
-            'menu_name' => $carts->first()->name, // 最初の商品の名前を保存
-            'price' => $carts->first()->price, // 最初の商品の価格を保存
-            'qty' => $carts->first()->qty, // 最初の商品の数量を保存
-            'subtotal' => $carts->first()->qty * $carts->first()->price, // 最初の商品の小計を保存
-
-
-            // 'user_id' => Auth::id(), // 必要であればユーザーIDを保存
-            // 'customer_id' => Auth::id(), // ユーザーIDを保存
-        ]);
-        Log::info('注文ヘッダーを作成', ['order_id' => $order->id]);
-
-        foreach ($carts as $cart) {
-            Log::info('カート内容をorderItemsに保存', ['cart' => $cart]);
-
-            // バリデーションエラー
-            if (!$cart->id || !$cart->name || !$cart->qty || $cart->price <= 0) {
-                throw new \Exception('無効な注文データが含まれています');
-            }
-
-            // orderItems に商品詳細を保存
-            OrderItem::create([
-                'order_id' => $order->id,
-                'menu_id' => $cart->id,
-                'menu_name' => $cart->name,
-                'qty' => $cart->qty,
-                'price' => $cart->price,
-                'subtotal' => $cart->qty * $cart->price,
-            ]);
+        if ($carts->isEmpty()) {
+            return redirect()->route('customer.carts.index')->withErrors('カートが空です。');
         }
-        Log::info('注文詳細をorderItemsに保存完了');
-        DB::commit();
 
-        // 注文完了後、カートを削除
-        session(['table_number' => $carts->first()->options->table ?? '未指定']);
-        Cart::instance('customer_' . Auth::id())->destroy();
-        Log::info('注文データを保存し、カートをクリア');
+        DB::beginTransaction();
+        try {
+            // 注文ヘッダーを作成
+            $order = Order::create([
+                'table_number' => $carts->first()->options->table ?? '未指定',
+                'status' => 'pending', // デフォルトのステータス
+                'is_paid' => false, // デフォルトの支払いステータス
+                'menu_id' => $carts->first()->id, // 最初の商品のIDを保存
+                'menu_name' => $carts->first()->name, // 最初の商品の名前を保存
+                'price' => $carts->first()->price, // 最初の商品の価格を保存
+                'qty' => $carts->first()->qty, // 最初の商品の数量を保存
+                'subtotal' => $carts->first()->qty * $carts->first()->price, // 最初の商品の小計を保存
 
-        return redirect()->route('customer.orders.complete')->with('success', '注文が完了しました');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('注文処理中にエラーが発生', [
-            'error_message' => $e->getMessage(),
-            'error_trace' => $e->getTraceAsString()
-        ]);
 
-        Cart::instance('customer_' . Auth::id())->destroy();
-        session(['table_number' => $carts->first()->options->table ?? '未指定']);
-        return redirect()->route('customer.carts.index')->withErrors('注文処理に失敗しました。');
+                // 'user_id' => Auth::id(), // 必要であればユーザーIDを保存
+                // 'customer_id' => Auth::id(), // ユーザーIDを保存
+            ]);
+            Log::info('注文ヘッダーを作成', ['order_id' => $order->id]);
+
+            foreach ($carts as $cart) {
+                Log::info('カート内容をorderItemsに保存', ['cart' => $cart]);
+
+                // バリデーションエラー
+                if (!$cart->id || !$cart->name || !$cart->qty || $cart->price <= 0) {
+                    throw new \Exception('無効な注文データが含まれています');
+                }
+
+                // orderItems に商品詳細を保存
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'menu_id' => $cart->id,
+                    'menu_name' => $cart->name,
+                    'qty' => $cart->qty,
+                    'price' => $cart->price,
+                    'subtotal' => $cart->qty * $cart->price,
+                ]);
+            }
+            Log::info('注文詳細をorderItemsに保存完了');
+            DB::commit();
+
+            // 注文完了後、カートを削除
+            session(['table_number' => $carts->first()->options->table ?? '未指定']);
+            Cart::instance('customer_' . Auth::id())->destroy();
+            Log::info('注文データを保存し、カートをクリア');
+
+            return redirect()->route('customer.orders.complete')->with('success', '注文が完了しました');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('注文処理中にエラーが発生', [
+                'error_message' => $e->getMessage(),
+                'error_trace' => $e->getTraceAsString()
+            ]);
+
+            Cart::instance('customer_' . Auth::id())->destroy();
+            session(['table_number' => $carts->first()->options->table ?? '未指定']);
+            return redirect()->route('customer.carts.index')->withErrors('注文処理に失敗しました。');
+        }
     }
-}
 
     // public function history()
     // {
@@ -500,14 +500,15 @@ class CartController extends Controller
     //     return view('customer.carts.history',compact('orders','tableNumber','totalIncludeTax'));
     // }
 
-    public function checkout(){
+    public function checkout()
+    {
         $tableNumber = session()->get('table_number');
         $orders = Order::where('table_number', $tableNumber)
-        ->with('orderItems') // orderItems を eager load
-        ->where('is_paid', false)//未払いの注文のみ
-        // ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->with('orderItems') // orderItems を eager load
+            ->where('is_paid', false) //未払いの注文のみ
+            // ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         // 合計金額（税込）の計算
         $calculatedTotalAmount = 0;
@@ -515,18 +516,18 @@ class CartController extends Controller
         $taxRate = (float) config('cart.tax') / 100; // Laravelの設定から税率を取得(10%)
 
         // pendingの注文があるかどうかを確認
-        $hasPendingOrder = false;//個別アイテムにPendingがあるかどうか
-        $hasUnpaidOrder = false;//有効な未払いの注文があるかどうか
+        $hasPendingOrder = false; //個別アイテムにPendingがあるかどうか
+        $hasUnpaidOrder = false; //有効な未払いの注文があるかどうか
         // $hasActiveUnpaidOrders = false; // 有効な未払いの注文があるかどうか
 
         foreach ($orders as $order) {
             // $hasUnpaidOrders = true; // 有効な未払いの注文がある
             foreach ($order->orderItems as $item) {
-                if($item->status === 'pending'){
+                if ($item->status === 'pending') {
                     $hasPendingItems = true; // 個別アイテムにPendingがある
                 }
 
-                if(strtolower($item->status) !== 'canceled' && $item->qty > 0){
+                if (strtolower($item->status) !== 'canceled' && $item->qty > 0) {
                     $unitAmountTaxInclusive = (int) round($item->price * (1 + $taxRate)); // 税抜き単価に税率を適用して税込単価を計算
                     $calculatedTotalAmount += ($unitAmountTaxInclusive * $item->qty); // その税込単価に数量を掛け、合計に加算
                     $hasUnpaidOrder = true; // 有効な未払いの注文がある
@@ -536,7 +537,7 @@ class CartController extends Controller
                 // 個々のアイテムの単価（税抜）に税率を適用し、四捨五入して税込単価を計算
                 // Stripeに送る unit_amount と同じ計算ロジックを適用
                 // $unitAmountTaxInclusive = (int) round($item->price * (1 + $taxRate));
-                
+
                 // その税込単価に数量を掛け、合計に加算
                 // $totalIncludeTax += ($unitAmountTaxInclusive * $item->qty);
                 // 各注文の小計を加算
@@ -557,10 +558,11 @@ class CartController extends Controller
         // $totalIncludeTax = ($totalIncludeTax, 0);
         // $calculatedTotalAmount = (int) round($totalIncludeTax); // 税込合計金額を整数に変換
 
-        return view('customer.carts.checkout',compact('orders','tableNumber','hasPendingOrder','hasUnpaidOrder','calculatedTotalAmount'));
+        return view('customer.carts.checkout', compact('orders', 'tableNumber', 'hasPendingOrder', 'hasUnpaidOrder', 'calculatedTotalAmount'));
     }
 
-    public function checkoutStore(){
+    public function checkoutStore()
+    {
         //stripe
         Log::info('Stripe Checkout Store 処理開始');
 
@@ -569,15 +571,15 @@ class CartController extends Controller
         // セッションから table_number で注文を取得
         // $orders = Order::where('table_number', session()->get('table_number'))->get();
         $tableNumber = session()->get('table_number');
-        $customerId= Auth::id();
+        $customerId = Auth::id();
 
         // ログインユーザーの未払いの注文を取得
         $orders = Order::where('table_number', $tableNumber)
-        ->where('table_number', $tableNumber)
-        ->where('is_paid', false)
-        ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
-        ->with('orderItems') // orderItems を eager load
-        ->get();
+            ->where('table_number', $tableNumber)
+            ->where('is_paid', false)
+            ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
+            ->with('orderItems') // orderItems を eager load
+            ->get();
 
         // dd($orders);
 
@@ -592,7 +594,7 @@ class CartController extends Controller
             // ここで $order->orderItems をループすることで、各アイテム ($item) が定義
             foreach ($order->orderItems as $item) {
                 //数量が0以下、キャンセルされたアイテムはline_itemsに追加せずスキップ
-               if(!isset($item->qty) || !is_numeric($item->qty) || (int) $item->qty <= 0 || strtolower($item->status) === 'canceled'){
+                if (!isset($item->qty) || !is_numeric($item->qty) || (int) $item->qty <= 0 || strtolower($item->status) === 'canceled') {
                     Log::warning('checkoutStore: スキップされた注文アイテム（無効な数量またはキャンセル済み）', [
                         'order_item_id' => $item->id,
                         'qty' => $item->qty,
@@ -631,7 +633,7 @@ class CartController extends Controller
         // foreach ($orders as $order) {
         //     //qtyが存在し、整数であることを確認
         //     if(isset($order->qty) && is_numeric($order->qty) &&(int) $order->qty > 0){
-    
+
         //         $line_items[] = [
         //             'price_data' => [
         //                 'currency' => 'jpy',
@@ -648,9 +650,9 @@ class CartController extends Controller
         //         // qtyが無効な場合の処理
         //         dd('無効なqtyが検出されました');
         //         Log::error('無効なqtyが検出されました', ['order_id' => $order->id, 'qty' => $order->qty]);
-                
+
         //     }
-            
+
         // }
 
         // line_items が空の場合の処理
@@ -675,7 +677,8 @@ class CartController extends Controller
         return redirect($checkout_session->url);
     }
 
-    public function checkoutSuccess(){
+    public function checkoutSuccess()
+    {
         //決済完了
         // セッションからテーブル番号を取得
         $tableNumber = session()->get('table_number');
@@ -685,4 +688,3 @@ class CartController extends Controller
         return view('customer.carts.checkoutSuccess');
     }
 }
-

@@ -1,16 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\MenuController;
-use App\Http\Controllers\Customer\AuthController;
-use App\Http\Controllers\Customer\CartController;
-use App\Http\Controllers\Customer\CheckoutController;
-// use App\Http\Controllers\Customer\MenuController;
-use App\Http\Controllers\Admin;
-use App\Http\Controllers\Admin\CategoryController;
-// use App\Http\Controllers\Admin\IncomingController;
-use App\Http\Controllers\Admin\CsvImportController;
-use App\Http\Controllers\Admin\SalesTargetController;
+use App\Http\Controllers\admin\MenuController;
+use App\Http\Controllers\customer\AuthController;
+use App\Http\Controllers\customer\CartController;
+use App\Http\Controllers\customer\CheckoutController;
+// use App\Http\Controllers\customer\MenuController;
+use App\Http\Controllers\admin;
+use App\Http\Controllers\admin\CategoryController;
+// use App\Http\Controllers\admin\IncomingController;
+use App\Http\Controllers\admin\CsvImportController;
+use App\Http\Controllers\admin\SalesTargetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,54 +32,57 @@ Route::get('/', function () {
 // });
 // ====================管理者用=====================
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('menus', \App\Http\Controllers\Admin\MenuController::class);
-    
-    Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
-    Route::post('orders/print/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
-    Route::get('orders/{id}/confirm',[\App\Http\Controllers\Admin\OrderController::class,'showConfirm'])->name('orders.showConfirm');
-    Route::post('/orders/{id}/confirm', [\App\Http\Controllers\Admin\OrderController::class, 'storeConfirmedOrder'])->name('orders.storeConfirmed');
-    // Route::post('orders/updateStatus/{id}',[\App\Http\Controllers\Admin\OrderController::class,'updateStatus'])->name('orders.updateStatus');
+    Route::resource('menus', \App\Http\Controllers\admin\MenuController::class);
+
+    Route::get('orders', [\App\Http\Controllers\admin\OrderController::class, 'index'])->name('orders.index');
+    Route::post('orders/print/{id}', [\App\Http\Controllers\admin\OrderController::class, 'print'])->name('orders.print');
+    Route::get('orders/{id}/confirm', [\App\Http\Controllers\admin\OrderController::class, 'showConfirm'])->name('orders.showConfirm');
+    Route::post('/orders/{id}/confirm', [\App\Http\Controllers\admin\OrderController::class, 'storeConfirmedOrder'])->name('orders.storeConfirmed');
+    // Route::post('orders/updateStatus/{id}',[\App\Http\Controllers\admin\OrderController::class,'updateStatus'])->name('orders.updateStatus');
 
     // 注文の全体ステータスを更新に変更
-    Route::put('/orders/{order}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateAllStatus'])->name('orders.updateAllStatus');
-    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only([
-        'show', 'edit', 'update', 'destroy'
+    Route::put('/orders/{order}/status', [\App\Http\Controllers\admin\OrderController::class, 'updateAllStatus'])->name('orders.updateAllStatus');
+    Route::resource('orders', \App\Http\Controllers\admin\OrderController::class)->only([
+        'show',
+        'edit',
+        'update',
+        'destroy'
     ]);;
-    Route::put('orders/{item}/updateQty',[\App\Http\Controllers\Admin\OrderController::class,'updateQty'])->name('orders.updateQty');
+    Route::put('orders/{item}/updateQty', [\App\Http\Controllers\admin\OrderController::class, 'updateQty'])->name('orders.updateQty');
 
     // 注文の個別アイテムのステータスを更新
-    Route::put('orders/items/{item}/status',[\App\Http\Controllers\Admin\OrderController::class,'updateOrderItemStatus'])->name('orders.updateOrderItemStatus');
-    
+    Route::put('orders/items/{item}/status', [\App\Http\Controllers\admin\OrderController::class, 'updateOrderItemStatus'])->name('orders.updateOrderItemStatus');
+
     // 注文の全体ステータスを更新
-    // Route::put('orders/{order}/status',[\App\Http\Controllers\Admin\OrderController::class,'updateStatusOverallOrder'])->name('orders.updateStatusOverallOrder');
+    // Route::put('orders/{order}/status',[\App\Http\Controllers\admin\OrderController::class,'updateStatusOverallOrder'])->name('orders.updateStatusOverallOrder');
 
 
-    
-    // Route::resource('sales', \App\Http\Controllers\Admin\SalesController::class);
-    Route::get('sales', [\App\Http\Controllers\Admin\SalesController::class, 'index'])->name('sales.index');
+
+    // Route::resource('sales', \App\Http\Controllers\admin\SalesController::class);
+    Route::get('sales', [\App\Http\Controllers\admin\SalesController::class, 'index'])->name('sales.index');
     //売上合計を表示
-    Route::get('sales/salesAmount', [\App\Http\Controllers\Admin\SalesController::class, 'salesAmount'])->name('sales.salesAmount');
+    Route::get('sales/salesAmount', [\App\Http\Controllers\admin\SalesController::class, 'salesAmount'])->name('sales.salesAmount');
     //売上の並び替え
-    // Route::get('sales/amountSort', [\App\Http\Controllers\Admin\SalesController::class, 'amountSort'])->name('sales.amountSort');
+    // Route::get('sales/amountSort', [\App\Http\Controllers\admin\SalesController::class, 'amountSort'])->name('sales.amountSort');
     //アイテム別の売上を表示
-    Route::get('sales/salesItem', [\App\Http\Controllers\Admin\SalesController::class, 'salesItem'])->name('sales.salesItem');
+    Route::get('sales/salesItem', [\App\Http\Controllers\admin\SalesController::class, 'salesItem'])->name('sales.salesItem');
     //アイテムの並び替え
-    // Route::get('sales/itemSort', [\App\Http\Controllers\Admin\SalesController::class, 'itemSort'])->name('sales.itemSort');
+    // Route::get('sales/itemSort', [\App\Http\Controllers\admin\SalesController::class, 'itemSort'])->name('sales.itemSort');
 
     //グラフの表示
-    Route::get('sales/chart',[\App\Http\Controllers\Admin\SalesController::class, 'chart'])->name('sales.chart');
+    Route::get('sales/chart', [\App\Http\Controllers\admin\SalesController::class, 'chart'])->name('sales.chart');
 
     // 売上検索
-    // Route::get('sales/search',[\App\Http\Controllers\Admin\SalesController::class, 'search'])->name('sales.search');
+    // Route::get('sales/search',[\App\Http\Controllers\admin\SalesController::class, 'search'])->name('sales.search');
 
     // カテゴリ管理
-    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+    Route::resource('categories', \App\Http\Controllers\admin\CategoryController::class);
 
     // 発注管理(未実装)
-    // Route::resource('incomings', \App\Http\Controllers\Admin\IncomingController::class);
+    // Route::resource('incomings', \App\Http\Controllers\admin\IncomingController::class);
 
     // CSVエクスポート
-    Route::get('sales/exportCsv', [\App\Http\Controllers\Admin\SalesController::class, 'exportCsv'])->name('sales.exportCsv');
+    Route::get('sales/exportCsv', [\App\Http\Controllers\admin\SalesController::class, 'exportCsv'])->name('sales.exportCsv');
 
     // 売上目標
     Route::get('sales_target', [SalesTargetController::class, 'index'])->name('sales_target.index');
@@ -96,20 +99,18 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
 Route::middleware('guest:admin')->group(function () {
     // Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('admin/login', [admin\Auth\AuthenticatedSessionController::class, 'create'])
-                ->name('admin.login');
+        ->name('admin.login');
 
     Route::post('admin/login', [admin\Auth\AuthenticatedSessionController::class, 'store']);
-    
-   
 });
 
 Route::middleware('auth:admin')->group(function () {
     Route::post('admin/logout', [admin\Auth\AuthenticatedSessionController::class, 'destroy'])
-                ->name('admin.logout');
+        ->name('admin.logout');
 });
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {
-    Route::get('home', [Admin\HomeController::class, 'index'])->name('home');
+    Route::get('home', [admin\HomeController::class, 'index'])->name('home');
 });
 
 //===============ユーザー側================
@@ -119,11 +120,11 @@ Route::middleware('auth:customer')->group(function () {
         return view('customer.menus.index');
     })->name('customer.menus.index');
     // Route::resource('menus', MenuController::class);
-    
+
 });
 
 Route::prefix('customer')->name('customer.')->middleware('auth:customer')->group(function () {
-    Route::resource('menus', \App\Http\Controllers\Customer\MenuController::class);
+    Route::resource('menus', \App\Http\Controllers\customer\MenuController::class);
     // Route::resource('customer/carts', CartController::class);
     Route::get('carts', [CartController::class, 'index'])->name('carts.index');
     // Route::get('carts/{cart}', [CartController::class, 'show'])->name('carts.show');
@@ -160,4 +161,3 @@ Route::prefix('customer')->name('customer.')->group(function () {
 // Route::get('/test-confirm/{id}', function($id) {
 //     return 'ID: ' . $id;
 // });
-

@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Customer;
+namespace App\Http\Controllers\customer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Log; 
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        Log::info('ログ確認: ' . now()); 
+        Log::info('ログ確認: ' . now());
         return view('customer.login');
     }
 
@@ -24,7 +24,7 @@ class AuthController extends Controller
         ]);
 
         // デバッグ: 認証情報を表示
-    // dd($credentials, Auth::guard('customer')->attempt($credentials));
+        // dd($credentials, Auth::guard('customer')->attempt($credentials));
 
 
         if (Auth::guard('customer')->attempt(['table_number' => $credentials['table_number'], 'password' => $credentials['password']])) {

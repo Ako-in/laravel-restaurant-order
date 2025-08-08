@@ -6,8 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Models\Admin;
-use App\Models\Customer;
+use App\Models\admin;
+use App\Models\customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Cart;
@@ -16,7 +16,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
-class CustomerOrderTest extends TestCase
+class customerOrderTest extends TestCase
 {
     use RefreshDatabase;
     /**
@@ -33,6 +33,6 @@ class CustomerOrderTest extends TestCase
     // =================
     // カスタマー側
     // =================
-  
+
 
 }

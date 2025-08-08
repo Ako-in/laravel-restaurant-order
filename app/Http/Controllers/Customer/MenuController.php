@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Customer;
+namespace App\Http\Controllers\customer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,7 +9,7 @@ use App\Models\Menu;
 use App\Models\Category;
 use App\Models\OrderItem;
 use App\Models\Order;
-use App\Models\Customer;
+use App\Models\customer;
 use Carbon\Carbon;
 
 class MenuController extends Controller
@@ -40,11 +40,11 @@ class MenuController extends Controller
         $lastOrderTime = $lastOrderTimeCarbon->format('H:i');
 
         // ラストオーダー前30分前にラストオーダー時間のアラートを出す
-        $alertTime = $closeTimeCarbon->clone()->subMinutes(30);//21:30を取得
+        $alertTime = $closeTimeCarbon->clone()->subMinutes(30); //21:30を取得
 
-        if ($now->between($alertTime, $lastOrderTime)) { 
+        if ($now->between($alertTime, $lastOrderTime)) {
             session()->put('alert', 'ラストオーダーは21:30です。ご注意ください。');
-        }else{
+        } else {
             session()->forget('alert');
         }
         // if ($now->between($closingTime->subMinutes(30), $closingTime)) {
@@ -58,7 +58,7 @@ class MenuController extends Controller
         $totalCount = 0; // 初期値として0を設定
         // メニュー検索（名前検索）
         $search = $request->input('search');
-        if($search) {
+        if ($search) {
             $query->where('name', 'like', '%' . $search . '%');
             // $totalCount = $query->count(); // 検索結果の総数を取得
         }
@@ -89,7 +89,7 @@ class MenuController extends Controller
         $newItem = $request->has('new_item');
         $hasStock = $request->has('has_stock');
         $stockLow = $request->has('stock_low');
-        
+
         // おすすめ商品検索
         if ($request->has('recommend')) {
             $query->where('is_recommended', true);
@@ -150,7 +150,7 @@ class MenuController extends Controller
         // 全ての検索条件が適用されたクエリに対してページネーションを適用
         $menus = $query->paginate(8); // 例: 1ページあたり8件表示
 
-        
+
 
         // $hasUnpaidOrder = false;
         // if (Auth::check()) {
@@ -159,7 +159,7 @@ class MenuController extends Controller
         //         ->where('is_paid', false)
         //         ->exists();
         // }
-        return view('customer.menus.index',compact(
+        return view('customer.menus.index', compact(
             'menus',
             'customer',
             'categories',

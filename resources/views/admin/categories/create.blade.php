@@ -35,28 +35,28 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container mt-4">
-    <div class="mb-4">
-        <h4>カテゴリ新規作成</h4>
-        <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">戻る</a>
-    </div>
+    <div class="container mt-4">
+        <div class="mb-4">
+            <h4>カテゴリ新規作成</h4>
+            <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">戻る</a>
+        </div>
 
-    <div class="card p-4">
-        <form action="{{ route('admin.categories.store') }}" method="POST">
-            @csrf
+        <div class="card p-4">
+            <form action="{{ route('admin.categories.store') }}" method="POST">
+                @csrf
 
-            <div class="mb-3">
-                <label for="name" class="form-label">カテゴリ名</label>
-                <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}">
-                @error('name')
-                    <div class="invalid-feedback d-block">
-                        {{ $message }}
-                    </div>
-                @enderror
-            </div>
-        
-            <button type="submit" class="btn btn-primary">カテゴリ作成</button>
-        </form>
+                <div class="mb-3">
+                    <label for="name" class="form-label">カテゴリ名</label>
+                    <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}">
+                    @error('name')
+                        <div class="invalid-feedback d-block">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
+                <button type="submit" class="btn btn-primary">カテゴリ作成</button>
+            </form>
+        </div>
     </div>
-</div>
 @endsection

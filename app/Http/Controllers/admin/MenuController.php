@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
@@ -57,22 +57,22 @@ class MenuController extends Controller
         // // メニューのページネーション
         $menus = Menu::with('category')
             ->withCount([
-            'orderItems as sales_count' => function ($query) {
-                $query->whereHas('order', function ($q) {
-                    // orderItemsの親であるOrderのcreated_atをフィルタ
-                    $q->where('created_at', '>=', now()->subDays(30));
-                })
-                ->select(DB::raw('sum(qty)')); // 数量の合計をselect
-            }
-        ])
-        ->sortable()
-        ->paginate(30); // ページネーションを追加
+                'orderItems as sales_count' => function ($query) {
+                    $query->whereHas('order', function ($q) {
+                        // orderItemsの親であるOrderのcreated_atをフィルタ
+                        $q->where('created_at', '>=', now()->subDays(30));
+                    })
+                        ->select(DB::raw('sum(qty)')); // 数量の合計をselect
+                }
+            ])
+            ->sortable()
+            ->paginate(30); // ページネーションを追加
 
         // $menus = $query->paginate(30); 
 
 
 
-        return view('admin.menus.index', compact('menus','categories'));
+        return view('admin.menus.index', compact('menus', 'categories'));
     }
 
     /**
@@ -83,8 +83,8 @@ class MenuController extends Controller
     public function create()
     {
         $categories = Category::all();
-        $menu = new Menu();//からのMenuインスタンスを作成
-        return view('admin.menus.create',compact('categories','menu'));
+        $menu = new Menu(); //からのMenuインスタンスを作成
+        return view('admin.menus.create', compact('categories', 'menu'));
     }
 
     /**
@@ -121,7 +121,7 @@ class MenuController extends Controller
             'stock.integer' => 'Stock must be an integer.',
             'stock.min' => 'Stock must be 0 or more.',
         ]);
-        $menu = new Menu();        
+        $menu = new Menu();
         $menu->name = $validatedData['name'];
         $menu->category_id = $validatedData['category_id'];
         $menu->price = $validatedData['price'];
@@ -151,7 +151,7 @@ class MenuController extends Controller
         //     // Storage::disk('public')->put($imagePath, (string) $img); // 画像をストレージに保存
         //     $image->storeAs('images', $filename, 'public');
         //     $menu->image_file = $imagePath; // カラム名を 'image_file' に)
-        
+
         // if ($request->hasFile('image_file')) {
         //     $image = $request->file('image_file');
         //     $imagePath = $image->store('images', 'public'); // publicディスクに保存
@@ -160,23 +160,23 @@ class MenuController extends Controller
         //     $menu->image_file = 'storage/images/noimage.png';
         // }
 
-    
+
         // 画像アップロードの処理
         if ($request->hasFile('image_file')) {
             $imagePath = $request->file('image_file')->store('images', 'public'); // 'menus'ではなく'images'に統一
             $menu->image_file = $imagePath; // ★ここを修正 (カラム名を 'image_file' に)
-        //     // $imagePath = $request->file('image_file')->store('images', 'public');
-        //     // $menu->image_file = $imagePath; // ★ここを修正 (コメントアウトを解除)
+            //     // $imagePath = $request->file('image_file')->store('images', 'public');
+            //     // $menu->image_file = $imagePath; // ★ここを修正 (コメントアウトを解除)
         } else {
             // 画像がアップロードされなかった場合のデフォルト設定
             // 例えば、`noimage.png` をデフォルトにする場合
             $menu->image_file = 'storage/images/noimage.png'; // storage/images/noimage.png を指すように
         }
         // dd($imagePath);
-        
+
         $menu->save(); // **データベースに保存**
 
-        return redirect()->route('admin.menus.index')->with('success','メニューを追加しました。');
+        return redirect()->route('admin.menus.index')->with('success', 'メニューを追加しました。');
     }
 
     /**
@@ -200,7 +200,7 @@ class MenuController extends Controller
     {
 
         $categories = Category::all();
-        return view('admin.menus.edit', compact('menu','categories'));
+        return view('admin.menus.edit', compact('menu', 'categories'));
     }
 
     /**
@@ -212,7 +212,7 @@ class MenuController extends Controller
      */
     public function update(Request $request, Menu $menu)
     {
-        $validatedData=$request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'category_id' => 'nullable|exists:categories,id',
@@ -222,7 +222,7 @@ class MenuController extends Controller
             // 'is_new' => 'nullable|boolean',
             // 'is_recommended' => 'nullable|boolean',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // 画像のバリデーション
-        ],[
+        ], [
             'image_file.image' => 'The file must be an image...',
             'image_file.mimes' => 'Image must be in jpeg, png, jpg, gif, or svg format.',
             'image_file.max' => 'Image size must not exceed 2MB.',
@@ -238,7 +238,7 @@ class MenuController extends Controller
         $menu->status = $validatedData['status'];
         // $menu->status = $request->input('status') === '1' ? 'active' : 'inactive';
 
-        $menu->stock = $request->input('stock',0);
+        $menu->stock = $request->input('stock', 0);
         $menu->is_new = $request->input('is_new');
         $menu->is_recommended = $request->input('is_recommended');
         if ($request->hasFile('image_file')) {
@@ -246,7 +246,7 @@ class MenuController extends Controller
             if ($menu->image_file && Storage::disk('public')->exists($menu->image_file)) {
                 Storage::disk('public')->delete($menu->image_file);
             }
-            $path = $request->file('image_file')->store('images','public');
+            $path = $request->file('image_file')->store('images', 'public');
             // $filename = time() . '.'. $image->getClientOriginalExtension();
             // $path = 'images/'. $filename;
 
@@ -259,7 +259,7 @@ class MenuController extends Controller
             // $menu->image = $path;
             // dd('画像をアップロードしました: ' . $path);
             // dd($menu->image_file);
-        } 
+        }
         // else {
         //     $menu->image_file = '';
         // }
@@ -278,7 +278,6 @@ class MenuController extends Controller
     public function destroy(Menu $menu)
     {
         $menu->delete();
-        return to_route('admin.menus.index')->with('flash_message','menuを削除しました。');
+        return to_route('admin.menus.index')->with('flash_message', 'menuを削除しました。');
     }
-
 }

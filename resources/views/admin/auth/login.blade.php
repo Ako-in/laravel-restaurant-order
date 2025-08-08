@@ -21,11 +21,13 @@
                 <form method="POST" action="{{ route('admin.login') }}">
                     @csrf
                     <div class="form-group mb-3">
-                            <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="メールアドレス" autofocus>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}"
+                            required autocomplete="email" placeholder="メールアドレス" autofocus>
                     </div>
 
                     <div class="form-group mb-3">
-                        <input id="password" type="password" class="form-control" name="password" required autocomplete="new-password" placeholder="パスワード">
+                        <input id="password" type="password" class="form-control" name="password" required
+                            autocomplete="new-password" placeholder="パスワード">
                     </div>
 
                     {{-- <div class="form-group mb-3">

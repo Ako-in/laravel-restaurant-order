@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Customer>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\customer>
  */
-class CustomerFactory extends Factory
+class customerFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,7 +17,7 @@ class CustomerFactory extends Factory
     public function definition()
     {
         return [
-            'table_number'=>$this->faker->numberBetween(1,100),
+            'table_number' => $this->faker->numberBetween(1, 100),
             'password' => bcrypt('password'),
         ];
     }
