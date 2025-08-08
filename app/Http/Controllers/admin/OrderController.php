@@ -5,7 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\customer;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Menu;
 use App\Models\OrderItem;

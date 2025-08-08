@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\admin;
+use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\admin>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Admin>
  */
 class adminFactory extends Factory
 {

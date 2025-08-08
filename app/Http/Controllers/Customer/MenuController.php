@@ -9,7 +9,7 @@ use App\Models\Menu;
 use App\Models\Category;
 use App\Models\OrderItem;
 use App\Models\Order;
-use App\Models\customer;
+use App\Models\Customer;
 use Carbon\Carbon;
 
 class MenuController extends Controller

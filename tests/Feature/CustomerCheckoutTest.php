@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Models\customer;
+use App\Models\Customer;
 use App\Models\Menu;
 use App\Models\Order; // Order モデルをuse
 use App\Models\OrderItem; // OrderItem モデルをuse

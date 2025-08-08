@@ -6,8 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Models\admin;
-use App\Models\customer;
+use App\Models\Admin;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Menu;
 use App\Models\OrderItem;

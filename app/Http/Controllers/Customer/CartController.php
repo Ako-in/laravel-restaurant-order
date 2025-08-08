@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use App\Models\ShoppingCart;
 use App\Models\Menu;
-use App\Models\customer;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 // use Darryldecode\Cart\Facades\CartFacade as Cart;

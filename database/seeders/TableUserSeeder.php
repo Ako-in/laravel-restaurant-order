@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 // use Illuminate\Support\Facades\DB;
-use App\Models\customer;
+use App\Models\Customer;
 use Illuminate\Support\Facades\Hash;
 
 class TableUserSeeder extends Seeder
