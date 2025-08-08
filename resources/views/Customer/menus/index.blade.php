@@ -144,6 +144,8 @@
                   @if($menu->is_recommended)
                     <div><span class="badge bg-danger grayscale">おすすめ</span></div>
                   @endif
+                  @if($lowStock)
+                    <div><span class="badge bg-warning graysclae">残りわずか</span></div>
                 </p>
               </div>
             </div>
@@ -200,9 +202,9 @@
                 @if ($menu->stock === 0)
                   {{-- 在庫が0の時、在庫なしを表示 --}}
                   <p class="text-danger">在庫なし</p>
-                @elseif($menu->stock > 0 && $menu->stock < 5)
+                {{-- @elseif($menu->stock > 0 && $menu->stock < 5)
                   {{-- 在庫が1−4の時、残りわずかを表示 --}}
-                  <div><span class="badge bg-warning">残りわずか</span></div>
+                  {{-- <div><span class="badge bg-warning">残りわずか</span></div> --}}
                 @endif
 
                 {{-- カート内超過による在庫なし表示 --}}
@@ -222,6 +224,10 @@
                   @endif
                   @if($menu->is_recommended)
                     <div><span class="badge bg-danger">おすすめ</span></div>
+                  @endif
+                  @if($menu->stock > 0 && $menu->stock < 5)
+                  {{-- 在庫が1−4の時、残りわずかを表示 --}}
+                  <div><span class="badge bg-warning">残りわずか</span></div>
                   @endif
                 </p>
                 
