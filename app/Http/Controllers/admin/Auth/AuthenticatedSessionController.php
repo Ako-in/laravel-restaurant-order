@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\admin\Auth;
+namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
