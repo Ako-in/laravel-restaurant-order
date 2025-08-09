@@ -156,7 +156,7 @@
                                     @if ($menu->is_recommended)
                                         <div><span class="badge bg-danger grayscale">おすすめ</span></div>
                                     @endif
-                                    @if ($lowStock)
+                                    @if ($stockLow)
                                         <div><span class="badge bg-warning graysclae">残りわずか</span></div>
                                     @endif
                                 </p>
