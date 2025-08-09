@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\CategoryController;
 // use App\Http\Controllers\Admin\IncomingController;
 use App\Http\Controllers\Admin\CsvImportController;
 use App\Http\Controllers\Admin\SalesTargetController;
+use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,7 +33,7 @@ Route::get('/', function () {
 // });
 // ====================管理者用=====================
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('menus', \App\Http\Controllers\admin\MenuController::class);
+    Route::resource('menus', \App\Http\Controllers\Admin\MenuController::class);
 
     Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
     Route::post('orders/print/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'print'])->name('orders.print');
