@@ -75,6 +75,8 @@ https://urbanspoon.sakura.ne.jp/admin/login
 
 <img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_login2.png" height="250px" alt="Urbanspoon カスタマーログイン">
 
+<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/master/public/images/readme/customer/urbanspoon_customer_login2.png" height="250px" alt="Urbanspoon カスタマーログイン">
+
 <img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_toppagemenu.png" height="250px" alt="Urbanspoon カスタマーメニュートップページ">
 
 <img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_cart.png" height="250px" alt="Urbanspoon カスタマーカート">
