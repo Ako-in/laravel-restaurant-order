@@ -1,7 +1,8 @@
 # ▪️Larvel 飲食店オーダー管理アプリ：Urbanspoon
 
 <!-- <img src="storage/app/public/images/toppage.jpg" height="300px" alt="Urbanspoon トップページ"> -->
-<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/toppage.jpg" height="300px" alt="トップページ画像">
+<!-- <img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/toppage.jpg" height="300px" alt="トップページ画像"> -->
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/toppage.png" height="250px" alt="Urbanspoon トップページ">
 
 https://urbanspoon.sakura.ne.jp/customer/login  
 https://urbanspoon.sakura.ne.jp/admin/login
@@ -98,8 +99,6 @@ https://urbanspoon.sakura.ne.jp/admin/login
 <img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_toppage.png" height="250px" alt="Urbanspoon 管理者トップページ">
 
 <img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_orderlist.png" height="250px" alt="Urbanspoon 管理者注文リスト">
-
-https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_orderlist.png
 
 <img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_orderconfirm.png" height="250px" alt="Urbanspoon 管理者注文詳細">
 
