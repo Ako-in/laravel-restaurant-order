@@ -2,7 +2,7 @@
 
 <!-- <img src="storage/app/public/images/toppage.jpg" height="300px" alt="Urbanspoon トップページ"> -->
 <!-- <img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/toppage.jpg" height="300px" alt="トップページ画像"> -->
-<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/toppage.png" height="250px" alt="Urbanspoon トップページ">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/toppage.jpg" height="250px" alt="Urbanspoon トップページ">
 
 https://urbanspoon.sakura.ne.jp/customer/login  
 https://urbanspoon.sakura.ne.jp/admin/login
