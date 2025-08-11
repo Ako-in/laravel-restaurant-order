@@ -1,7 +1,7 @@
 # ▪️Larvel 飲食店オーダー管理アプリ：Urbanspoon
 
 <!-- <img src="storage/app/public/images/toppage.jpg" height="300px" alt="Urbanspoon トップページ"> -->
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/toppage.jpg" height="300px" alt="トップページ画像">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/toppage.jpg" height="300px" alt="トップページ画像">
 
 https://urbanspoon.sakura.ne.jp/customer/login  
 https://urbanspoon.sakura.ne.jp/admin/login
@@ -73,37 +73,39 @@ https://urbanspoon.sakura.ne.jp/admin/login
 
 ### カスタマー側の表示
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_login2.png" height="250px" alt="Urbanspoon カスタマーログイン">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/urbanspoon_customer_login2.png" height="250px" alt="Urbanspoon カスタマーログイン">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/master/public/images/readme/customer/urbanspoon_customer_login2.png" height="250px" alt="Urbanspoon カスタマーログイン">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/urbanspoon_customer_login2.png" height="250px" alt="Urbanspoon カスタマーログイン">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_toppagemenu.png" height="250px" alt="Urbanspoon カスタマーメニュートップページ">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/urbanspoon_customer_toppagemenu.png" height="250px" alt="Urbanspoon カスタマーメニュートップページ">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_cart.png" height="250px" alt="Urbanspoon カスタマーカート">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/urbanspoon_customer_cart.png" height="250px" alt="Urbanspoon カスタマーカート">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_carteditqty.png" height="250px" alt="Urbanspoon カスタマーカート数量変更">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/urbanspoon_customer_carteditqty.png" height="250px" alt="Urbanspoon カスタマーカート数量変更">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_cartDelete.png" height="250px" alt="Urbanspoon カスタマーカート削除">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/urbanspoon_customer_cartDelete.png" height="250px" alt="Urbanspoon カスタマーカート削除">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_orderhistory.png" height="250px" alt="Urbanspoon カスタマー注文履歴">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/urbanspoon_customer_orderhistory.png" height="250px" alt="Urbanspoon カスタマー注文履歴">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_payment.png" height="250px" alt="Urbanspoon カスタマー支払い">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/urbanspoon_customer_payment.png" height="250px" alt="Urbanspoon カスタマー支払い">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/customer/urbanspoon_customer_afterpayment.png" height="250px" alt="Urbanspoon カスタマー支払い完了">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/customer/urbanspoon_customer_afterpayment.png" height="250px" alt="Urbanspoon カスタマー支払い完了">
 
 ### 　管理者側の表示
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/admin/urbanspoon_admin_login.png" height="250px" alt="Urbanspoon 管理者ログイン">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_login.png" height="250px" alt="Urbanspoon 管理者ログイン">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/admin/urbanspoon_admin_toppage.png" height="250px" alt="Urbanspoon 管理者トップページ">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_toppage.png" height="250px" alt="Urbanspoon 管理者トップページ">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/admin/urbanspoon_admin_orderlist.png" height="250px" alt="Urbanspoon 管理者注文リスト">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_orderlist.png" height="250px" alt="Urbanspoon 管理者注文リスト">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/admin/urbanspoon_admin_orderconfirm.png" height="250px" alt="Urbanspoon 管理者注文詳細">
+https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_orderlist.png
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/admin/urbanspoon_admin_menutop2.png" height="250px" alt="Urbanspoon 管理者メニュー一覧">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_orderconfirm.png" height="250px" alt="Urbanspoon 管理者注文詳細">
 
-<img src="https://github.com/urbanspoon/laravel-restaurant-order/raw/main/public/images/readme/admin/urbanspoon_admin_menuedit.png" height="250px" alt="Urbanspoon 管理者メニュー編集">
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_menutop2.png" height="250px" alt="Urbanspoon 管理者メニュー一覧">
+
+<img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_menuedit.png" height="250px" alt="Urbanspoon 管理者メニュー編集">
 
 ## 苦労したこと
 

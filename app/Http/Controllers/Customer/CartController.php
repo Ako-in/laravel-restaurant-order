@@ -566,8 +566,8 @@ class CartController extends Controller
         //stripe
         Log::info('Stripe Checkout Store 処理開始');
 
-        // Stripe::setApiKey(env('STRIPE_SECRET'));
-        Stripe::setApiKey(config('services.stripe.secret'));
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+        // Stripe::setApiKey(config('services.stripe.secret'));
 
         // セッションから table_number で注文を取得
         // $orders = Order::where('table_number', session()->get('table_number'))->get();
