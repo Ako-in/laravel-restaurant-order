@@ -393,6 +393,8 @@ class CartController extends Controller
     public function storeOrder(Request $request)
     {
         Log::info('注文確定処理開始１！！');
+        // ユーザーが注文を作成できるかポリシーでチェック
+        $this->authorize('create', Order::class);
 
         // カートの中身を取得
         $carts = Cart::instance('customer_' . Auth::id())->content();
@@ -506,7 +508,7 @@ class CartController extends Controller
         $orders = Order::where('table_number', $tableNumber)
             ->with('orderItems') // orderItems を eager load
             ->where('is_paid', false) //未払いの注文のみ
-            // ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
+            ->where('status', '!=', 'canceled') // キャンセルされた注文を除外
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -688,4 +690,5 @@ class CartController extends Controller
         Order::where('table_number', $tableNumber)->update(['is_paid' => true]);
         return view('customer.carts.checkoutSuccess');
     }
+    
 }

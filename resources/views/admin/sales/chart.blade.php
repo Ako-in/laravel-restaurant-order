@@ -2,7 +2,7 @@
 
 @section('content')
     <h4>売上管理</h4>
-
+    
     <div class="container d-flex">
         {{-- 棒グラフ用 --}}
         <div style="width: 100%; height: 300px;">

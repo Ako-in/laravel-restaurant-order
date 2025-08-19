@@ -1,6 +1,13 @@
 @extends('layouts.admin')
 
 @section('content')
+    <div>
+        @if($admin->email === 'guest@example.com')
+            <div class="alert alert-warning text-center rounded-0 mb-0 py-2 pt-3" role="alert">
+                <strong>💡 このアカウントはデモ用です。</strong> データの変更などはできません。
+            </div>
+        @endif
+    </div>
     <div class="col container">
         <div class="row justify-content-center">
             <div class="col-xl-10 col-lg-11">

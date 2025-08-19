@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Menu;
 use App\Models\OrderItem;
+use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -169,16 +170,19 @@ class OrderController extends Controller
     // }
 
     public function showConfirm($id){
+        $admin = Auth::guard('admin')->user();
         $order = Order::with('orderItems')->find($id);
 
         if (!$order || $order->orderItems->isEmpty()) {
             return redirect()->back()->with('warning', '空の注文です');
         }
 
-        return view('admin.orders.confirm', compact('order'));
+        return view('admin.orders.confirm', compact('order','admin'));
     }
 
     public function storeConfirmedOrder($id){
+
+        $this->authorize('create', Auth::guard('admin')->user());
         $originalOrder = Order::with('orderItems')->find($id);
 
         if (!$originalOrder || $originalOrder->orderItems->isEmpty()) {
@@ -327,6 +331,7 @@ class OrderController extends Controller
     public function updateOrderItemStatus(Request $request,OrderItem $item)
     //注文個別アイテムのステータスを更新
     {
+        $this->authorize('create', Auth::guard('admin')->user());
 
         Log::info('--- updateOrderItemStatus Start ---');
         Log::info('リクエスト受信: ' . json_encode($request->all()));
@@ -449,6 +454,7 @@ class OrderController extends Controller
 
     public function updateQty(Request $request, OrderItem $item)
     {
+        $this->authorize('create', Auth::guard('admin')->user());
         $validated = $request ->validate([
             'qty'=>'required|integer|min:0',
         ]);

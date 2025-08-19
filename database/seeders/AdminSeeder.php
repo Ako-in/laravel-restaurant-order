@@ -20,5 +20,11 @@ class adminSeeder extends Seeder
         $admin->email = 'admin@example.com';
         $admin->password = Hash::make('restaurant');
         $admin->save();
+
+        Admin::create([
+            'name' => 'guest',
+            'email' => 'guest@example.com',
+            'password' => bcrypt('password'),
+        ]);
     }
 }

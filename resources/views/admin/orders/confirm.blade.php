@@ -1,6 +1,13 @@
 @extends('layouts.admin')
 
 @section('content')
+<div>
+    @if($admin->email === 'guest@example.com')
+        <div class="alert alert-warning text-center rounded-0 mb-0 py-2 pt-3" role="alert">
+            <strong>💡 このアカウントはデモ用です。</strong> データの変更などはできません。
+        </div>
+    @endif
+</div>
     <h3>注文内容</h3>
     @if (session('flash_message'))
         <div class="alert alert-success mt-3">

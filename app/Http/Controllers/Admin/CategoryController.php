@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
@@ -40,6 +41,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Auth::guard('admin')->user());
         $validationRules = [
             'name' => 'required|string|max:50|unique:categories,name',
             // 'description' => 'nullable|string|max:50',

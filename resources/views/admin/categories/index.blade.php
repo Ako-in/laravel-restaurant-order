@@ -1,6 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
+
     {{-- <p>カテゴリ一覧</p> --}}
 
     <div class="container">

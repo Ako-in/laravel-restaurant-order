@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
 use App\Models\SalesTarget;
 use Symfony\Component\HttpFoundation\StreamedResponse; // CSV export StreamedResponse をインポート
+use Illuminate\Support\Facades\Auth;
 
 // use Encore\Admin\Grid;
 // use Encore\Admin\Form;
@@ -108,7 +109,7 @@ class SalesController extends Controller
         $todaySalesFormatted = number_format($todaySales, 0);
         $monthlySalesFormatted = number_format($monthlySales, 0);
 
-        return view('admin.sales.index', compact('salesData', 'todaySalesFormatted', 'monthlySalesFormatted'));
+        return view('admin.sales.index', compact('salesData', 'todaySalesFormatted', 'monthlySalesFormatted',));
     }
 
     function salesAmount(Request $request){

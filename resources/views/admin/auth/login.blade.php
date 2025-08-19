@@ -79,7 +79,7 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        <input id="password" type="password" class="form-control" name="password" required
+                        <input id="password" type="password" class="form-control" name="password"
                             autocomplete="new-password" placeholder="パスワード">
                     </div>
 
@@ -95,6 +95,20 @@
 
                     <div class="form-group d-flex justify-content-center mb-4">
                         <button type="submit" class="btn text-black shadow-sm w-100 ">ログイン</button>
+                    </div>
+                </form>
+                <hr>
+                <p class="text-center">
+                    ゲストログイン用
+                </p>
+                <form method="POST" action="{{ route('admin.guest-login') }}">
+                    @csrf
+                    <div class="form-group mb-3">
+                        <label for="email" >Email</label>
+                        <input class="form-control" id="email" type="email" name="email" value="guest@example.com" required>
+                    </div>
+                    <div class="form-group d-flex justify-content-center mb-4">
+                        <button type="submit" class="btn text-black shadow-sm ">ゲストログイン</button>
                     </div>
                 </form>
             </div>

@@ -98,7 +98,10 @@ Route::middleware('guest:admin')->group(function () {
     // Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('admin/login', [Admin\Auth\AuthenticatedSessionController::class, 'create'])
         ->name('admin.login');
-
+        
+    // ゲストログイン用の新しいルートを追加
+    Route::post('admin/guest-login', [AuthenticatedSessionController::class, 'guestLogin'])
+    ->name('admin.guest-login');
     Route::post('admin/login', [Admin\Auth\AuthenticatedSessionController::class, 'store']);
 });
 

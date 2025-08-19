@@ -8,6 +8,7 @@ use App\Models\SalesTarget; // 売上目標モデルをインポート
 use App\Models\OrderItem; // 売上目標の合計を取得するためにOrderItemモデルをインポート
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log; // ログ出力のためにインポート
+use Illuminate\Support\Facades\Auth;
 
 class SalesTargetController extends Controller
 {
@@ -17,7 +18,8 @@ class SalesTargetController extends Controller
         // $monthlySalesTargets = []; // 月ごとの売上目標を取得するロジックを実装
         // 管理者向けの売上目標の一覧を表示
 
-        
+        // 現在ログインしているAdminユーザーを取得
+        $admin = Auth::guard('admin')->user();
 
         $allSalesTargets = SalesTarget::all(); // 売上目標の全データを取得
         // $start_year = $salesTargets->format('Y');
@@ -98,6 +100,7 @@ class SalesTargetController extends Controller
             'yearlySalesData',
             'unachieved_amount',
             'achievement_rate',
+            'admin',
         ));
     }
 
@@ -124,6 +127,8 @@ class SalesTargetController extends Controller
     }
     public function store(Request $request)
     {
+        $this->authorize('create', Auth::guard('admin')->user());
+        
         // 売上目標の新規作成処理
         // バリデーションや保存処理を実装
         $validation = [
@@ -278,6 +283,8 @@ class SalesTargetController extends Controller
 
     public function update(Request $request, $id)
     {
+        $this->authorize('create', Auth::guard('admin')->user());
+
         // updateは売り上げ目標金額のみ更新可能
         $validation = [
             'target_amount' => 'required|numeric|min:0',

@@ -1,6 +1,13 @@
 @extends('layouts.admin')
 
 @section('content')
+{{-- <div>
+    @if($admin->email === 'guest@example.com')
+        <div class="alert alert-warning text-center rounded-0 mb-0 py-2 pt-3" role="alert">
+            <strong>💡 このアカウントはデモ用です。</strong> データの変更などはできません。
+        </div>
+    @endif
+</div> --}}
 <div class="">
     <h4 class="mt-4">メニュー・在庫一覧</h4>
     <a href="{{ route('admin.menus.create') }}"class="btn btn-success"> ＋新規メニュー</a>

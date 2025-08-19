@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Category;
+use App\Models\Admin;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage; // DBファサードをインポート
 // use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Auth;
 
 class MenuController extends Controller
 {
@@ -82,9 +84,10 @@ class MenuController extends Controller
      */
     public function create()
     {
+        $admin = Auth::guard('admin')->user();
         $categories = Category::all();
         $menu = new Menu();//からのMenuインスタンスを作成
-        return view('admin.menus.create',compact('categories','menu'));
+        return view('admin.menus.create',compact('categories','menu','admin'));
     }
 
     /**
@@ -95,6 +98,7 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Auth::guard('admin')->user());
         // dd('store');
         // dd($request->all());
         // dd($request->file('image_file')->getClientOriginalName());
@@ -198,9 +202,11 @@ class MenuController extends Controller
      */
     public function edit(Menu $menu)
     {
+        // 現在ログインしているAdminユーザーを取得
+        $admin = Auth::guard('admin')->user();
 
         $categories = Category::all();
-        return view('admin.menus.edit', compact('menu','categories'));
+        return view('admin.menus.edit', compact('menu','categories','admin'));
     }
 
     /**
@@ -212,6 +218,7 @@ class MenuController extends Controller
      */
     public function update(Request $request, Menu $menu)
     {
+        $this->authorize('create', Auth::guard('admin')->user());
         $validatedData=$request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',

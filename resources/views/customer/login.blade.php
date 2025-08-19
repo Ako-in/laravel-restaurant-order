@@ -44,6 +44,10 @@
                 </div>
                 <button type="submit"class="btn btn-primary">ログイン</button>
             </div>
+            <div class="text-center pt-3">
+                <p>ゲストログイン:guest</p>
+                <p>パスワード:guestpass</p>
+            </div>
 
         </form>
     </div>

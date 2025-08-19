@@ -1,6 +1,14 @@
 @extends('layouts.admin')
 
 @section('content')
+
+{{-- <div>
+    @if($admin->email === 'guest@example.com')
+        <div class="alert alert-warning text-center rounded-0 mb-0 py-2 pt-3" role="alert">
+            <strong>💡 このアカウントはデモ用です。</strong> データの変更などはできません。
+        </div>
+    @endif
+</div> --}}
     <h3>注文一覧</h3>
 
     {{-- <p>注文検索</p> --}}
