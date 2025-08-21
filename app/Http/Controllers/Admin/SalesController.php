@@ -4,29 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-// use App\Models\Admin;
-// use App\Models\Order;
 use App\Models\Menu;
 use App\Models\OrderItem;
-// use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-// use Illuminate\Validation\Rule;
 use Illuminate\Support\Carbon;
 use App\Models\SalesTarget;
 use Symfony\Component\HttpFoundation\StreamedResponse; // CSV export StreamedResponse をインポート
 use Illuminate\Support\Facades\Auth;
-
-// use Encore\Admin\Grid;
-// use Encore\Admin\Form;
-// use Encore\Admin\Show; 
-
-// use App\Admin\Extensions\Tools\CsvImport;
-// use Goodby\CSV\Import\Standard\Lexer;
-// use Goodby\CSV\Import\Standard\Interpreter;
-// use Goodby\CSV\Import\Standard\LexerConfig;
-
-
 
 class SalesController extends Controller
 {
@@ -35,7 +20,6 @@ class SalesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    // protected $title = '売上管理';
 
     public function index(Request $request)
     {
@@ -50,12 +34,9 @@ class SalesController extends Controller
             ->join('orders','order_items.order_id','=','orders.id')
             ->where('orders.status','=','completed')
             ->whereBetween('orders.created_at', [Carbon::now()->subDays(30), Carbon::now()])
-            // ->selectRaw('DATE(created_at) as sale_date, sum(subtotal) as total_sales, count(*) as total_orders, avg(subtotal) as averageSales')
             ->selectRaw('DATE(orders.created_at) as sale_date, SUM(order_items.price * order_items.qty) as total_sales, COUNT(DISTINCT orders.id) as total_orders')
             ->groupBy('sale_date')
             ->orderBy('sale_date','desc')
-            // ->keyBy('sale_date')
-            // ->toArray();
             ->get();
 
         // 過去30日間のデータが存在しない日付を補完
@@ -73,28 +54,6 @@ class SalesController extends Controller
             }
         }
 
-        // // 目標額のデータを取得する
-        // $salesTargets = SalesTarget::orderBy('year')->orderBy('month')->get();
-
-        // // グラフのデータ形式に合わせて整形する
-        // $targetAmounts = $salesTargets->mapWithKeys(function ($item) {
-        //     // 月と年のキーを結合
-        //     return ["{$item->year}-{$item->month}" => $item->target_amount];
-        // })->all();
-        
-
-    
-        
-
-        // if ($request->has('sort_sales_daily')) {
-        //     $sortOrder = $request->input('sort_sales_daily');
-        //     if ($sortOrder === 'asc') {
-        //         ksort($salesData); // 昇順
-        //     } else {
-        //         krsort($salesData); // 降順
-        //     }
-        // }
-
         krsort($salesData); // 日付で降順ソート
 
         $todaySales = OrderItem::where('status','completed')
@@ -109,7 +68,11 @@ class SalesController extends Controller
         $todaySalesFormatted = number_format($todaySales, 0);
         $monthlySalesFormatted = number_format($monthlySales, 0);
 
-        return view('admin.sales.index', compact('salesData', 'todaySalesFormatted', 'monthlySalesFormatted',));
+        return view('admin.sales.index', compact(
+            'salesData',
+            'todaySalesFormatted',
+            'monthlySalesFormatted'
+        ));
     }
 
     function salesAmount(Request $request){
@@ -123,12 +86,6 @@ class SalesController extends Controller
         if (!in_array($sortOrder, ['asc', 'desc'])) {
             $sortOrder = 'desc';
         }
-
-        // 過去30日間の売上データをデータベースから取得
-        // $dailySalesQuery = Order::where('status', '!=', 'canceled')
-        //     ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
-        //     ->selectRaw('DATE(created_at) as sale_date, sum(subtotal) as total_sales, count(*) as total_orders, avg(subtotal) as averageSales')
-        //     ->groupBy('sale_date');
         
         $dailySalesQuery = OrderItem::query()
         ->join('orders','order_items.order_id','=','orders.id')
@@ -167,22 +124,6 @@ class SalesController extends Controller
                 ];
             }
         }
-
-        // PHPでの最終的な並び替え
-
-        // if($sortColumn === 'total_sales'){
-        //     if ($sortOrder === 'asc') {
-        //         asort($salesData); // 売上金額で昇順ソート
-        //     } else {
-        //         arsort($salesData); // 売上金額で降順ソート
-        //     }
-        // } elseif($sortColumn === 'total_orders'){
-        //     if ($sortOrder === 'asc') {
-        //         asort($salesData); // 売上件数で昇順ソート
-        //     } else {
-        //         arsort($salesData); // 売上件数で降順ソート
-        //     }
-        // }
 
         // データの補完やキー操作により、DBソート順が失われる可能性があるため、ここで改めてソートを適用
         uasort($salesData, function($a, $b) use ($sortColumn, $sortOrder) {
@@ -231,7 +172,6 @@ class SalesController extends Controller
 
     function salesItem()
     {
-        // dd('salesItem');
         // アイテム別売上金額、数量は注文ステータスが完了になったものを集計する
         // 過去30日間の売上データを取得
         $salesItemQuery = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -242,106 +182,15 @@ class SalesController extends Controller
             'order_items.menu_id',
             'menus.name as menu_name',
             'order_items.price',
-            // DB::raw('CAST(order_items.price AS UNSIGNED) as order_item_price'),
             DB::raw('SUM(order_items.price * order_items.qty) as total_sales'),
             DB::raw('SUM(order_items.qty) as total_orders')
         )
-        // ->groupBy('sale_date','order_items.menu_id', 'menus.name','order_items.price')
         ->groupBy('order_items.menu_id', 'menus.name', 'order_items.price');
-        // ->orderByDesc('total_orders') // 売上個数で降順にソート
-        // ->get();
 
         $salesItem = $salesItemQuery->sortable()->get();
 
         return view('admin.sales.salesItem', compact('salesItem'));
-    
-
-        // //アイテム別売上金額、数量は注文ステータスが完了になったものを集計する
-        // // 過去30日間の売上データを取得
-        // $salesItem = orderItem::where('status', '!=', 'canceled')
-        //     ->whereBetween('created_at', [Carbon::now()->subDays(30), Carbon::now()])
-        //     ->selectRaw('DATE(created_at) as sale_date, sum(subtotal) as total_sales, count(*) as total_orders')
-        //     ->groupBy('sale_menu')
-        //     ->orderBy('sale_menu')
-        //     ->get()
-        //     ->keyBy('sale_menu')
-        //     ->toArray();
-
-        // // 過去30日間のデータが存在しない日付を補完
-        // $datas = [];
-        // foreach ($dates as $date) {
-        //     if (isset($salesItem[$date])) {
-        //         $salesData[$date] = $salesItem[$date];
-        //     } else {
-        //         $salesData[$date] = [
-        //             // 'sale_date' => $date,
-        //             'total_sales' => 0,
-        //             'total_orders' => 0,
-        //             // 'averageSales' => 0,
-        //         ];
-        //     }
-        // }
-        // // $sales = Order::where('status', 'completed')->get();
-
-        // // // 売上日付を取得
-        // // $date = Order::select('created_at')->where('status', 'completed')->get();
-        // return view('admin.sales.salesItem', compact('sales','salesItem','salesData'));
     }
-
-    // public function itemSort(Request $request){
-    //     // dd($request->all());
-    //     $sort = $request->input('sort');
-    //     $order = $request->input('order');
-
-    //     // dd($sort,$order);
-    //     // アイテム別売上金額、数量は注文ステータスが完了になったものを集計する
-    //     // 過去30日間の売上データを取得
-    //     $salesItem = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
-    //         ->join('menus', 'order_items.menu_id', '=', 'menus.id')
-    //         ->where('orders.status', 'completed') // ステータスが完了の注文のみ
-    //         ->whereBetween('orders.created_at', [Carbon::now()->subDays(30), Carbon::now()])
-    //         ->select(
-    //             'order_items.menu_id',
-    //             'menus.name as menu_name',
-    //             'order_items.price',
-    //             DB::raw('SUM(order_items.price * order_items.qty) as total_sales'),
-    //             DB::raw('SUM(order_items.qty) as total_orders')
-    //         )
-    //         ->groupBy('order_items.menu_id', 'menus.name','order_items.price')
-    //         // ->orderBy($sort, $order) // 売上個数で降順にソート
-    //         ->orderByDesc('total_orders')
-    //         ->get();
-
-    //     return view('admin.sales.salesItem', compact('salesItem'));
-    // }
-
-    // public function amountSort(Request $request){
-    //     // dd($request->all());
-    //     $sort = $request->input('sort');
-    //     $order = $request->input('order');
-
-    //     // dd($sort,$order);
-    //     // アイテム別売上金額、数量は注文ステータスが完了になったものを集計する
-    //     // 過去30日間の売上データを取得
-    //     $salesData = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
-    //         ->join('menus', 'order_items.menu_id', '=', 'menus.id')
-    //         ->where('orders.status', 'completed') // ステータスが完了の注文のみ
-    //         ->whereBetween('orders.created_at', [Carbon::now()->subDays(30), Carbon::now()])
-    //         ->select(
-    //             'order_items.menu_id',
-    //             'menus.name as menu_name',
-    //             'order_items.price',
-    //             DB::raw('SUM(order_items.price * order_items.qty) as total_sales'),
-    //             DB::raw('SUM(order_items.qty) as total_orders')
-    //         )
-    //         ->groupBy('order_items.menu_id', 'menus.name','order_items.price')
-    //         // ->orderBy($sort, $order) // 売上個数で降順にソート
-    //         ->orderByDesc('total_sales', $order) // 売上金額で降順にソート
-    //         ->get();
-
-    //     return view('admin.sales.salesAmount', compact('salesData'));
-
-    // }
 
     public function chart(Request $request)
     {
@@ -499,7 +348,6 @@ class SalesController extends Controller
             'orderAmounts' => $orderAmounts,
             'orderCounts' => $orderCounts,
             'targetAmounts' => $targetAmounts,
-            // 'salesTargets'=>$salesTargets, 
             'itemCategorySummary' => $itemCategorySummary,
             'startDate' => $startDate,
             'endDate' => $endDate,
@@ -582,8 +430,6 @@ class SalesController extends Controller
             // $startDate = $request->input('start_date'); // リクエストから開始日を取得    
             // $endDate = $request->input('end_date'); // リクエストから終了日を取得
 
-            // dd($startDate, $endDate);
-
             // 取得した日付範囲でデータを絞り込む
             if (!$allData){
                 if($startDate) {
@@ -623,13 +469,11 @@ class SalesController extends Controller
                     $item->order_id,
                     $item->menu_id,
                     $cleanedMenuName, // 改行コードを削除したメニュー名
-                    // $item->menu_name,
                     $item->category_name, // カテゴリ名
                     $item->price,
                     $item->qty,
                     $item->subtotal,
                     $item->order_date,
-                    // $item->status,
                     $cleanedStatus, // 改行コードを削除したステータス
                     $item->created_at,
                 ], $delimiter);//デリミタを指定
@@ -637,10 +481,6 @@ class SalesController extends Controller
 
             fclose($handle);// ファイルハンドルを閉じる
         });
-
-        // $fileName = 'sales_data_' . Carbon::now()->format('Ymd_His') . '.csv';
-        // dd($fileName);
-        // Log::info('Generated File Name: ' . $fileName);
 
         // レスポンスヘッダーを設定
         // Content-Type: CSVファイルであることをブラウザに伝える

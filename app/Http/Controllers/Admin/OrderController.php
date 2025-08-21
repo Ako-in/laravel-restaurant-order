@@ -34,10 +34,6 @@ class OrderController extends Controller
         $menu_search_type = $request->input('menu_search_type','name','id');
         $order_id_search = $request->input('order_id_search');
 
-        // dd(route('admin.orders.index', ['order_date' => $date]));
-        // dd($date->order_date);
-        // dd($date);
-        // $query = Order::with('order_items.menu')->get();
         $query = Order::with('orderItems.menu');
 
         //注文IDで検索
@@ -123,75 +119,6 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.index')->with('success', '注文を登録しました。');
     }
 
-    // public function confirm($id){
-    //     // order_itemsテーブルにコピー,詳細を表示
-    //     $originalOrder = Order::with('order_items')->find($id);
-    //     // dd($originalOrder);
-
-    //     if (!$originalOrder || $originalOrder->order_items->isEmpty()) {
-    //         // dd('kara');
-    //         return redirect()->back()->with('warning', '空の注文は登録できません');
-    //     }
-
-    //     DB::beginTransaction();
-
-    //     try {
-    //         // 元の注文を複製（IDなどは除外される）
-    //         $confirmedOrder = $originalOrder->replicate();
-    //         $confirmedOrder->created_at = now(); // 必要に応じて
-    //         $confirmedOrder->save();
-
-    //         // 紐づく注文アイテムも複製
-    //         foreach ($originalOrder->order_items as $item) {
-    //             $newItem = $item->replicate();
-    //             $newItem->order_id = $confirmedOrder->id; // 新しい注文IDに関連付け
-    //             $newItem->save();
-    //         }
-
-    //         DB::commit();
-
-    //         return redirect()->route('admin.orders.print', ['id' => $confirmedOrder->id])
-    //             ->with('success', '注文が複製され、管理画面に登録されました');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         return redirect()->back()->with('error', '注文の複製中にエラーが発生しました: ' . $e->getMessage());
-    //     }
-
-    //     // 一時的に確認用
-    //     // dd($originalOrder, $originalOrder?->order_items);
-
-    //     // // すでに同じ注文が登録されていないかチェック
-    //     // $alreadyConfirmed = Order::where('id', $originalOrder->id)
-    //     // ->whereDate('created_at', now()->toDateString())
-    //     // ->exists();
-    //     // // dd($alreadyConfirmed);
-
-    //     // if ($alreadyConfirmed) {
-    //     //     return redirect()->back()->with('warning', 'この注文はすでに登録済みです');
-    //     // }
-
-    //     // $confirmedOrder = Order::create([
-    //     //     'table_number'=>$originalOrder->table_number,
-    //     //     'created_at'=>$originalOrder->created_at,
-    //     // ]);
-
-    //     // foreach($originalOrder->order_items as $item){
-    //     //     DB::table('order_items')->insert([
-    //     //         'order_id'=>$confirmedOrder->id,
-    //     //         'menu_id'=>$item->menu_id,
-    //     //         'qty'=>$item->qty,
-    //     //         'price'=>$item->price,
-    //     //         'menu_name' => $item->menu_name ??'', 
-    //     //         'created_at'=>$item->created_at,
-    //     //         'updated_at'=>$item->updated_at,
-    //     //     ]);
-            
-    //     // }
-    //     // // dd($confirmedOrder);
-
-    //     // return redirect()->route('admin.orders.print',['id'=>$confirmedOrder->id])->with('success','管理画面に登録');
-    // }
-
     public function showConfirm($id){
         $admin = Auth::guard('admin')->user();
         $order = Order::with('orderItems')->find($id);
@@ -215,13 +142,6 @@ class OrderController extends Controller
             return redirect()->back()->with('warning', 'テーブル番号が空の注文は登録できません');
         }
 
-        // OrderController.php のすべての Order::create() 前後に以下を追加
-        // Log::info('Order::create called', [
-        //     'request_data' => request()->all(),
-        //     'file' => __FILE__,
-        //     'line' => __LINE__,
-        // ]);
-
         DB::beginTransaction();
         $confirmedOrder = Order::create([
             'status' => 'pending',
@@ -238,16 +158,7 @@ class OrderController extends Controller
             if (empty($item->menu_id) || empty($item->menu_name) || empty($item->qty)) {
                 return redirect()->back()->with('warning', 'メニューID、メニュー名、または数量が不明な注文は登録できません');
             }         
-            
-            // DB::table('order_items')->insert([
-            //     'order_id'=>$confirmedOrder->id,
-            //     'menu_id'=>$item->menu_id,
-            //     'qty'=>$item->qty,
-            //     'price'=>$item->price,
-            //     'menu_name' => $item->menu_name ??'', 
-            //     'created_at'=>$item->created_at,
-            //     'updated_at'=>$item->updated_at,
-            // ]);
+
             $confirmedOrder->orderItems()->create([
                 'menu_id'=>$item->menu_id,
                 'qty'=>$item->qty,
@@ -268,88 +179,6 @@ class OrderController extends Controller
         ->with('success','管理画面に登録しました');
         // }
     }
-
-    // 一旦コメントアウトupdateAllStatusを使用
-    // public function updateStatus(Request $request, Order $order)
-    // {
-    //     // dd('updateStatuses');
-    //     // dd($order);
-    //     // 注文ステータスを変更
-    //     //pending->ongoing->completed
-    //     //pending->canceled
-    //     $validated = $request->validate([
-    //         //ruleオブジェクトを使って、現在のステータスに基づいて許可されたステータスを取得
-    //          'status' => ['required', Rule::in($this->allowedStatus($order->status))],
-    //         // 'status' => ['required', Rule::in(['pending', 'ongoing', 'completed', 'canceled'])],
-    //     ]);
-    //     $originalStatus = $order->status;
-    //     $newStatus = $validated['status'];
-
-    //     DB::beginTransaction(); // トランザクションを開始
-
-    //     try{
-    //         //在庫更新 Pending->Ongoingへステータスを変更、在庫を更新
-    //         if($originalStatus === 'pending' && $newStatus === 'ongoing'){
-    //             $hasInsufficientStock = false; //在庫不足フラグFalse
-    //             // $orderItems = $order->order_items;
-                
-    //             // 在庫数量を更新する処理Pending->Ongoing
-    //             foreach ($order->order_items as $item) {
-    //                 $menu = Menu::find($item->menu_id);
-    //                 if ($menu && $menu->stock < $item->qty) {
-    //                     $hasInsufficientStock = true;
-    //                     break;
-    //                 }
-    //             }
-
-    //             // 在庫不足フラグが立っている場合、処理を中断
-    //             if($hasInsufficientStock){
-    //                 DB::rollBack(); // 在庫不足の場合はロールバック
-    //                 return redirect()->back()->withErrors('在庫が不足しています。注文を続行できません。');
-    //             }
-
-    //             // 在庫を減らす処理
-    //             foreach ($order->order_items as $item) {
-    //                 $menu = Menu::find($item->menu_id);
-    //                 if ($menu) {
-    //                     $menu->stock -= $item->qty; // 在庫を減らす
-    //                     $menu->save();
-    //                 }
-    //             }
-    //             Log::info('注文 ' . $order->id . ' の在庫数を減らしました。');
-    //         }
-
-    //             // ステータスがOngoing・Pending→canceled の場合は在庫を戻す
-    //             if($newStatus === 'canceled' && ($originalStatus === 'ongoing' || $originalStatus === 'pending')){
-    //                 // dd('$newStatus is canceled', '$originalStatus is', $originalStatus);
-    //                 // ステータスが canceled の場合は在庫を元に戻す
-    //                 foreach ($order->order_items as $item) {
-    //                     $menu = Menu::find($item->menu_id);
-    //                     if ($menu) {
-    //                         $menu->stock += $item->qty; // 在庫を戻す
-    //                         $menu->save();
-    //                     }
-    //                 }
-
-    //                 Log::info('注文 ' . $order->id . ' の在庫数を戻しました。');
-                
-
-    //             //ステータスを更新
-    //             $order->status = $newStatus;
-    //             $order->save();
-
-    //             DB::commit(); // トランザクションをコミット
-    //             return redirect()->back()->with('flash_message', 'ステータスを更新しました。');
-
-    //         }
-
-        
-    //     } catch (\Exception $e) {
-    //         DB::rollBack(); // エラーが発生した場合はロールバック
-    //         Log::error("注文ステータス更新中にエラー: " . $e->getMessage(), ['order_id' => $order->id]);
-    //         return redirect()->back()->withErrors('ステータス更新中にエラーが発生しました。');
-    //     }
-    // }
 
     public function updateOrderItemStatus(Request $request,OrderItem $item)
     //注文個別アイテムのステータスを更新
@@ -571,24 +400,17 @@ class OrderController extends Controller
 
     public function print($id)
     {
-        // プリント画面表示、プリントボタン
-        // dd('print通過');//ok
-        // $order = Order::find($id);//orderを取得
         $order = Order::with('orderItems.menu')->find($id);
-        // dd($order);
         $table_number = $order->table_number;
-        // dd($table_number);//nullになってる->ok
         $order_items = DB::table('orderItems')
             ->join('menus', 'orderItems.menu_id', '=', 'menus.id')//メニュー名を取得するためにjoin
             ->where('orderItems.order_id', $id)//特定の注文を絞るためにWhere
             ->select('orderItems.*', 'menus.name as menu_name')//必要なカラムだけを取得して、別名
             ->get();
 
-        // dd($order_items);//取得できない、空のまま
         $menus = Menu::all();
         return view('admin.orders.print', compact('order','table_number', 'order_items', 'menus'));
     }
-
 
     protected function allowedStatus($currentStatus){
         switch($currentStatus){

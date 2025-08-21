@@ -11,14 +11,10 @@
                     <div class="col-md-3 mb-3">
                         <div class="card" style="width: 18rem;">
                             <div class="card-body">
-                                {{-- <h5 class="card-title">{{$menu->menu->name}}</h5>
-                                <p class="card-text">Price:{{$menu->menu->price}}JPY</p>
-                                <p class="card-text">Quantity:{{$menu->quantity}}</p> --}}
                                 <h5 class="card-title">{{$cart->name}}</h5>
-                                <p class="card-text">Price:{{$cart->price}}JPY</p>
-                                <p class="card-text">Quantity:{{$cart->qty}}</p>
-                                <p class="card-text">Table number:{{$cart->table_number}}</p>
-                                {{-- <p class="card-text">Request:{{$menu->request}}</p> --}}
+                                <p class="card-text">価格:{{$cart->price}}JPY</p>
+                                <p class="card-text">数量:{{$cart->qty}}</p>
+                                <p class="card-text">テーブル番号:{{$cart->table_number}}</p>
                             </div>
                             
                         </div>

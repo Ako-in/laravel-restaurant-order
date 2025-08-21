@@ -14,15 +14,12 @@ class SalesTargetController extends Controller
 {
     public function index()
     {
-        // 売上目標の一覧を表示
-        // $monthlySalesTargets = []; // 月ごとの売上目標を取得するロジックを実装
         // 管理者向けの売上目標の一覧を表示
-
         // 現在ログインしているAdminユーザーを取得
         $admin = Auth::guard('admin')->user();
 
         $allSalesTargets = SalesTarget::all(); // 売上目標の全データを取得
-        // $start_year = $salesTargets->format('Y');
+
         $monthlySalesTargets = $allSalesTargets->where('period_type', 'monthly'); // 月間売上目標のデータ  
         $yearlySalesTargets = $allSalesTargets->where('period_type', 'yearly'); // 年間売上目標のデータ
 
@@ -43,8 +40,8 @@ class SalesTargetController extends Controller
             $monthlySalesData[$month] = OrderItem::whereHas('order', function ($query) {
                 $query->where('status', 'completed');
             })
-                ->whereMonth('created_at', $month) // 月ごとにフィルタリング
-                ->sum('subtotal'); // 月ごとの売上合計を取得
+            ->whereMonth('created_at', $month) // 月ごとにフィルタリング
+            ->sum('subtotal'); // 月ごとの売上合計を取得
         }
 
         // 各年の実売上累計を取得
@@ -54,8 +51,8 @@ class SalesTargetController extends Controller
             $yearlySalesData[$year] = OrderItem::whereHas('order', function ($query) {
                 $query->where('status', 'completed');
             })
-                ->whereYear('created_at', $year) // 年ごとにフィルタリング
-                ->sum('subtotal'); // 年ごとの売上合計を取得
+            ->whereYear('created_at', $year) // 年ごとにフィルタリング
+            ->sum('subtotal'); // 年ごとの売上合計を取得
         }
 
         //未達成金額（月、年）
@@ -136,29 +133,13 @@ class SalesTargetController extends Controller
             'period_type'=> 'required|in:monthly,yearly',
             'start_year' => 'required|integer',
             'start_month' => 'required_if:period_type,monthly|nullable|string|digits_between:1,2',
-            // 'start_day'=> 'required_if:period_type,daily|string|min:1|max:31',
         ];
-
-
-
-        // $validationMessages = [
-        //     'start_year.required' => '年は必須です。',
-        //     // 'start_year.integer' => '年は整数で入力してください。',
-        //     // 'start_month.required' => '月は必須です。',
-        //     // 'start_month.integer' => '月は整数で入力してください。',
-        //     // 'start_month.min' => '月は1から12の間で入力してください。',
-        //     // 'start_month.max' => '月は1から12の間で入力してください。',
-        //     'target_amount.required' => '目標金額は必須です。',
-        //     'target_amount.numeric' => '目標金額は数値で入力してください。',
-        //     'target_amount.min' => '目標金額は0以上で入力してください。',
-        // ];
 
         $validatedData = $request->validate($validation);
         $targetAmount = $validatedData['target_amount'];
         $periodType = $validatedData['period_type'];
         $startYear = $validatedData['start_year'];
         $startMonth = $validatedData['start_month'] ?? null; // 月はオプション
-        // $startDay = $validatedData['start_day'] ?? null; // 日はオプション
 
         // if($startMonth >= 4){
         //     // 年度の開始月が4月以降の場合、年度は翌年に設定
@@ -174,11 +155,7 @@ class SalesTargetController extends Controller
         $endDate = Null;
 
         Log::info("Attempting to store sales target with period_type: " . $periodType);
-        // if($periodType === 'daily'){
-        //     //日別目標の場合、開始日と終了日は同じ日付
-        //     $startDate = Carbon::create($startYear, $startMonth, $startDay)->toString();
-        //     $endDate = $startDate;
-        // }else
+
         if($periodType === 'monthly'){
             Log::info("Monthly target processing. start_month value: '" . $startMonth . "', type: " . gettype($startMonth));
             Log::info("Is start_month numeric? " . (is_numeric($startMonth) ? 'Yes' : 'No'));
@@ -190,18 +167,12 @@ class SalesTargetController extends Controller
             }else {
                 return redirect()->back()->withErrors(['start_month' => '月は必須です。']);
             }
-            // //月間目標の場合、開始日は月の初日、終了日は月の最終日
-            // $startDate = Carbon::create($startYear, $startMonth,1)->startOfMonth()->toString();
-            // $endDate = Carbon::create($startYear, $startMonth,1)->endOfMonth()->toString();
 
         }elseif($periodType === 'yearly'){
             // 年間目標の場合、開始日はその年の4月1日、終了日は翌年の3月31日（日本の会計年度の場合）
             // もし開始年をそのまま使うなら 1月1日
             $startDate = Carbon::create($startYear, 4, 1)->format('Y-m-d'); // 仮に日本の会計年度の4月1日開始とする
             $endDate = Carbon::create($startYear + 1, 3, 31)->format('Y-m-d'); // 翌年の3月31日
-            // //年間目標の場合、開始日は1月1日、終了日は12月31日
-            // $startDate = Carbon::create($startYear, 1, 1)->toString();
-            // $endDate = Carbon::create($startYear, 12, 31)->toString();
         }else{
             // 他の期間タイプは未対応
             return redirect()->back()->withErrors(['period_type' => '無効な期間タイプです。']);
@@ -264,9 +235,7 @@ class SalesTargetController extends Controller
         //     'target_amount' => $request->input('target_amount'),    
         // ]);
         // $salesTarget->save();
-        // dd($salesTarget);
 
-        
         return redirect()->route('admin.sales_target.index')->with('success', '売上目標が作成されました。');
     }
 
@@ -274,10 +243,6 @@ class SalesTargetController extends Controller
     {
         $salesTarget = SalesTarget::findOrFail($id); // データ取得を追加
         $years = range(date('Y'), date('Y') + 5);
-        // $months = [
-        //     '01', '02', '03', '04', '05', '06',
-        //     '07', '08', '09', '10', '11', '12'
-        // ];
         return view('admin.sales_target.edit', compact('salesTarget', 'years'));
     }
 
@@ -288,9 +253,6 @@ class SalesTargetController extends Controller
         // updateは売り上げ目標金額のみ更新可能
         $validation = [
             'target_amount' => 'required|numeric|min:0',
-            // 'period_type'=> 'required|in:monthly,yearly',
-            // 'start_year' => 'required|integer',
-            // 'start_month' => 'required_if:period_type,monthly|nullable|integer|min:1|max:12',
         ];
         $validatedData = $request->validate($validation);
 
@@ -315,9 +277,6 @@ class SalesTargetController extends Controller
         // }
 
         $salesTarget->update([
-            // 'start_date' => $startDate,
-            // 'end_date' => $endDate,
-            // 'period_type' => $periodType,
             'target_amount' => $targetAmount,
         ]);
         

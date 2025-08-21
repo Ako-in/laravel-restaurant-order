@@ -21,7 +21,7 @@ class Order extends Model
         // 'subtotal',
         'status',
         'created_at',
-        'total_amount', // 新規作成したカラム
+        'total_amount',
     ];
 
     // ソート可能なカラムを定義
@@ -40,14 +40,14 @@ class Order extends Model
     // @sortablelink(total_orders)の呼び出しに使用
     public function totalOrdersSortable($query, $direction)
     {
-        // 'total_orders' は集計結果のエイリアスなので、テーブル名を付けずにソートします。
+        // 'total_orders' は集計結果のエイリアスなので、テーブル名を付けずにソート
         return $query->orderBy('total_orders', $direction);
     }
 
     // @sortablelink(total_sales)の呼び出しに使用
     public function totalSalesSortable($query, $direction)
     {
-        // 'total_sales' は集計結果のエイリアスなので、テーブル名を付けずにソートします。
+        // 'total_sales' は集計結果のエイリアスなので、テーブル名を付けずにソート
         return $query->orderBy('total_sales', $direction);
     }
 

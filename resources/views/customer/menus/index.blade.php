@@ -120,18 +120,6 @@
         @endif
     </div>
 
-    {{-- <div>
-    @if ($search)
-      <p>{{$search}}の商品一覧{{$totalCount}}件</p>
-    @elseif($categoryId)
-      @if (isset($categoryName) && $categoryName)
-        <p>{{$categoryName}}の商品一覧{{$totalCount}}件</p> 
-      @endif
-    @elseif($priceRange)
-      <p>{{$priceRange}}の商品一覧{{$totalCount}}件</p>
-    @endif
-  </div> --}}
-
     <div class="row w-100">
         @foreach ($menus as $menu)
             {{-- メニューのステータスが 'inactive' の場合は、このループの残りの処理をスキップ --}}

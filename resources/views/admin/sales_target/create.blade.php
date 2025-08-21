@@ -1,214 +1,128 @@
 @extends('layouts.admin')
 
 @section('content')
-    @if (session('flash_message'))
-        <div class="alert alert-success mt-3">
-            {{ session('flash_message') }}
+  @if (session('flash_message'))
+      <div class="alert alert-success mt-3">
+          {{ session('flash_message') }}
+      </div>
+  @endif
+
+  @if (session('error_message'))
+      <div class="alert alert-danger mt-3">
+          {{ session('error_message') }}
+      </div>
+  @endif
+
+  {{-- startDateがNullの時のアラートを表示 --}}
+  @if (session('general_message'))
+      <div class="alert alert-danger mt-3">
+          {{ session('general_message') }}
+      </div>
+  @endif
+
+  {{-- すでに目標が設定されている時のアラートを表示 --}}
+  @if (session('exist_message'))
+      <div class="alert alert-danger mt-3">
+          {{ session('exist_message') }}
+      </div>
+  @endif
+
+  <div class="container py-4">
+      <div>
+        <div class="d-flex justify-content-center mb-2"> {{-- タイトルを中央寄せ --}}
+          <h4 class="mb-0">売上目標作成(年間、月間)</h4>
         </div>
-    @endif
-
-    @if (session('error_message'))
-        <div class="alert alert-danger mt-3">
-            {{ session('error_message') }}
+        <div class="mb-4"> {{-- 戻るボタンの親divに下マージン --}}
+          <a href="{{ route('admin.sales_target.index') }}" class="btn btn-primary">戻る</a>
         </div>
-    @endif
-
-    {{-- startDateがNullの時のアラートを表示 --}}
-    @if (session('general_message'))
-        <div class="alert alert-danger mt-3">
-            {{ session('general_message') }}
-        </div>
-    @endif
-
-    {{-- すでに目標が設定されている時のアラートを表示 --}}
-    @if (session('exist_message'))
-        <div class="alert alert-danger mt-3">
-            {{ session('exist_message') }}
-        </div>
-    @endif
-
-    <div class="container py-4">
-        <div>
-            <div class="d-flex justify-content-center mb-2"> {{-- タイトルを中央寄せ --}}
-                <h4 class="mb-0">売上目標作成(年間、月間)</h4>
-            </div>
-            <div class="mb-4"> {{-- 戻るボタンの親divに下マージン --}}
-                <a href="{{ route('admin.sales_target.index') }}" class="btn btn-primary">戻る</a>
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <form action="{{ route('admin.sales_target.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-
-                    {{-- 目標の種類 --}}
-                    <div class="mb-3">
-                        <label for="period_type"class="form-label">目標の種類：</label>
-                        <select name="period_type" id="period_type" class="form-select"required>
-
-                            <option value="">目標の種類を選択してください</option>
-                            <option value="yearly" {{ old('period_type') == 'yearly' ? 'selected' : '' }}>年間目標</option>
-                            <option value="monthly" {{ old('period_type') == 'monthly' ? 'selected' : '' }}>月間目標</option>
-                            {{-- <option value="daily" {{ old('period_type') == 'daily' ? 'selected' : '' }}>日別目標</option> --}}
-                        </select>
-                        @error('period_type')
-                            <div class="text-danger mt-2">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-
-
-                    {{-- 開始年月選択グループ 初期は非表示 --}}
-                    <div id="start_date_group_wrapper"class="mb-3" style="display:none;">
-                        {{-- <div id="start_date_group" class="flex flex-col mt-4"> JavaScriptで表示/非表示を制御 --}}
-                        <label class="start_date">開始年月</label>
-                        <div class="row g-2">
-                            <div class="col-md-6">
-                                <select name="start_year" id="start_year"class="form-select">
-                                    <option value="">年度を選択してください</option>
-                                    @foreach ($years as $year)
-                                        <option value="{{ $year }}"
-                                            {{ old('start_year') == $year ? 'selected' : '' }}>{{ $year }}年
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('start_year')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6" id="start_month_container">
-                                <select name="start_month" id="start_month" class="form-select">
-                                    <option value="">月を選択してください</option>
-                                    {{-- @foreach ($months as $month)
-                            <option value="{{ $month }}" {{ old('start_month') == $month ? 'selected' : '' }}>{{ $month }}</option>
-                        @endforeach --}}
-                                    @foreach (range(1, 12) as $monthNum)
-                                        {{-- Make sure this line is exactly like this --}}
-                                        <option value="{{ sprintf('%02d', $monthNum) }}"
-                                            {{ old('start_month') == sprintf('%02d', $monthNum) ? 'selected' : '' }}>
-                                            {{ $monthNum }}月 {{-- And this line as well, to display "1月", "2月", etc. --}}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('start_month')
-                                    <div class="text-danger mt-2">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-
-                        {{-- 開始日(年月日)表示グループ --}}
-                        <div id="start_date_display_group" class="mb-3"style="display:none;">
-                            <label class="form-label">開始日</label>
-                            <div class="d-flex align-items-center">
-                                <span id="start_year_display"class="me-1"></span>年
-                                <span id="start_month_display"class="me-1"></span>月
-                                <span id="start_day_display"class="me-1"></span>日
-                            </div>
-
-                        </div>
-                        <div>
-                            {{-- 終了日表示グループ --}}
-                            <div id="end_date_display_group" class="mb-3"style="display:none;">
-                                <label class="form-label">終了日</label>
-                                <div class="d-flex align-items-center">
-                                    <span id="end_year_display"class="me-1"></span>年
-                                    <span id="end_month_display"class="me-1"></span>月
-                                    <span id="end_day_display"class="me-1"></span>日
-                                </div>
-
-                            </div>
-
-
-                        </div>
-
-
-
-                        {{-- <select name="start_day" id="start_day">
-                    <option value="">日にちを選択してください</option>
-                    @for ($day = 1; $day <= 31; $day++)
-                        <option value="{{ $day }}" {{ old('day') == $day ? 'selected' : '' }}>{{ $day }}</option>
-                    @endfor
-                  </select> --}}
-
-                        {{-- </div> --}}
-                    </div>
-                    {{-- 売り上げ目標額 --}}
-                    <div class="mb-3">
-                        <label class="target_amount" class="form-label">売上目標額：</label>
-                        <input type="number" name="target_amount" id="target_amount" class="form-select mb-3"
-                            value="{{ old('target_amount') }}" required>
-                        @error('target_amount')
-                            <div class="text-danger mt-2">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    {{-- <div>
-                  <label for="end_date" class="text-gray-800">終了年月</label>
-                  <select name="end_year" id="end_year">
-                    <option value="">年度を選択してください</option>
-                    @foreach ($years as $year)
-                        <option value="{{ $year }}" {{ old('end_year') == $year ? 'selected' : '' }}>{{ $year }}</option>
-                    @endforeach
-                  </select>
-                  <select name="end_month" id="end_month">
-                    <option value="">月を選択してください</option>
-                    @foreach ($months as $month)
-                        <option value="{{ $month }}" {{ old('end_month') == $month ? 'selected' : '' }}>{{ $month }}</option>
-                    @endforeach
-                  </select>
-                  <select name="end_day" id="end_day">
-                    <option value="">日にちを選択してください</option>
-                    @for ($day = 1; $day <= 31; $day++)
-                        <option value="{{ $day }}" {{ old('end_day') == $day ? 'selected' : '' }}>{{ $day }}</option>
-                    @endfor
-                  </select>
-                </div>
-              </div> --}}
-                    {{-- <div>
-                終了日表示グループ
-                <div id="end_date_display_group" class="mb-3"style="display:none;">
-                  <label class="form-label">終了日</label>
-                  <div class="d-flex align-items-center">
-                    <span id="end_year_display"class="me-1"></span>年 
-                    <span id="end_month_display"class="me-1"></span>月
-                    <span id="end_day_display"class="me-1"></span>日
+      </div>
+      <div class="row justify-content-center">
+          <div class="col-md-8">
+              <form action="{{ route('admin.sales_target.store') }}" method="POST" enctype="multipart/form-data">
+                  @csrf
+                  {{-- 目標の種類 --}}
+                  <div class="mb-3">
+                    <label for="period_type"class="form-label">目標の種類：</label>
+                    <select name="period_type" id="period_type" class="form-select"required>
+                      <option value="">目標の種類を選択してください</option>
+                      <option value="yearly" {{ old('period_type') == 'yearly' ? 'selected' : '' }}>年間目標</option>
+                      <option value="monthly" {{ old('period_type') == 'monthly' ? 'selected' : '' }}>月間目標</option>
+                    </select>
+                    @error('period_type')
+                      <div class="text-danger mt-2">{{ $message }}</div>
+                    @enderror
                   </div>
-                  
-                </div>
-                
 
-              </div> --}}
+                  {{-- 開始年月選択グループ 初期は非表示 --}}
+                  <div id="start_date_group_wrapper"class="mb-3" style="display:none;">
+                      {{-- <div id="start_date_group" class="flex flex-col mt-4"> JavaScriptで表示/非表示を制御 --}}
+                      <label class="start_date">開始年月</label>
+                      <div class="row g-2">
+                        <div class="col-md-6">
+                          <select name="start_year" id="start_year"class="form-select">
+                            <option value="">年度を選択してください</option>
+                            @foreach ($years as $year)
+                              <option value="{{ $year }}"
+                                {{ old('start_year') == $year ? 'selected' : '' }}>{{ $year }}年
+                              </option>
+                            @endforeach
+                          </select>
+                          @error('start_year')
+                            <div class="text-danger mt-2">{{ $message }}</div>
+                          @enderror
+                        </div>
+                        <div class="col-md-6" id="start_month_container">
+                          <select name="start_month" id="start_month" class="form-select">
+                              <option value="">月を選択してください</option>
+                              @foreach (range(1, 12) as $monthNum)
+                                  <option value="{{ sprintf('%02d', $monthNum) }}"
+                                      {{ old('start_month') == sprintf('%02d', $monthNum) ? 'selected' : '' }}>
+                                      {{ $monthNum }}月 {{-- "1月", "2月",  --}}
+                                  </option>
+                              @endforeach
+                          </select>
+                          @error('start_month')
+                              <div class="text-danger mt-2">{{ $message }}</div>
+                          @enderror
+                        </div>
+                      </div>
 
+                      {{-- 開始日(年月日)表示グループ --}}
+                      <div id="start_date_display_group" class="mb-3"style="display:none;">
+                        <label class="form-label">開始日</label>
+                        <div class="d-flex align-items-center">
+                          <span id="start_year_display"class="me-1"></span>年
+                          <span id="start_month_display"class="me-1"></span>月
+                          <span id="start_day_display"class="me-1"></span>日
+                        </div>
+                      </div>
+                      <div>
+                        {{-- 終了日表示グループ --}}
+                        <div id="end_date_display_group" class="mb-3"style="display:none;">
+                          <label class="form-label">終了日</label>
+                          <div class="d-flex align-items-center">
+                            <span id="end_year_display"class="me-1"></span>年
+                            <span id="end_month_display"class="me-1"></span>月
+                            <span id="end_day_display"class="me-1"></span>日
+                          </div>
+                        </div>
+                      </div>
 
-                    {{-- <div class="flex flex-col mt-4">
-                <label for="year" class="text-gray-800">年度：</label>
-                <select name="year" id="year" class="form-select">
-                    <option value="">年度を選択してください</option>
-                    @foreach ($years as $year)
-                        <option value="{{ $year }}" {{ old('year') == $year ? 'selected' : '' }}>{{ $year }}</option>
-                    @endforeach
-                </select>
-                
-              </div>
-
-              <div class="flex flex-col mt-4">
-                <label for="month" class="text-gray-800">月：</label>
-                <select name="month" id="month" class="form-select" required>
-                  <option value="">月を選択してください</option>
-                  @foreach ($months as $month)
-                      <option value="{{ $month }}" {{ old('month') == $month ? 'selected' : '' }}>{{ $month }}</option>
-                  @endforeach
-                </select>
-               
-              </div> --}}
-
-
-                    <button type="submit" class="btn btn-primary mt-3">売上登録作成</button>
-                </form>
-            </div>
-        </div>
-    </div>
+                  </div>
+                  {{-- 売り上げ目標額 --}}
+                  <div class="mb-3">
+                      <label class="target_amount" class="form-label">売上目標額：</label>
+                      <input type="number" name="target_amount" id="target_amount" class="form-select mb-3"
+                          value="{{ old('target_amount') }}" required>
+                      @error('target_amount')
+                          <div class="text-danger mt-2">{{ $message }}</div>
+                      @enderror
+                  </div>
+                  <button type="submit" class="btn btn-primary mt-3">売上登録作成</button>
+              </form>
+          </div>
+      </div>
+  </div>
 @endsection
 
 @push('scripts')
@@ -352,8 +266,6 @@
             } else {
                 updateFieldsVisibility(); // old値がない場合も初期表示を設定
             }
-
-
         });
     </script>
 @endpush

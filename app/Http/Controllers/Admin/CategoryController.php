@@ -51,9 +51,7 @@ class CategoryController extends Controller
             'name.required' => 'カテゴリ名は必須です',
             'name.string' => 'カテゴリ登録は文字列のみです',
             'name.max' => '50文字以内で入力してください',
-            'name.unique' => 'このカテゴリ名はすでに登録されています。',
-            // 'description.string' => 'カテゴリ説明は文字列のみです',
-            // 'description.max' => '50文字以内で入力してください',    
+            'name.unique' => 'このカテゴリ名はすでに登録されています。',  
         ];
 
         $validatedData = $request->validate($validationRules, $validationMessages);
@@ -65,50 +63,5 @@ class CategoryController extends Controller
 
         return redirect()->route('admin.categories.index')->with('success', 'カテゴリは登録されました。');
 
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

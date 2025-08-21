@@ -52,33 +52,12 @@
 <body>
     <div class="wrapper">
         @include('layouts.adminheader')
-        {{-- <header>
-        <nav class="navbar navbar-light bg-light">
-            <div class="container">
-                <a href="{{ route('customer.menus.index') }}" class="navbar-brand">レストラン注文アプリ</a>
-
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a href="{{ route('customer.logout') }}" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">ログアウト</a>
-                        <form id="logout-form" action="{{ route('customer.logout') }}" method="POST">
-                            @csrf
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </header> --}}
-
         <main>
             <div class="container">
                 <h1 class="fs-2 my-3">@yield('title')</h1>
                 @yield('content')
             </div>
         </main>
-
-        {{-- <footer class="d-flex justify-content-center align-items-center bg-light">
-        <p class="text-muted small mb-0">&copy; 投稿アプリ All rights reserved.</p>
-    </footer> --}}
         @include('layouts.footer')
     </div>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

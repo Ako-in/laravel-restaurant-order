@@ -23,16 +23,9 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // デバッグ: 認証情報を表示
-        // dd($credentials, Auth::guard('customer')->attempt($credentials));
-
-
         if (Auth::guard('customer')->attempt(['table_number' => $credentials['table_number'], 'password' => $credentials['password']])) {
             return redirect()->route('customer.menus.index');
         }
-        // if (Auth::guard('customer')->attempt($credentials)) {
-        //     return redirect()->route('customer.dashboard');
-        // }
 
         return redirect()->route('customer.login')->withErrors(['table_number' => 'ログイン情報が正しくありません']);
     }
