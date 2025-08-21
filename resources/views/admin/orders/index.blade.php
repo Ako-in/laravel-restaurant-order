@@ -59,13 +59,31 @@
 
     <div class="form-group row mb-3">
         <form action="{{ route('admin.orders.index') }}" method="GET" class="admin-search-box mb-3">
-            <label for="menu_search" class="col-md-5 col-form-label text-md-left fw-bold">◆メニューから検索する</label>
+            <label for="order_id_search" class="col-md-5 col-form-label text-md-left fw-bold">◆注文IDから検索する</label>
+            <div class="col-md-7">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="order_id_search" name="order_id_search"
+                        placeholder="注文IDを入力" value="{{ $order_id_search }}">
+                    {{-- <select class="form-select" id="menu_search_type" name="menu_search_type">
+                        <option value=""disabled selected>名前を選択</option>
+                        <option value="name" {{ $menu_search_type === 'name' ? 'selected' : '' }}>名前</option>
+                        {{-- <option value="id" {{ $menu_search_type === 'id' ? 'selected' : '' }}>ID</option> --}}
+                    {{-- </select> --}}
+                    {{-- <button type="submit" class="btn">検索</button> --}}
+                    <button type="submit" class="btn btn-primary">検索</button>
+                    {{-- クリアボタン --}}
+                    <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">クリア</a>
+                </div>
+            </div>
+        </form>
+        <form action="{{ route('admin.orders.index') }}" method="GET" class="admin-search-box mb-3">
+            <label for="menu_search" class="col-md-5 col-form-label text-md-left fw-bold">◆メニュー名から検索する</label>
             <div class="col-md-7">
                 <div class="input-group">
                     <input type="text" class="form-control" id="menu_search" name="menu_search"
-                        placeholder="メニュー名またはIDを入力" value="{{ $menu_search }}">
+                        placeholder="メニューID/メニュー名を入力" value="{{ $menu_search }}">
                     <select class="form-select" id="menu_search_type" name="menu_search_type">
-                        <option value=""disabled selected>IDまたは名前を選択</option>
+                        <option value=""disabled selected>メニューID/メニュー名を選択</option>
                         <option value="name" {{ $menu_search_type === 'name' ? 'selected' : '' }}>名前</option>
                         <option value="id" {{ $menu_search_type === 'id' ? 'selected' : '' }}>ID</option>
                     </select>

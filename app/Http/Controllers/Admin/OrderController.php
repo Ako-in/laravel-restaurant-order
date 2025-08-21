@@ -31,13 +31,21 @@ class OrderController extends Controller
         $date = $request->input('order_date');
         // メニュー検索
         $menu_search = $request->input('menu_search');
-        $menu_search_type = $request->input('menu_search_type','name');
+        $menu_search_type = $request->input('menu_search_type','name','id');
+        $order_id_search = $request->input('order_id_search');
 
         // dd(route('admin.orders.index', ['order_date' => $date]));
         // dd($date->order_date);
         // dd($date);
         // $query = Order::with('order_items.menu')->get();
         $query = Order::with('orderItems.menu');
+
+        //注文IDで検索
+        if (!empty($order_id_search)) {
+            $query->where('id', $order_id_search);
+        }
+
+        //日付検索
         if(!empty($date)){
             $query->whereDate('created_at', $date);
         }
@@ -45,10 +53,17 @@ class OrderController extends Controller
         if(!empty($menu_search)){
             $query->whereHas('orderItems.menu', function($q) use ($menu_search, $menu_search_type){
                 if($menu_search_type === 'name'){
+                    //メニュー名で検索
                     $q->where('name','like','%'.$menu_search.'%');
+                // }
                 }else{
-                    $q->where('id',$menu_search);
+                    //メニューIDで検索
+                    $q->where('menu_id',$menu_search);
                 }
+                // if($menu_search_type === 'name'){
+                //     //メニュー名で検索
+                //     $q->where('name','like','%'.$menu_search.'%');
+                // }
             });
         }
 
@@ -62,7 +77,15 @@ class OrderController extends Controller
         $menu_search = $request->input('menu_search');
 
 
-        return view('admin.orders.index', compact('orders','orderDate','date','menu_search','menu_search_type','orderedMenu'));
+        return view('admin.orders.index', compact(
+            'orders',
+            'orderDate',
+            'date',
+            'menu_search',
+            'menu_search_type',
+            'orderedMenu',
+            'order_id_search'
+        ));
 
     }
 
