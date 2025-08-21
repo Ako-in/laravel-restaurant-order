@@ -106,6 +106,3 @@ https://urbanspoon.sakura.ne.jp/admin/login
 
 <img src="https://raw.githubusercontent.com/Ako-in/laravel-restaurant-order/master/public/images/readme/admin/urbanspoon_admin_menuedit.png" height="250px" alt="Urbanspoon 管理者メニュー編集">
 
-## 苦労したこと
-
-## 今後の展望
