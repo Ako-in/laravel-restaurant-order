@@ -1,7 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
-
+<style>
+    .attention-blink {
+        animation: attention-blink-animation 1.8s infinite;
+    }
+    
+    @keyframes attention-blink-animation {
+        0% {
+            transform: scale(1);        /* サイズを元に戻す */
+            background-color: #0d6efd;  /* 通常の青色 */
+            box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); /* シャドウなし */
+        }
+        50% {
+            transform: scale(1.05);     /* 少し拡大 */
+            background-color: #ff9307;  /* 黄色に変化 */
+        }
+        100% {
+            transform: scale(1);        /* サイズを元に戻す */
+            background-color: #0d6efd;  /* 通常の青色 */
+            box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); /* シャドウなし */
+        }
+    }
+    </style>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -35,10 +56,6 @@
                     </tr>
                 </thead>
                 <tbody>
-
-                    {{-- @php
-                    $totalAmount = 0; // 合計金額の初期化
-                @endphp --}}
                     @foreach ($orders as $order)
                         @foreach ($order->orderItems as $item)
                             <tr>
@@ -132,45 +149,49 @@
 
             <hr>
             <tfoot>
-                <tr>
-                    <td colspan="7" style="text-align: right;"><strong>合計金額(税込)</strong></td>
-                    <td colspan="2"><strong>{{ number_format($calculatedTotalAmount) }}円</strong></td>
+                <tr class="text-center">
+                    <td colspan="7" class="text-center"><strong>合計金額(税込)</strong></td>
+                    <td colspan="2" class="text-center"><strong>{{ number_format($calculatedTotalAmount) }}円</strong></td>
                 </tr>
             </tfoot>
         @else
             <p>注文履歴がありません。</p>
         @endif
 
-        <form action="{{ route('customer.carts.checkoutStore') }}" method="POST">
+        <div class="pt-3 text-center">
+            <form action="{{ route('customer.carts.checkoutStore') }}" method="POST" class="d-grid gap-2">
             @csrf
             @if ($hasPendingOrder)
                 {{-- 注文アイテムが保留中または注文がない場合は決済ボタンを無効化 --}}
                 <p class="alert alert-warning">
                     まだ保留の注文アイテムがあります。全ての注文アイテムが「完了」または「準備中」になってから決済に進んでください。
                 </p>
-                <button type="submit" class="btn btn-primary" disabled>最終確定</button>
+                <button type="submit" id="payment" class="btn btn-primary" disabled>お支払いへ</button>
             @elseif($orders->count() === 0)
                 {{-- 注文がない場合は決済ボタンを無効化 --}}
                 <p class="alert alert-warning">
                     注文がありません。メニューを注文してから決済に進んでください。
                 </p>
-                <button type="submit" class="btn btn-primary" disabled>最終確定</button>
+                <button type="submit" id="payment" class="btn btn-primary" disabled>お支払いへ</button>
                 <a class="btn btn-info"href="{{ route('customer.menus.index') }}">メニューに戻る</a>
             @else
                 {{-- 決済に進める場合 --}}
-                <button type="submit" class="btn btn-primary">最終確定</button>
+                <button type="submit" id="payment" class="btn btn-primary">お支払いへ</button>
             @endif
         </form>
-
-        {{-- <form action="{{ route('customer.carts.checkoutStore') }}" method="POST">
-      @csrf
-      <button type="submit" class="btn btn-primary" >最終確定</button>
-    </form> --}}
-        {{-- <a href="{{route('customer.carts.checkoutStore')}}" class="btn btn-primary"
-            @if ($orders->count() === 0 || $hasPendingOrder)
-                disabled
-                style="pointer-events: none; opacity: 0.6;"
-            @endif
-        >決済画面へ</a> --}}
+        </div>
+        
     </div>
 @endsection
+
+<script>
+    window.onload = function(){
+      const button = document.getElementById('payment');
+   
+      if(payment){
+        button.classList.add('attention-blink');
+      }
+    };
+    
+  </script>
+  

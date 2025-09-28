@@ -1,5 +1,28 @@
 @extends('layouts.app')
 @section('content')
+
+  <style>
+    .attention-blink {
+        animation: attention-blink-animation 1.8s infinite;
+    }
+    
+    @keyframes attention-blink-animation {
+        0% {
+            transform: scale(1);        /* サイズを元に戻す */
+            background-color: #0d6efd;  /* 通常の青色 */
+            box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); /* シャドウなし */
+        }
+        50% {
+            transform: scale(1.05);     /* 少し拡大 */
+            background-color: #ff9307;  /* 黄色に変化 */
+        }
+        100% {
+            transform: scale(1);        /* サイズを元に戻す */
+            background-color: #0d6efd;  /* 通常の青色 */
+            box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); /* シャドウなし */
+        }
+    }
+    </style>
 {{-- ゲストユーザーの場合にのみ表示するメッセージ --}}
 @if (Auth::check() && Auth::user()->table_number === 'guest')
   <div class="alert alert-warning text-center rounded-0 mb-0 py-2 pt-3" role="alert">
@@ -118,14 +141,28 @@
 <div class="d-flex justify-content-center">
   <p class="mb-0 me-3 fs-5">{{ $itemCount }}点</p>
   <p class="mb-0 me-3 fs-5">合計:{{ $totalIncludeTax }}円(税込)</p>
-  <a href="{{ route('customer.menus.index') }}" class="btn btn-success me-3">他のメニューを探す</a>
+  <div>
+    <a href="{{ route('customer.menus.index') }}" class="btn btn-success me-3 btn-sm">他のメニューを探す</a>
+  </div>
+  {{-- <a href="{{ route('customer.menus.index') }}" class="btn btn-success me-3 btn-sm">他のメニューを探す</a> --}}
   @if ($totalIncludeTax > 0)
       <form action="{{ route('customer.orders.store') }}" method="POST">
           @csrf
-          <button type="submit" class="btn submit-button btn-primary">注文送信</button>
+          <button id="submitButton"type="submit" class="btn submit-button btn-primary btn-lg">注文送信</button>
       </form>
   @else
       <a href="{{ route('customer.orders.store') }}"class="btn disabled">注文送信</a>
   @endif
 </div>
 @endsection
+
+<script>
+  window.onload = function(){
+    const button = document.getElementById('submitButton');
+ 
+    if(submitButton){
+      button.classList.add('attention-blink');
+    }
+  };
+  
+</script>
