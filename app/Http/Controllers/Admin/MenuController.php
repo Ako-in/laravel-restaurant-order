@@ -25,6 +25,8 @@ class MenuController extends Controller
         $menus = Menu::all();
         $categories = Category::all(); // カテゴリも取得
 
+        // dd(Auth::user());
+
         // メニューのページネーション
         $menus = Menu::with('category')
             ->withCount([
@@ -49,6 +51,7 @@ class MenuController extends Controller
      */
     public function create()
     {
+        // $this->authorize('create', Auth::guard('admin')->user());
         $admin = Auth::guard('admin')->user();
         $categories = Category::all();
         $menu = new Menu();//からのMenuインスタンスを作成
@@ -64,6 +67,7 @@ class MenuController extends Controller
     public function store(Request $request)
     {
         $this->authorize('create', Auth::guard('admin')->user());
+        // $this->authorize('store', Auth::guard('admin')->user());
         // dd('store');
         // dd($request->all());
         // dd($request->file('image_file')->getClientOriginalName());
@@ -134,6 +138,7 @@ class MenuController extends Controller
     {
         // 現在ログインしているAdminユーザーを取得
         $admin = Auth::guard('admin')->user();
+        // dd(Auth::user());
 
         $categories = Category::all();
         return view('admin.menus.edit', compact('menu','categories','admin'));
@@ -148,7 +153,7 @@ class MenuController extends Controller
      */
     public function update(Request $request, Menu $menu)
     {
-        $this->authorize('create', Auth::guard('admin')->user());
+        $this->authorize('update', Auth::guard('admin')->user());
         $validatedData=$request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
