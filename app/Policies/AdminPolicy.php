@@ -64,7 +64,7 @@ class AdminPolicy
      * @param  \App\Models\Admin  $admin
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(Admin $admin)
+    public function update(Admin $admin, $model = null)
     {
         // // ログインユーザーのemailが 'guest' であるかをチェック
         // if($admin->email === 'guest@example.com'){
@@ -79,8 +79,10 @@ class AdminPolicy
      * @param  \App\Models\User  $user
      * @param  \App\Models\Admin  $admin
      * @return \Illuminate\Auth\Access\Response|bool
+     * update, delete, view は、Admin モデルがリソースを操作するため、
+     * 標準的な形式として第二引数 $model (操作対象) を追加
      */
-    public function delete(Admin $admin)
+    public function delete(Admin $admin, $model = null)
     {
         // // ログインユーザーのemailが 'guest' であるかをチェック
         // if($admin->email === 'guest@example.com'){
