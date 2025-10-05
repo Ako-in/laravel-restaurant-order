@@ -66,7 +66,8 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authorize('create', Auth::guard('admin')->user());
+        // $this->authorize('create', Auth::guard('admin')->user());
+        $this->authorize('create', Menu::class);
         // $this->authorize('store', Auth::guard('admin')->user());
         // dd('store');
         // dd($request->all());
@@ -153,7 +154,8 @@ class MenuController extends Controller
      */
     public function update(Request $request, Menu $menu)
     {
-        $this->authorize('update', Auth::guard('admin')->user());
+        // $this->authorize('update', Auth::guard('admin')->user());
+        $this->authorize('update', $menu);
         $validatedData=$request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',

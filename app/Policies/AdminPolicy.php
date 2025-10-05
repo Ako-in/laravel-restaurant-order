@@ -7,12 +7,17 @@ use App\Models\User;
 use App\Models\Order;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Log;
 
 class AdminPolicy
 {
     use HandlesAuthorization;
 
     public function before(Admin $admin){
+        // Log::debug('AdminPolicy確認',[
+        //     'admin_email' => $admin->email ?? 'メールアドレスなし',
+        //     'policy_status' => $admin->email === 'guest@example.com' ? 'DENY' : 'PASS TO METHOD',
+        // ]);
         if($admin->email === 'guest@example.com'){
             return Response::deny('デモアカウントではデータの変更ができません');
         }
