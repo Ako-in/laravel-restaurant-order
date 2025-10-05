@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Admin;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Menu;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Support\Facades\Log;
@@ -69,7 +70,7 @@ class AdminPolicy
      * @param  \App\Models\Admin  $admin
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(Admin $admin, $model = null)
+    public function update(Admin $admin, Menu $menu)
     {
         // // ログインユーザーのemailが 'guest' であるかをチェック
         // if($admin->email === 'guest@example.com'){
@@ -87,7 +88,7 @@ class AdminPolicy
      * update, delete, view は、Admin モデルがリソースを操作するため、
      * 標準的な形式として第二引数 $model (操作対象) を追加
      */
-    public function delete(Admin $admin, $model = null)
+    public function delete(Admin $admin, Menu $menu)
     {
         // // ログインユーザーのemailが 'guest' であるかをチェック
         // if($admin->email === 'guest@example.com'){
