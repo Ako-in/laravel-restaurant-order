@@ -9,6 +9,38 @@
 @endif
 <h4 class="mt-4">メニュー一覧</h4>
 
+@if (session('notice'))
+<script>
+    // ページ読み込み完了後に実行
+    document.addEventListener('DOMContentLoaded', function () {
+        // モーダルのDOM要素を取得
+        const successModal = new bootstrap.Modal(document.getElementById('noticeModal'));
+        
+        // モーダルの本文にメッセージを設定
+        document.querySelector('#noticeModal .modal-body').textContent = "{{ session('notice') }}";
+        
+        // モーダルを表示
+        successModal.show();
+    });
+</script>
+@endif
+
+<div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="noticeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="noticeModalLabel">いらっしゃいませ！</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 <p>営業時間 {{ $startTime }}-{{ $closeTime }}(ラストオーダー{{ $lastOrderTime }})</p>
 

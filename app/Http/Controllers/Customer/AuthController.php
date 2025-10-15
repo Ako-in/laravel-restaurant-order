@@ -24,7 +24,7 @@ class AuthController extends Controller
         ]);
 
         if (Auth::guard('customer')->attempt(['table_number' => $credentials['table_number'], 'password' => $credentials['password']])) {
-            return redirect()->route('customer.menus.index');
+            return redirect()->route('customer.menus.index')->with('notice','お支払いはクレジットカードのみです。予めご了承ください。');
         }
 
         return redirect()->route('customer.login')->withErrors(['table_number' => 'ログイン情報が正しくありません']);
