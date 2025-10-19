@@ -51,7 +51,7 @@
 
 {{-- 営業時間以外の場合にメッセージを表示、写真をグレースケール、カートに追加ボタンを非表示 --}}
 @if (now()->format('H:i') < $startTime || now()->format('H:i') > $lastOrderTime)
-    <div class="alert alert-warning" role="alert">
+    <div class="alert alert-warning text-center" role="alert">
         ただいまのお時間はご注文を受け付けていません。ご注文は{{ $startTime }}から{{ $lastOrderTime }}まで受け付けています。
     </div>
 
@@ -178,8 +178,8 @@
                             @endif
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title">商品名：{{ $menu->name }}</h5>
-                            <p class="card-text mb-2">Price:{{ $menu->price }}円（税抜）</p>
+                            <h5 class="card-title">{{ $menu->name }}</h5>
+                            <p class="card-text mb-2">{{ $menu->price }}円（税抜）</p>
                             <p class="text-danger">営業時間外です。</p>
                             {{-- <p class="text-muted">在庫数: {{ $menu->stock }}</p> ★営業時間外でも在庫数を表示 --}}
                             <p class="d-flex gap-2 mb-0">
@@ -213,8 +213,8 @@
                             @endif
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title">商品名：{{ $menu->name }}</h5>
-                            <p class="card-text mb-2">Price:{{ $menu->price }}円（税抜）</p>
+                            <h5 class="card-title">{{ $menu->name }}</h5>
+                            <p class="card-text mb-2">{{ $menu->price }}円（税抜）</p>
                             <p class="text-danger">在庫なし</p>
                             <p class="d-flex gap-2 mb-0">
                                 @if ($menu->is_new)
@@ -242,8 +242,8 @@
                     </div>
 
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">商品名：{{ $menu->name }}</h5>
-                        <p class="card-text mb-2">価格:{{ $menu->price }}円（税抜）</p>
+                        <h5 class="card-title">{{ $menu->name }}</h5>
+                        <p class="card-text mb-2">{{ $menu->price }}円（税抜）</p>
 
                         @if ($menu->stock === 0)
                             {{-- 在庫が0の時、在庫なしを表示 --}}
