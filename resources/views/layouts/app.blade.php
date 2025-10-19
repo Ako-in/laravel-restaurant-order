@@ -40,13 +40,39 @@
             padding-top: 60px;
             padding-bottom: 50px;
         }
+
+        /* メニュー画像にカーソルが当たった時に画像に動きをつける */
+        .image-hover {
+            cursor: pointer;
+            max-width: 500px;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+        .image-hover img {
+            height: auto;
+            transition: transform .6s ease; /* ゆっくり変化させる */
+        }
+        .image-hover:hover img {
+            transform: scale(1.1); /* 拡大 */
+        }
+        /* メニューカードにも動きをつける */
+        .card {
+            ransition:box-shadow 0.3s;
+        }
+        .card:hover {
+            box-shadow:0 0 30px rgba(128, 128, 128, 0.758), 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 
 </head>
 
-<body>
+<body style="background-image:url('{{ asset('storage/images/wood.jpg') }}'); background-size: cover; background-repeat: no-repeat;">
+
+    {{-- <img src="{{ asset('storage/images/bricks.jpg')}}" alt=""width="1000" height="800"> --}}
     <div class="wrapper">
         @include('layouts.header')
 

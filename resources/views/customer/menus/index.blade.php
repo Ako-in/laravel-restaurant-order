@@ -7,7 +7,6 @@
         <strong>💡 このアカウントはデモ用です。</strong> 注文の確定やデータの変更はできません。
     </div>
 @endif
-<h4 class="mt-4">メニュー一覧</h4>
 
 @if (session('notice'))
 <script>
@@ -25,6 +24,7 @@
 </script>
 @endif
 
+{{-- ログイン後の支払いNotice --}}
 <div class="modal fade" id="noticeModal" tabindex="-1" aria-labelledby="noticeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -39,10 +39,15 @@
         </div>
       </div>
     </div>
-  </div>
+</div>
 
+<div class="d-flex align-items-baseline">
+    <h4 class="mt-4 me-3"><strong>メニュー一覧</strong></h4>
+    <strong class="mt-4">営業時間 {{ $startTime }}-{{ $closeTime }}(ラストオーダー{{ $lastOrderTime }}) ⚠️お支払いはクレジットカードのみです⚠️</え>
+</div>
 
-<p>営業時間 {{ $startTime }}-{{ $closeTime }}(ラストオーダー{{ $lastOrderTime }})</p>
+{{-- <h4 class="mt-4">メニュー一覧</h4>
+<p>営業時間 {{ $startTime }}-{{ $closeTime }}(ラストオーダー{{ $lastOrderTime }})</p> --}}
 
 {{-- 営業時間以外の場合にメッセージを表示、写真をグレースケール、カートに追加ボタンを非表示 --}}
 @if (now()->format('H:i') < $startTime || now()->format('H:i') > $lastOrderTime)
@@ -70,19 +75,19 @@
 {{-- 検索ボックス --}}
 <form method="GET" action="{{ route('customer.menus.index') }}" class="mb-3">
     <div class="row g-2 ">
-        <div class=""style="background-color:ivory;">
+        <div class=""style="">
 
             <div class="mb-3">
                 <p class="text-center mb-0 fw-bold">==ワンクリック検索==</p>
                 <div class="d-flex align-items-center justify-content-center flex-wrap mb-2">
                     <button type="submit" name="recommend" value="1"
-                        class="btn btn-outline-primary me-2">おすすめから探す</button>
+                        class="btn btn-outline-danger me-2">おすすめから探す</button>
                     <button type="submit" name="new_item" value="1"
-                        class="btn btn-outline-primary me-2">新商品から探す</button>
+                        class="btn btn-outline-success me-2">新商品から探す</button>
                     <button type="submit" name="has_stock" value="1"
                         class="btn btn-outline-primary me-2">在庫ありから探す</button>
                     <button type="submit" name="stock_low"
-                        value="1"class="btn btn-outline-primary me-2">残りわずか</button>
+                        value="1"class="btn btn-outline-warning me-2">残りわずか</button>
 
                 </div>
             </div>
@@ -164,7 +169,7 @@
                 {{-- 営業時間外の場合、メニューをグレースケールにする --}}
                 <div class="col-md-3 mb-4">
                     <div class="card h-100" style="width: 18rem;">
-                        <div class="mb-2">
+                        <div class="">
                             @if ($menu->image_file !== '')
                                 <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image"
                                     class="w-100 grayscale">
@@ -174,18 +179,18 @@
                         </div>
                         <div class="card-body">
                             <h5 class="card-title">商品名：{{ $menu->name }}</h5>
-                            <p class="card-text">Price:{{ $menu->price }}円（税抜）</p>
+                            <p class="card-text mb-2">Price:{{ $menu->price }}円（税抜）</p>
                             <p class="text-danger">営業時間外です。</p>
                             {{-- <p class="text-muted">在庫数: {{ $menu->stock }}</p> ★営業時間外でも在庫数を表示 --}}
-                            <p class="">
+                            <p class="d-flex gap-2 mb-0">
                                 @if ($menu->is_new)
-                                    <div><span class="badge bg-secondary grayscale">新商品</span></div>
+                                    <span class="badge bg-secondary grayscale">新商品</span>
                                 @endif
                                 @if ($menu->is_recommended)
-                                    <div><span class="badge bg-danger grayscale">おすすめ</span></div>
+                                    <span class="badge bg-danger grayscale">おすすめ</span>
                                 @endif
                                 @if ($stockLow)
-                                    <div><span class="badge bg-warning graysclae">残りわずか</span></div>
+                                    <span class="badge bg-warning graysclae">残りわずか</span>
                                 @endif
                             </p>
                         </div>
@@ -194,12 +199,11 @@
                 @continue
             @endif
 
-
             @if ($menu->stock <= 0)
                 {{-- 在庫が０の時、在庫なしを表示 --}}
                 <div class="col-md-3 mb-4">
                     <div class="card h-100" style="width: 18rem;">
-                        <div class="mb-2">
+                        <div class="">
                             @if ($menu->image_file !== '')
                                 <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image"
                                     class="w-100 {{ $menu->stock <= 0 ? 'grayscale' : '' }}">
@@ -210,14 +214,14 @@
                         </div>
                         <div class="card-body">
                             <h5 class="card-title">商品名：{{ $menu->name }}</h5>
-                            <p class="card-text">Price:{{ $menu->price }}円（税抜）</p>
+                            <p class="card-text mb-2">Price:{{ $menu->price }}円（税抜）</p>
                             <p class="text-danger">在庫なし</p>
-                            <p class="">
+                            <p class="d-flex gap-2 mb-0">
                                 @if ($menu->is_new)
-                                    <div><span class="badge bg-secondary">新商品</span></div>
+                                    <span class="badge bg-success">新商品</span>
                                 @endif
                                 @if ($menu->is_recommended)
-                                    <div><span class="badge bg-danger">おすすめ</span></div>
+                                    <span class="badge bg-danger">おすすめ</span>
                                 @endif
                             </p>
                         </div>
@@ -226,11 +230,10 @@
                 @continue
             @endif
 
-            {{-- メニューのステータスが'Active'の時 --}}
+            {{-- メニューのステータスが'Active'の時、在庫ありの時、営業時間中 --}}
             <div class="col-md-3 mb-4">
                 <div class="card h-100 " style="width: 18rem;">
-                    <div class="mb-2">
-
+                    <div class="image-hover">
                         @if ($menu->image_file !== '')
                             <img src="{{ asset('storage/' . $menu->image_file) }}" alt="Menu Image" class="w-100">
                         @else
@@ -240,13 +243,13 @@
 
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">商品名：{{ $menu->name }}</h5>
-                        <p class="card-text">価格:{{ $menu->price }}円（税抜）</p>
+                        <p class="card-text mb-2">価格:{{ $menu->price }}円（税抜）</p>
 
                         @if ($menu->stock === 0)
                             {{-- 在庫が0の時、在庫なしを表示 --}}
                             <p class="text-danger">在庫なし</p>
                             {{-- @elseif($menu->stock > 0 && $menu->stock < 5)
-              {{-- 在庫が1−4の時、残りわずかを表示 --}}
+                            {{-- 在庫が1−4の時、残りわずかを表示 --}}
                             {{-- <div><span class="badge bg-warning">残りわずか</span></div> --}}
                         @endif
 
@@ -254,23 +257,18 @@
                         @if (isset($cart[$menu->id]) && $menu->stock < $cart[$menu->id]->qty)
                             <p class="text-danger">在庫なし（カート内超過）</p>
                         @endif
-                        {{-- @if ($menu->stock < ($cart[$menu->id]->qty ?? 0)){
-              <button type="submit" class="btn submit-button btn-primary"disabled>                    
-                カートに追加
-              </button>
-            }
-            @endif --}}
 
-                        <p class="">
+
+                        <p class="d-flex gap-2 mb-0">
                             @if ($menu->is_new)
-                                <div><span class="badge bg-secondary">新商品</span></div>
+                                <span class="badge bg-success">新商品</span>
                             @endif
                             @if ($menu->is_recommended)
-                                <div><span class="badge bg-danger">おすすめ</span></div>
+                                <span class="badge bg-danger">おすすめ</span>
                             @endif
                             @if ($menu->stock > 0 && $menu->stock < 5)
                                 {{-- 在庫が1−4の時、残りわずかを表示 --}}
-                                <div><span class="badge bg-warning">残りわずか</span></div>
+                                <span class="badge bg-warning">残りわずか</span>
                             @endif
                         </p>
 
@@ -293,7 +291,7 @@
                                     </div>
                                     {{-- リクエストは一旦保留のためコメントアウト --}}
                                     {{-- <p class="">Any request</p>
-                    <input class="flex"type="text" id="request"></input> --}}
+                                    <input class="flex"type="text" id="request"></input> --}}
                                     {{-- <button type="submit" class="btn btn-primary">カートに追加する</button> --}}
                                 @else
                                     <p class="text-danger">在庫なし</p>
