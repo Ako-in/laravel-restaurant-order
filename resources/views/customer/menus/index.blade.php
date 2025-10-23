@@ -78,7 +78,7 @@
 <div class="container-fluid">
     <div class="row">
         {{-- 左側メニュー --}}
-        <div class="menu-side col-lg-9 ">
+        <div class="menu-side col-lg-9">
             <div class="d-flex align-items-baseline text-center">
                 {{-- <h4 class="mt-4 me-3"><strong>メニュー一覧</strong></h4> --}}
                 <div class="mt-4 text-center w-100">
@@ -298,8 +298,6 @@
                                         @if (isset($cart[$menu->id]) && $menu->stock < $cart[$menu->id]->qty)
                                             <p class="text-danger">在庫なし（カート内超過）</p>
                                         @endif
-                
-                
                                         <p class="d-flex gap-2 mb-0">
                                             @if ($menu->is_new)
                                                 <span class="badge bg-success">新商品</span>
@@ -367,14 +365,15 @@
         </div>{{-- div class="menu-side"の閉じタグ --}}
 
          {{-- 右側カートの表示 --}}
-        <div class="cart-side col-lg-3 mt-3" style="background-color: antiquewhite;">
+        <div class="cart-side col-lg-3 mt-3 mb-2 me-0" style="background-color: antiquewhite;">
             {{-- ゲストユーザーの場合にのみ表示するメッセージ --}}
-            @if (Auth::check() && Auth::user()->table_number === 'guest')
+            {{-- @if (Auth::check() && Auth::user()->table_number === 'guest')
             <div class="alert alert-warning text-center rounded-0 mb-0 py-2 pt-3" role="alert">
                 <strong>💡 このアカウントはデモ用です。</strong> 注文の確定やデータの変更はできません。
             </div>
-            @endif
-            <h4 class="mt-4">あなたのカート</h4>
+            @endif --}}
+            <h4 class="mt-4 text-center">あなたのカート</h4>
+            <hr>
 
             <div class="">
                 @if (session('flash_message'))
@@ -385,22 +384,23 @@
 
                 @if ($carts->count() > 0)
                 <div class="d-flex justify-content-center">
-                    <table class="">
+                    <table class="w-100">
                     <tr>
-                        <th class="text-center" style="font-size: 0.8rem;"></th>
-                        <th class="text-center" style="font-size: 0.8rem;">商品名</th>
-                        <th class="text-center" style="font-size: 0.8rem;"></th>
-                        <th class="text-center" style="font-size: 0.8rem;">数量</th>
-                        {{-- <th class="text-center" style="font-size: 0.8rem;">価格（税抜）</th>
-                        <th class="text-center" style="font-size: 0.8rem;">小計（税抜）</th> --}}
-                        <th class="text-center" style="font-size: 0.8rem;">小計（税込）</th>
+                        <th class="text-center" style="font-size: 0.8rem; width:5%;"></th>
+                        <th class="text-center" style="font-size: 0.8rem;width:35%;">商品名</th>
+                        {{-- <th class="text-center" style="font-size: 0.8rem;width:5%;"></th> --}}
+                        <th class="text-center" style="font-size: 0.8rem;width:10%;">数量</th>
+                        {{-- {{-- <th class="text-center" style="font-size: 0.8rem;">価格（税抜）</th> --}}
+                        {{-- <th class="text-center" style="font-size: 0.8rem;"></th> --}}
+                        <th class="text-center" style="font-size: 0.8rem;width:20%;">小計（税込）</th>
+                        <th class="text-center" style="font-size: 0.8rem;width:15%;"></th>
                     </tr>
                     <tbody>
                         @foreach ($carts as $cart)
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}.</td>
                             <td class="text-center">{{ $cart->name }}</td>
-                            <td class="text-center">
+                            {{-- <td class="text-center">
                                 <div class="mb-2">
                                     @php
                                         $menus = collect($menus);
@@ -414,10 +414,12 @@
                                         <img src="{{ asset('storage/images/noimage.png') }}"
                                             style="max-width: 60px; height: auto;">
                                     @endif --}}
-                                </div>
-                            </td>
+                                {{-- </div>
+                            </td>  --}}
                             <td class="text-center align-middle">
-                                <form action="{{ route('customer.carts.update', $cart->rowId) }}" method="POST">
+                                {{$cart->qty}}
+                                {{-- 数量更新ボタン一旦削除 --}}
+                                {{-- <form action="{{ route('customer.carts.update', $cart->rowId) }}" method="POST">
                                     @csrf
                                     @method('PUT')
                                     <div class="">
@@ -429,11 +431,11 @@
                                                     style="width: 60px;">
                                             </div>
                                             <div class="col-auto">
-                                                <button type="submit" class="btn btn-sm btn-primary mt-1">更新</button>
+                                                <button type="submit" class="btn btn-sm btn-primary mt-1">数量更新</button>
                                             </div>
                                         </div>
                                     </div>
-                                </form>
+                                </form> --}}
                             </td>
                             {{-- <td class="text-center align-middle"style="font-size: 0.8rem;">{{ number_format($cart->price) }}円</td>
                             <td class="text-center align-middle"style="font-size: 0.8rem;">{{ number_format($cart->qty * $cart->price) }}円</td> --}}
@@ -477,12 +479,14 @@
                     </table>
                 </div>
                 @else
-                    <p>カートに商品がありません。</p>
+                    <p class="text-center">カートに商品がありません。</p>
                 @endif
                 </div>
             <hr>
-            <strong>⚠️数量を変更する場合は、変更後必ず更新ボタンをクリックしてください</strong>
-            <hr>
+            @if($carts->count() > 0)
+                <strong>⚠️数量を変更する場合は、変更後必ず更新ボタンをクリックしてください</strong>
+                <hr>
+            @endif
             <div class="d-flex justify-content-center">
                 <p class="mb-0 me-3 fs-5">{{ $itemCount }}点</p>
                 <p class="mb-0 me-3 fs-5">合計:{{ $totalIncludeTax }}円(税込)</p>
@@ -516,16 +520,14 @@
 
     }
     .cart-side{
-        width: 420px;               幅指定 */
-        /* height: 200px;              /* 高さ指定 */
+        /* width: 400px;               幅指定 */ */
+        height: 200px;              /* 高さ指定
         border: solid 2px #000;     /* 枠線指定 */
         background-color: #eee;     /* 背景色指定 */
         border-radius: 10px;        /* 角丸指定 */
         /* position: sticky; */
         top: 0;
-        height: 100vh; 
-        /* ★重要: ビューポートの高さ全体を占有させることで、スクロール領域を確保 */
-        /* overflow-y: auto; カートが長くなった場合に縦スクロールを可能にする */
+        /* height: 100vh;  */
         background-color: rgb(162, 125, 78); 背景色をCSSに移動
         /* z-index: 100; 他の要素より手前に表示 */
     }
