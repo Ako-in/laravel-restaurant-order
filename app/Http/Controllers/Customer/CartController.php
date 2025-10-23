@@ -108,7 +108,7 @@ class CartController extends Controller
         } else {
             Log::info('カートはすでに保存されています');
         }
-        return to_route('customer.carts.index')->with('success', 'カートに追加しました');
+        return to_route('customer.menus.index')->with('success', 'カートに追加しました');
     }
 
     /**
@@ -142,7 +142,7 @@ class CartController extends Controller
             // return redirect()->back()->with('error', 'カートの保存中にエラーが発生しました。');
         }
 
-        return redirect()->route('customer.carts.index')->with('flash_message', '数量を更新しました');
+        return redirect()->route('customer.menus.index')->with('flash_message', '数量を更新しました');
     }
 
     /**
@@ -156,7 +156,7 @@ class CartController extends Controller
         //カートを空にする
         Cart::instance('customer_' . Auth::id())->remove($rowId);
 
-        return redirect()->route('customer.carts.index')->with('flash_message', 'カートから削除しました');
+        return redirect()->route('customer.menus.index')->with('flash_message', 'カートから削除しました');
     }
 
     public function storeOrder(Request $request)

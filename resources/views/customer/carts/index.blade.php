@@ -56,8 +56,8 @@
           @foreach ($carts as $cart)
             <tr>
               <td class="text-center">{{ $loop->iteration }}.</td>
-              <td>{{ $cart->name }}</td>
-              <td>
+              <td class="text-center">{{ $cart->name }}</td>
+              <td class="text-center">
                 <div class="mb-2">
                   @php
                       $menus = collect($menus);
@@ -73,7 +73,7 @@
                   @endif
                 </div>
               </td>
-              <td>
+              <td class="text-center align-middle">
                 <form action="{{ route('customer.carts.update', $cart->rowId) }}" method="POST">
                     @csrf
                     @method('PUT')
@@ -82,7 +82,7 @@
                             <div class="col-auto">
                                 <input type="number" name="qty" value="{{ $cart->qty }}"
                                     min="1"
-                                    max="{{ $menus[$cart->rowId]->stock ?? '' }}"class="form-control form-control-sm"
+                                    max="{{ $menus[$cart->rowId]->stock ?? '' }}"class="form-control form-control-sm pb-2"
                                     style="width: 60px;">
                             </div>
                             <div class="col-auto">
@@ -92,12 +92,12 @@
                     </div>
                 </form>
               </td>
-              <td class="text-end">{{ number_format($cart->price) }}円</td>
-              <td class="text-end">{{ number_format($cart->qty * $cart->price) }}円</td>
-              <td class="text-end">
+              <td class="text-center align-middle">{{ number_format($cart->price) }}円</td>
+              <td class="text-center align-middle">{{ number_format($cart->qty * $cart->price) }}円</td>
+              <td class="text-center align-middle">
                 {{ number_format(round($cart->qty * $cart->price * (1 + config('cart.tax') / 100))) }}円
               </td>
-              <td>
+              <td class="text-center align-middle">
                   <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
                     data-bs-target="#deleteCartModal{{ $cart->rowId }}">削除</button>
 

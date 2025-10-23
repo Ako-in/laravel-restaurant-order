@@ -73,17 +73,17 @@
 <body style="background-image:url('{{ asset('storage/images/wood.jpg') }}'); background-size: cover; background-repeat: no-repeat;">
 
     {{-- <img src="{{ asset('storage/images/bricks.jpg')}}" alt=""width="1000" height="800"> --}}
-    <div class="wrapper">
+    {{-- <div class="wrapper"> --}}
         @include('layouts.header')
 
         <main>
-            <div class="container">
+            <div class="">
                 <h1 class="fs-2 my-3">@yield('title')</h1>
                 @yield('content')
             </div>
         </main>
         @include('layouts.footer')
-    </div>
+    {{-- </div> --}}
 
     <div class="modal fade" id="unpaidAlertModal" tabindex="-1" aria-labelledby="unpaidAlertModalLabel"
         aria-hidden="true">

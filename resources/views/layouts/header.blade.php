@@ -38,7 +38,7 @@
             <li class="nav-item d-flex align-items-center">
 
               <a href="{{ route('customer.menus.index') }}"class="nav-link text-white me-3 fw-bold">メニュー一覧</a>
-              <a href="{{ route('customer.carts.index') }}" class="nav-link text-white me-3 fw-bold">カート</a>
+              {{-- <a href="{{ route('customer.carts.index') }}" class="nav-link text-white me-3 fw-bold">カート</a> --}}
               <a href="{{ route('customer.carts.checkout') }}"class="nav-link text-white me-3 fw-bold">注文履歴・決済画面</a>
               <form id="logout-form" action="{{ route('customer.logout') }}" method="POST">
                 @csrf

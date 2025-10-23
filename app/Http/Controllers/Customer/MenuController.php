@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Menu;
 use App\Models\Category;
+use Gloudemans\Shoppingcart\Facades\Cart;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use App\Models\OrderItem;
 use App\Models\Order;
 use App\Models\Customer;
@@ -152,6 +156,31 @@ class MenuController extends Controller
 
 
 
+
+        // メニュー一覧の右側にカート中身を表示させたい
+        //カートの中身を取得
+        $carts = Cart::instance('customer_' . Auth::id())->content();
+        Log::info('indexカートの中身を取得', ['carts' => $carts->toArray()]);
+        $subTotal = 0;
+        $total = 0;
+
+        $subTotal = (float) str_replace(',', '', Cart::subtotal()); // カンマ削除＆数値変換
+        $taxRate = (float) config('cart.tax'); // 税率を float に変換
+        $tax = ($subTotal * $taxRate) / 100; // 税額
+        $totalIncludeTax = $subTotal + $tax; // 合計
+
+        $menu = Menu::all();
+        $itemCount = $carts->sum('qty');
+        $cart_menus = [];
+        foreach ($carts as $cartItem) {
+            // $cartItem->id はMenuのIDに紐付いていることを前提
+            $menu_item = Menu::find($cartItem->id); // 一時的な変数名に変更
+            if ($menu_item) {
+                $cart_menus[$cartItem->rowId] = $menu_item;
+            }
+        }
+
+
         // $hasUnpaidOrder = false;
         // if (Auth::check()) {
         //     // ユーザーの未払いの注文を確認
@@ -176,6 +205,9 @@ class MenuController extends Controller
             'hasStock',
             'stockLow',
             // 'hasUnpaidOrder',
+            // 下記追加
+            'carts',
+            'totalIncludeTax', 'subTotal', 'itemCount', 'cart_menus'
         ));
     }
 
